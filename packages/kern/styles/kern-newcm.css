@@ -1,7 +1,13 @@
 /* kern-newcm.css: Swaps to New Computer Modern Math for Typst visual parity. */
 /* Include this after kern.css to override font stacks. */
 
-@import url("https://cdn.jsdelivr.net/npm/newcomputermodern@1.0.5/fonts/newcmmath-regular-webfont.css");
+@font-face {
+  font-family: 'NewCMMath-Regular';
+  src: url('https://cdn.jsdelivr.net/gh/fred-wang/MathFonts@master/NewComputerModern/fonts/NewCMMath-Regular.woff2') format('woff2'),
+       url('https://cdn.jsdelivr.net/gh/fred-wang/MathFonts@master/NewComputerModern/fonts/NewCMMath-Regular.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+}
 
 .kern,
 .kern-mi,

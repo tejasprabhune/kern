@@ -21,18 +21,21 @@
     </nav>
   </header>
 
-  <ul class="toc-list">
-    <li><a href="#install">Install</a></li>
-    <li><a href="#quickstart">Quick start</a></li>
-    <li><a href="#api">API</a></li>
-    <li><a href="#options">Options</a></li>
-    <li><a href="#auto-render">Auto-render</a></li>
-    <li><a href="#output-modes">Output modes</a></li>
-    <li><a href="#errors">Errors</a></li>
-    <li><a href="#migration">Migration from KaTeX</a></li>
-    <li><a href="#syntax">Syntax cheat sheet</a></li>
-    <li><a href="#fonts">Fonts</a></li>
-  </ul>
+  <nav class="toc-box">
+    <p class="toc-header">On this page</p>
+    <ul class="toc-list">
+      <li><a href="#install">Install</a></li>
+      <li><a href="#quickstart">Quick start</a></li>
+      <li><a href="#api">API</a></li>
+      <li><a href="#options">Options</a></li>
+      <li><a href="#auto-render">Auto-render</a></li>
+      <li><a href="#output-modes">Output modes</a></li>
+      <li><a href="#errors">Errors</a></li>
+      <li><a href="#migration">Migration from KaTeX</a></li>
+      <li><a href="#syntax">Syntax cheat sheet</a></li>
+      <li><a href="#fonts">Fonts</a></li>
+    </ul>
+  </nav>
 
   <section id="install">
     <h2>Install</h2>
@@ -303,17 +306,26 @@ try {
   <section id="fonts">
     <h2>Fonts</h2>
     <p>
-      By default, <code>kern.css</code> references KaTeX's web fonts by family name.
-      Include KaTeX's CSS to load them:
+      For Typst visual parity, include <code>kern-newcm.css</code> after <code>kern.css</code>.
+      It loads New Computer Modern Math (Typst's default math font) from
+      <a href="https://github.com/fred-wang/MathFonts" target="_blank" rel="noopener">fred-wang/MathFonts</a>
+      via jsDelivr:
     </p>
-    <pre><code>&lt;link rel="stylesheet"
-  href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.11/katex.min.css"&gt;</code></pre>
+    <pre><code>&lt;link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/kern-typ/styles/kern.css"&gt;
+&lt;link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/kern-typ/styles/kern-newcm.css"&gt;</code></pre>
     <p>
-      For Typst visual parity, include <code>kern-newcm.css</code> to use New Computer
-      Modern Math instead:
+      For MathML output, the browser uses its system math font by default. Add this to your
+      CSS to use New Computer Modern Math for MathML elements too:
     </p>
-    <pre><code>&lt;link rel="stylesheet"
-  href="https://cdn.jsdelivr.net/npm/kern-typ/styles/kern-newcm.css"&gt;</code></pre>
+    <pre><code>@font-face {
+  font-family: 'NewCMMath-Regular';
+  src: url('https://cdn.jsdelivr.net/gh/fred-wang/MathFonts@master/NewComputerModern/fonts/NewCMMath-Regular.woff2') format('woff2'),
+       url('https://cdn.jsdelivr.net/gh/fred-wang/MathFonts@master/NewComputerModern/fonts/NewCMMath-Regular.woff') format('woff');
+}
+
+math {
+  font-family: 'NewCMMath-Regular', 'New Computer Modern Math', serif;
+}</code></pre>
   </section>
 
   <footer>

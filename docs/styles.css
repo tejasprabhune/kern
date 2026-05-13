@@ -1,4 +1,10 @@
-@import url("https://cdn.jsdelivr.net/npm/newcomputermodern@1.0.5/fonts/newcmmath-regular-webfont.css");
+@font-face {
+  font-family: 'NewCMMath-Regular';
+  src: url('https://cdn.jsdelivr.net/gh/fred-wang/MathFonts@master/NewComputerModern/fonts/NewCMMath-Regular.woff2') format('woff2'),
+       url('https://cdn.jsdelivr.net/gh/fred-wang/MathFonts@master/NewComputerModern/fonts/NewCMMath-Regular.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+}
 
 *, *::before, *::after {
   box-sizing: border-box;
@@ -7,14 +13,14 @@
 }
 
 :root {
-  --cream: #FCEADE;
-  --tan:   #C07A50;
-  --brown: #8C5A3C;
-  --dark:  #1A1410;
+  --bg:     #FFFAFF;
+  --muted:  #9194B5;
+  --accent: #6B6E9D;
+  --dark:   #4B4E6D;
 }
 
 html {
-  background: var(--cream);
+  background: var(--bg);
   color: var(--dark);
   font-family: "neue-haas-grotesk-display", "Helvetica Neue", Helvetica, Arial, sans-serif;
   font-weight: 400;
@@ -50,7 +56,7 @@ header {
 
 .tagline {
   font-size: 15px;
-  color: var(--brown);
+  color: var(--muted);
   font-weight: 400;
   margin-bottom: 18px;
 }
@@ -63,19 +69,19 @@ nav {
 
 nav a {
   font-size: 13px;
-  color: var(--tan);
+  color: var(--muted);
   text-decoration: none;
   letter-spacing: 0.02em;
   padding-bottom: 2px;
 }
 
 nav a:hover {
-  color: var(--brown);
+  color: var(--accent);
 }
 
 nav a.active {
-  color: var(--brown);
-  border-bottom: 1px solid var(--brown);
+  color: var(--accent);
+  border-bottom: 1px solid var(--accent);
 }
 
 /* Typography */
@@ -85,7 +91,7 @@ h2 {
   font-weight: 600;
   font-style: italic;
   font-size: 22px;
-  color: var(--brown);
+  color: var(--accent);
   margin: 48px 0 14px;
 }
 
@@ -98,7 +104,7 @@ h3 {
   font-weight: 700;
   letter-spacing: 0.07em;
   text-transform: uppercase;
-  color: var(--brown);
+  color: var(--accent);
   margin: 30px 0 10px;
 }
 
@@ -129,7 +135,7 @@ li {
 /* Links */
 
 a {
-  color: var(--brown);
+  color: var(--accent);
   text-decoration: underline;
   text-underline-offset: 3px;
 }
@@ -143,15 +149,15 @@ a:hover {
 code {
   font-family: "SF Mono", "Menlo", "Consolas", monospace;
   font-size: 13.5px;
-  background: rgba(139, 90, 60, 0.08);
+  background: rgba(75, 78, 109, 0.08);
   color: var(--dark);
   padding: 1px 5px;
   border-radius: 3px;
 }
 
 pre {
-  background: var(--dark);
-  color: var(--cream);
+  background: #2D2F45;
+  color: var(--bg);
   padding: 20px 24px;
   border-radius: 6px;
   overflow-x: auto;
@@ -168,7 +174,7 @@ pre code {
   font-size: inherit;
 }
 
-/* MathML font: use NewCMMath (Typst's font) for all math elements */
+/* Math font: New Computer Modern Math (Typst's default) */
 math {
   font-family: "NewCMMath-Regular", "New Computer Modern Math", "Latin Modern Math",
     "STIX Two Math", "Times New Roman", serif;
@@ -185,7 +191,7 @@ math {
 .demo-label {
   font-family: "SF Mono", "Menlo", "Consolas", monospace;
   font-size: 12px;
-  color: var(--tan);
+  color: var(--muted);
   text-align: center;
   margin-bottom: 36px !important;
 }
@@ -203,8 +209,8 @@ th {
   text-align: left;
   font-weight: 700;
   padding: 8px 12px 8px 0;
-  border-bottom: 1px solid rgba(139, 90, 60, 0.2);
-  color: var(--brown);
+  border-bottom: 1px solid rgba(75, 78, 109, 0.2);
+  color: var(--accent);
   font-size: 12px;
   letter-spacing: 0.04em;
   text-transform: uppercase;
@@ -212,7 +218,7 @@ th {
 
 td {
   padding: 9px 12px 9px 0;
-  border-bottom: 1px solid rgba(139, 90, 60, 0.1);
+  border-bottom: 1px solid rgba(75, 78, 109, 0.1);
   vertical-align: top;
 }
 
@@ -220,25 +226,46 @@ tr:last-child td {
   border-bottom: none;
 }
 
-/* Docs: on-this-page list */
+/* Docs: on-this-page TOC box */
+
+.toc-box {
+  border: 1px solid rgba(75, 78, 109, 0.18);
+  border-radius: 6px;
+  padding: 16px 20px 20px;
+  margin-bottom: 48px;
+}
+
+.toc-header {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 12px;
+}
 
 .toc-list {
   list-style: none;
   padding: 0;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 4px 20px;
-  margin-bottom: 48px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px 24px;
+  margin-bottom: 0;
+}
+
+.toc-list li {
+  margin-bottom: 0;
+  font-size: 15.5px;
 }
 
 .toc-list a {
-  font-size: 13.5px;
-  color: var(--tan);
+  font-size: 14px;
+  color: var(--accent);
   text-decoration: none;
 }
 
 .toc-list a:hover {
-  color: var(--brown);
+  color: var(--dark);
 }
 
 /* Syntax cheat sheet */
@@ -248,14 +275,14 @@ tr:last-child td {
   align-items: center;
   gap: 16px;
   padding: 8px 0;
-  border-bottom: 1px solid rgba(139, 90, 60, 0.08);
+  border-bottom: 1px solid rgba(75, 78, 109, 0.08);
   font-size: 14.5px;
 }
 
 .cheat-src {
   font-family: "SF Mono", "Menlo", "Consolas", monospace;
   font-size: 12.5px;
-  background: rgba(139, 90, 60, 0.07);
+  background: rgba(75, 78, 109, 0.07);
   padding: 2px 6px;
   border-radius: 3px;
   min-width: 180px;
@@ -264,7 +291,7 @@ tr:last-child td {
 }
 
 .cheat-arrow {
-  color: var(--tan);
+  color: var(--muted);
 }
 
 .cheat-out {
@@ -275,7 +302,7 @@ tr:last-child td {
 
 .editor-wrap {
   margin: 20px 0;
-  border: 1px solid rgba(139, 90, 60, 0.2);
+  border: 1px solid rgba(75, 78, 109, 0.2);
   border-radius: 6px;
   overflow: hidden;
   display: grid;
@@ -288,7 +315,7 @@ tr:last-child td {
 }
 
 .editor-col + .editor-col {
-  border-left: 1px solid rgba(139, 90, 60, 0.2);
+  border-left: 1px solid rgba(75, 78, 109, 0.2);
 }
 
 .pane-label {
@@ -296,10 +323,10 @@ tr:last-child td {
   font-weight: 700;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: var(--tan);
+  color: var(--muted);
   font-family: "SF Mono", "Menlo", "Consolas", monospace;
   padding: 8px 12px;
-  border-bottom: 1px solid rgba(139, 90, 60, 0.15);
+  border-bottom: 1px solid rgba(75, 78, 109, 0.15);
 }
 
 #editor-textarea {
@@ -345,9 +372,9 @@ tr:last-child td {
 .btn {
   font-size: 13px;
   padding: 4px 12px;
-  border: 1px solid var(--tan);
+  border: 1px solid var(--muted);
   border-radius: 4px;
-  color: var(--tan);
+  color: var(--muted);
   background: transparent;
   cursor: pointer;
   font-family: inherit;
@@ -356,8 +383,8 @@ tr:last-child td {
 }
 
 .btn:hover {
-  background: var(--tan);
-  color: var(--cream);
+  background: var(--muted);
+  color: var(--bg);
   text-decoration: none;
 }
 
@@ -368,8 +395,8 @@ tr:last-child td {
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 1px;
   margin-top: 16px;
-  background: rgba(139, 90, 60, 0.12);
-  border: 1px solid rgba(139, 90, 60, 0.12);
+  background: rgba(75, 78, 109, 0.12);
+  border: 1px solid rgba(75, 78, 109, 0.12);
   border-radius: 6px;
   overflow: hidden;
 }
@@ -377,18 +404,18 @@ tr:last-child td {
 .gallery-card {
   padding: 14px 16px;
   cursor: pointer;
-  background: var(--cream);
+  background: var(--bg);
   transition: background 0.1s;
 }
 
 .gallery-card:hover {
-  background: rgba(139, 90, 60, 0.05);
+  background: rgba(75, 78, 109, 0.05);
 }
 
 .gallery-card-src {
   font-family: "SF Mono", "Menlo", "Consolas", monospace;
   font-size: 11px;
-  color: var(--tan);
+  color: var(--muted);
   margin-bottom: 10px;
   white-space: pre;
   overflow: hidden;
@@ -406,20 +433,20 @@ tr:last-child td {
 footer {
   margin-top: 80px;
   padding-top: 24px;
-  border-top: 1px solid rgba(139, 90, 60, 0.15);
+  border-top: 1px solid rgba(75, 78, 109, 0.15);
   font-size: 13px;
-  color: var(--tan);
+  color: var(--muted);
   display: flex;
   gap: 20px;
 }
 
 footer a {
-  color: var(--tan);
+  color: var(--muted);
   text-decoration: none;
 }
 
 footer a:hover {
-  color: var(--brown);
+  color: var(--accent);
 }
 
 /* Responsive */
@@ -443,6 +470,10 @@ footer a:hover {
 
   .editor-col + .editor-col {
     border-left: none;
-    border-top: 1px solid rgba(139, 90, 60, 0.2);
+    border-top: 1px solid rgba(75, 78, 109, 0.2);
+  }
+
+  .toc-list {
+    grid-template-columns: 1fr;
   }
 }
