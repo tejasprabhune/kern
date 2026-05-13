@@ -28,5 +28,8 @@ export default defineConfig({
   },
   test: {
     include: ['test/**/*.test.ts'],
+    // The visual suite spins up Playwright and the Typst CLI; keep it opt-in
+    // by default so `pnpm test` stays fast and doesn't require those.
+    exclude: ['test/visual/**', '**/node_modules/**', '**/dist/**'],
   },
 });

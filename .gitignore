@@ -3,6 +3,7 @@ dist/
 *.tsbuildinfo
 .DS_Store
 coverage/
+packages/kern/test/visual/__output__/
 # Copies created by prepack for npm publishing
 packages/kern/README.md
 packages/kern/LICENSE

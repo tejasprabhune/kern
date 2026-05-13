@@ -14,21 +14,36 @@ importers:
 
   packages/kern:
     devDependencies:
+      '@types/pixelmatch':
+        specifier: ^5.2.6
+        version: 5.2.6
+      '@types/pngjs':
+        specifier: ^6.0.5
+        version: 6.0.5
       '@vitest/coverage-v8':
         specifier: ^1.6.0
-        version: 1.6.1(vitest@1.6.1)
+        version: 1.6.1(vitest@1.6.1(@types/node@25.7.0))
+      pixelmatch:
+        specifier: ^5.3.0
+        version: 5.3.0
+      playwright:
+        specifier: ^1.45.0
+        version: 1.60.0
+      pngjs:
+        specifier: ^7.0.0
+        version: 7.0.0
       typescript:
         specifier: ^5.4.5
         version: 5.9.3
       vite:
         specifier: ^5.2.12
-        version: 5.4.21
+        version: 5.4.21(@types/node@25.7.0)
       vite-plugin-dts:
         specifier: ^3.9.1
-        version: 3.9.1(rollup@4.60.3)(typescript@5.9.3)(vite@5.4.21)
+        version: 3.9.1(@types/node@25.7.0)(rollup@4.60.3)(typescript@5.9.3)(vite@5.4.21(@types/node@25.7.0))
       vitest:
         specifier: ^1.6.0
-        version: 1.6.1
+        version: 1.6.1(@types/node@25.7.0)
 
   scripts:
     devDependencies:
@@ -561,6 +576,15 @@ packages:
   '@types/estree@1.0.9':
     resolution: {integrity: sha512-GhdPgy1el4/ImP05X05Uw4cw2/M93BCUmnEvWZNStlCzEKME4Fkk+YpoA5OiHNQmoS7Cafb8Xa3Pya8m1Qrzeg==}
 
+  '@types/node@25.7.0':
+    resolution: {integrity: sha512-z+pdZyxE+RTQE9AcboAZCb4otwcrvgHD+GlBpPgn0emDVt0ohrTMhAwlr2Wd9nZ+nihhYFxO2pThz3C5qSu2Eg==}
+
+  '@types/pixelmatch@5.2.6':
+    resolution: {integrity: sha512-wC83uexE5KGuUODn6zkm9gMzTwdY5L0chiK+VrKcDfEjzxh1uadlWTvOmAbCpnM9zx/Ww3f8uKlYQVnO/TrqVg==}
+
+  '@types/pngjs@6.0.5':
+    resolution: {integrity: sha512-0k5eKfrA83JOZPppLtS2C7OUtyNAl2wKNxfyYl9Q5g9lPkgBl/9hNyAu6HuEH2J4XmIv2znEpkDd0SaZVxW6iQ==}
+
   '@vitest/coverage-v8@1.6.1':
     resolution: {integrity: sha512-6YeRZwuO4oTGKxD3bijok756oktHSIm3eczVVzNe3scqzuhLwltIF3S9ZL/vwOVIpURmU6SnZhziXXAfw8/Qlw==}
     peerDependencies:
@@ -726,6 +750,11 @@ packages:
 
   fs.realpath@1.0.0:
     resolution: {integrity: sha512-OO0pH2lK6a0hZnAdau5ItzHPI6pUlvI7jMVnxUQRtw4owF2wk8lOSabtGDCTP4Ggrg2MbGnWO9X8K1t4+fGMDw==}
+
+  fsevents@2.3.2:
+    resolution: {integrity: sha512-xiqMQR4xAeHTuB9uWm+fFRcIOgKBMiOBP+eXiyT7jsgVCq1bkVygt00oASowB7EdtpOHaaPgKt812P9ab+DDKA==}
+    engines: {node: ^8.16.0 || ^10.6.0 || >=11.0.0}
+    os: [darwin]
 
   fsevents@2.3.3:
     resolution: {integrity: sha512-5xoDfX+fL7faATnagmWPpbFtwh/R77WmMMqqHGS65C3vvB0YHrgF+B1YmZ3441tMj5n63k0212XNoJwzlhffQw==}
@@ -936,8 +965,30 @@ packages:
     resolution: {integrity: sha512-QP88BAKvMam/3NxH6vj2o21R6MjxZUAd6nlwAS/pnGvN9IVLocLHxGYIzFhg6fUQ+5th6P4dv4eW9jX3DSIj7A==}
     engines: {node: '>=12'}
 
+  pixelmatch@5.3.0:
+    resolution: {integrity: sha512-o8mkY4E/+LNUf6LzX96ht6k6CEDi65k9G2rjMtBe9Oo+VPKSvl+0GKHuH/AlG+GA5LPG/i5hrekkxUc3s2HU+Q==}
+    hasBin: true
+
   pkg-types@1.3.1:
     resolution: {integrity: sha512-/Jm5M4RvtBFVkKWRu2BLUTNP8/M2a+UwuAX+ae4770q1qVGtfjG+WTCupoZixokjmHiry8uI+dlY8KXYV5HVVQ==}
+
+  playwright-core@1.60.0:
+    resolution: {integrity: sha512-9bW6zvX/m0lEbgTKJ6YppOKx8H3VOPBMOCFh2irXFOT4BbHgrx5hPjwJYLT40Lu+4qtD36qKc/Hn56StUW57IA==}
+    engines: {node: '>=18'}
+    hasBin: true
+
+  playwright@1.60.0:
+    resolution: {integrity: sha512-hheHdokM8cdqCb0lcE3s+zT4t4W+vvjpGxsZlDnikarzx8tSzMebh3UiFtgqwFwnTnjYQcsyMF8ei2mCO/tpeA==}
+    engines: {node: '>=18'}
+    hasBin: true
+
+  pngjs@6.0.0:
+    resolution: {integrity: sha512-TRzzuFRRmEoSW/p1KVAmiOgPco2Irlah+bGFCeNfJXxxYGwSw7YwAOAcd7X28K/m5bjBWKsC29KyoMfHbypayg==}
+    engines: {node: '>=12.13.0'}
+
+  pngjs@7.0.0:
+    resolution: {integrity: sha512-LKWqWJRhstyYo9pGvgor/ivk2w94eSjE3RGVuzLGlr3NmD8bf7RcYGze1mNdEHRP6TRP6rMuDHk5t44hnTRyow==}
+    engines: {node: '>=14.19.0'}
 
   postcss@8.5.14:
     resolution: {integrity: sha512-SoSL4+OSEtR99LHFZQiJLkT59C5B1amGO1NzTwj7TT1qCUgUO6hxOvzkOYxD+vMrXBM3XJIKzokoERdqQq/Zmg==}
@@ -1075,6 +1126,9 @@ packages:
 
   ufo@1.6.4:
     resolution: {integrity: sha512-JFNbkD1Svwe0KvGi8GOeLcP4kAWQ609twvCdcHxq1oSL8svv39ZuSvajcD8B+5D0eL4+s1Is2D/O6KN3qcTeRA==}
+
+  undici-types@7.21.0:
+    resolution: {integrity: sha512-w9IMgQrz4O0YN1LtB7K5P63vhlIOvC7opSmouCJ+ZywlPAlO9gIkJ+otk6LvGpAs2wg4econaCz3TvQ9xPoyuQ==}
 
   universalify@0.1.2:
     resolution: {integrity: sha512-rBJeI5CXAlmy1pV+617WB9J63U6XcazHHF2f2dbJix4XzpUF0RS3Zbj0FGIOCAva5P/d/GBOYaACQ1w+0azUkg==}
@@ -1381,23 +1435,23 @@ snapshots:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.5.5
 
-  '@microsoft/api-extractor-model@7.28.13':
+  '@microsoft/api-extractor-model@7.28.13(@types/node@25.7.0)':
     dependencies:
       '@microsoft/tsdoc': 0.14.2
       '@microsoft/tsdoc-config': 0.16.2
-      '@rushstack/node-core-library': 4.0.2
+      '@rushstack/node-core-library': 4.0.2(@types/node@25.7.0)
     transitivePeerDependencies:
       - '@types/node'
 
-  '@microsoft/api-extractor@7.43.0':
+  '@microsoft/api-extractor@7.43.0(@types/node@25.7.0)':
     dependencies:
-      '@microsoft/api-extractor-model': 7.28.13
+      '@microsoft/api-extractor-model': 7.28.13(@types/node@25.7.0)
       '@microsoft/tsdoc': 0.14.2
       '@microsoft/tsdoc-config': 0.16.2
-      '@rushstack/node-core-library': 4.0.2
+      '@rushstack/node-core-library': 4.0.2(@types/node@25.7.0)
       '@rushstack/rig-package': 0.5.2
-      '@rushstack/terminal': 0.10.0
-      '@rushstack/ts-command-line': 4.19.1
+      '@rushstack/terminal': 0.10.0(@types/node@25.7.0)
+      '@rushstack/ts-command-line': 4.19.1(@types/node@25.7.0)
       lodash: 4.17.23
       minimatch: 3.0.8
       resolve: 1.22.12
@@ -1499,7 +1553,7 @@ snapshots:
   '@rollup/rollup-win32-x64-msvc@4.60.3':
     optional: true
 
-  '@rushstack/node-core-library@4.0.2':
+  '@rushstack/node-core-library@4.0.2(@types/node@25.7.0)':
     dependencies:
       fs-extra: 7.0.1
       import-lazy: 4.0.0
@@ -1507,20 +1561,24 @@ snapshots:
       resolve: 1.22.12
       semver: 7.5.4
       z-schema: 5.0.5
+    optionalDependencies:
+      '@types/node': 25.7.0
 
   '@rushstack/rig-package@0.5.2':
     dependencies:
       resolve: 1.22.12
       strip-json-comments: 3.1.1
 
-  '@rushstack/terminal@0.10.0':
+  '@rushstack/terminal@0.10.0(@types/node@25.7.0)':
     dependencies:
-      '@rushstack/node-core-library': 4.0.2
+      '@rushstack/node-core-library': 4.0.2(@types/node@25.7.0)
       supports-color: 8.1.1
+    optionalDependencies:
+      '@types/node': 25.7.0
 
-  '@rushstack/ts-command-line@4.19.1':
+  '@rushstack/ts-command-line@4.19.1(@types/node@25.7.0)':
     dependencies:
-      '@rushstack/terminal': 0.10.0
+      '@rushstack/terminal': 0.10.0(@types/node@25.7.0)
       '@types/argparse': 1.0.38
       argparse: 1.0.10
       string-argv: 0.3.2
@@ -1535,7 +1593,19 @@ snapshots:
 
   '@types/estree@1.0.9': {}
 
-  '@vitest/coverage-v8@1.6.1(vitest@1.6.1)':
+  '@types/node@25.7.0':
+    dependencies:
+      undici-types: 7.21.0
+
+  '@types/pixelmatch@5.2.6':
+    dependencies:
+      '@types/node': 25.7.0
+
+  '@types/pngjs@6.0.5':
+    dependencies:
+      '@types/node': 25.7.0
+
+  '@vitest/coverage-v8@1.6.1(vitest@1.6.1(@types/node@25.7.0))':
     dependencies:
       '@ampproject/remapping': 2.3.0
       '@bcoe/v8-coverage': 0.2.3
@@ -1550,7 +1620,7 @@ snapshots:
       std-env: 3.10.0
       strip-literal: 2.1.1
       test-exclude: 6.0.0
-      vitest: 1.6.1
+      vitest: 1.6.1(@types/node@25.7.0)
     transitivePeerDependencies:
       - supports-color
 
@@ -1789,6 +1859,9 @@ snapshots:
 
   fs.realpath@1.0.0: {}
 
+  fsevents@2.3.2:
+    optional: true
+
   fsevents@2.3.3:
     optional: true
 
@@ -1973,11 +2046,27 @@ snapshots:
 
   picomatch@4.0.4: {}
 
+  pixelmatch@5.3.0:
+    dependencies:
+      pngjs: 6.0.0
+
   pkg-types@1.3.1:
     dependencies:
       confbox: 0.1.8
       mlly: 1.8.2
       pathe: 2.0.3
+
+  playwright-core@1.60.0: {}
+
+  playwright@1.60.0:
+    dependencies:
+      playwright-core: 1.60.0
+    optionalDependencies:
+      fsevents: 2.3.2
+
+  pngjs@6.0.0: {}
+
+  pngjs@7.0.0: {}
 
   postcss@8.5.14:
     dependencies:
@@ -2113,6 +2202,8 @@ snapshots:
 
   ufo@1.6.4: {}
 
+  undici-types@7.21.0: {}
+
   universalify@0.1.2: {}
 
   uri-js@4.4.1:
@@ -2121,13 +2212,13 @@ snapshots:
 
   validator@13.15.35: {}
 
-  vite-node@1.6.1:
+  vite-node@1.6.1(@types/node@25.7.0):
     dependencies:
       cac: 6.7.14
       debug: 4.4.3
       pathe: 1.1.2
       picocolors: 1.1.1
-      vite: 5.4.21
+      vite: 5.4.21(@types/node@25.7.0)
     transitivePeerDependencies:
       - '@types/node'
       - less
@@ -2139,9 +2230,9 @@ snapshots:
       - supports-color
       - terser
 
-  vite-plugin-dts@3.9.1(rollup@4.60.3)(typescript@5.9.3)(vite@5.4.21):
+  vite-plugin-dts@3.9.1(@types/node@25.7.0)(rollup@4.60.3)(typescript@5.9.3)(vite@5.4.21(@types/node@25.7.0)):
     dependencies:
-      '@microsoft/api-extractor': 7.43.0
+      '@microsoft/api-extractor': 7.43.0(@types/node@25.7.0)
       '@rollup/pluginutils': 5.3.0(rollup@4.60.3)
       '@vue/language-core': 1.8.27(typescript@5.9.3)
       debug: 4.4.3
@@ -2150,21 +2241,22 @@ snapshots:
       typescript: 5.9.3
       vue-tsc: 1.8.27(typescript@5.9.3)
     optionalDependencies:
-      vite: 5.4.21
+      vite: 5.4.21(@types/node@25.7.0)
     transitivePeerDependencies:
       - '@types/node'
       - rollup
       - supports-color
 
-  vite@5.4.21:
+  vite@5.4.21(@types/node@25.7.0):
     dependencies:
       esbuild: 0.21.5
       postcss: 8.5.14
       rollup: 4.60.3
     optionalDependencies:
+      '@types/node': 25.7.0
       fsevents: 2.3.3
 
-  vitest@1.6.1:
+  vitest@1.6.1(@types/node@25.7.0):
     dependencies:
       '@vitest/expect': 1.6.1
       '@vitest/runner': 1.6.1
@@ -2183,9 +2275,11 @@ snapshots:
       strip-literal: 2.1.1
       tinybench: 2.9.0
       tinypool: 0.8.4
-      vite: 5.4.21
-      vite-node: 1.6.1
+      vite: 5.4.21(@types/node@25.7.0)
+      vite-node: 1.6.1(@types/node@25.7.0)
       why-is-node-running: 2.3.0
+    optionalDependencies:
+      '@types/node': 25.7.0
     transitivePeerDependencies:
       - less
       - lightningcss
