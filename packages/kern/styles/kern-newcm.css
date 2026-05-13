@@ -1,0 +1,28 @@
+/* kern-newcm.css — Swaps to New Computer Modern Math for Typst visual parity. */
+/* Include this after kern.css to override font stacks. */
+
+@import url("https://cdn.jsdelivr.net/npm/newcomputermodern@1.0.5/fonts/newcmmath-regular-webfont.css");
+
+.kern,
+.kern-mi,
+.kern-mn,
+.kern-mo,
+.kern-mtext {
+  font-family: "NewCMMath-Regular", "New Computer Modern Math", "Times New Roman", serif;
+}
+
+.kern-cal {
+  font-family: "NewCMMath-Regular", cursive;
+}
+
+.kern-bb {
+  font-family: "NewCMMath-Regular", "Times New Roman", serif;
+}
+
+.kern-frak {
+  font-family: "NewCMMath-Regular", fantasy;
+}
+
+.kern-upright {
+  font-family: "NewCMMath-Regular", "Times New Roman", serif;
+}
