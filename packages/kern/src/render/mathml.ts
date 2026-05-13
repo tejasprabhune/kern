@@ -30,6 +30,7 @@ function renderNode(node: AstNode, ctx: RenderCtx): string {
     case 'spacing': return `<mspace width="${mspaceWidth(node.kind)}"/>`;
     case 'align': return `<mo>&#x200B;</mo>`;
     case 'binom': return renderBinom(node.top, node.bot, ctx);
+    case 'accent': return renderAccent(node.kind, node.body, ctx);
   }
 }
 
@@ -106,8 +107,7 @@ function renderMatrix(kind: MatrixKind, rows: AstNode[][], ctx: RenderCtx): stri
   let table = `<mtable>${tableRows}</mtable>`;
 
   if (kind === 'cases') {
-    // cases: left brace, right nothing
-    return `<mrow><mo>{</mo><mtable columnalign="left left">${tableRows}</mtable></mrow>`;
+    return `<mrow><mo>{</mo><mtable columnalign="left">${tableRows}</mtable></mrow>`;
   }
 
   if (open || close) {
@@ -138,5 +138,16 @@ function renderStyle(kind: string, body: AstNode, ctx: RenderCtx): string {
 }
 
 function renderLR(open: string, close: string, body: AstNode, ctx: RenderCtx): string {
-  return `<mrow><mo>${escapeHtml(open)}</mo>${renderNode(body, ctx)}<mo>${escapeHtml(close)}</mo></mrow>`;
+  const openMo = open ? `<mo>${escapeHtml(open)}</mo>` : '';
+  const closeMo = close ? `<mo>${escapeHtml(close)}</mo>` : '';
+  return `<mrow>${openMo}${renderNode(body, ctx)}${closeMo}</mrow>`;
+}
+
+const ACCENT_CHARS: Record<string, string> = {
+  hat: '^', tilde: '~', dot: '˙', overline: '‾', bar: '‾', arrow: '⃗',
+};
+
+function renderAccent(kind: string, body: AstNode, ctx: RenderCtx): string {
+  const ch = ACCENT_CHARS[kind] ?? '^';
+  return `<mover accent="true">${renderNode(body, ctx)}<mo>${escapeHtml(ch)}</mo></mover>`;
 }

@@ -226,6 +226,23 @@
   font-family: KaTeX_Typewriter, monospace;
 }
 
+/* Accents */
+.kern-mover {
+  display: inline-flex;
+  flex-direction: column-reverse;
+  align-items: center;
+}
+
+.kern-mover-body {
+  display: inline-block;
+}
+
+.kern-accent {
+  font-size: 0.85em;
+  line-height: 1;
+  padding: 0;
+}
+
 /* Error */
 .kern-error {
   color: #cc0000;

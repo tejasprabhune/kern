@@ -30,6 +30,7 @@ function renderNode(node: AstNode, ctx: RenderCtx): string {
     case 'spacing': return renderSpacing(node.kind);
     case 'align': return `<span class="kern-align"></span>`;
     case 'binom': return renderBinom(node.top, node.bot, ctx);
+    case 'accent': return renderAccent(node.kind, node.body, ctx);
   }
 }
 
@@ -165,9 +166,23 @@ function renderStyle(kind: StyleKind, body: AstNode, ctx: RenderCtx): string {
 function renderLR(open: string, close: string, body: AstNode, ctx: RenderCtx): string {
   return (
     `<span class="kern-mrow">` +
-    `<span class="kern-mo kern-delimiter">${escapeHtml(open)}</span>` +
+    (open ? `<span class="kern-mo kern-delimiter">${escapeHtml(open)}</span>` : '') +
     renderNode(body, ctx) +
-    `<span class="kern-mo kern-delimiter">${escapeHtml(close)}</span>` +
+    (close ? `<span class="kern-mo kern-delimiter">${escapeHtml(close)}</span>` : '') +
+    `</span>`
+  );
+}
+
+const ACCENT_CHARS: Record<string, string> = {
+  hat: '^', tilde: '~', dot: '˙', overline: '‾', bar: '‾', arrow: '→',
+};
+
+function renderAccent(kind: string, body: AstNode, ctx: RenderCtx): string {
+  const ch = ACCENT_CHARS[kind] ?? '^';
+  return (
+    `<span class="kern-mover">` +
+    `<span class="kern-mover-body">${renderNode(body, ctx)}</span>` +
+    `<span class="kern-mo kern-accent">${escapeHtml(ch)}</span>` +
     `</span>`
   );
 }

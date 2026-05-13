@@ -127,7 +127,8 @@ describe('parser', () => {
     expect(ast.type).toBe('matrix');
     const m = ast as MatrixNode;
     expect(m.kind).toBe('vec');
-    expect(m.rows[0]).toHaveLength(3);
+    expect(m.rows).toHaveLength(3);
+    expect(m.rows[0]).toHaveLength(1);
   });
 
   it('parses mat with semicolons', () => {
@@ -220,10 +221,44 @@ describe('parser', () => {
     expect(ast).toMatchObject({ type: 'lr', open: '‖', close: '‖' });
   });
 
-  it('parses cases', () => {
+  it('parses cases with comma-separated rows', () => {
     const ast = parse('cases(x, y)');
     expect(ast.type).toBe('matrix');
     const m = ast as MatrixNode;
     expect(m.kind).toBe('cases');
+    expect(m.rows).toHaveLength(2);
+    expect(m.rows[0]).toHaveLength(1);
+    expect(m.rows[1]).toHaveLength(1);
+  });
+
+  it('parses e^(i pi) with transparent paren grouping', () => {
+    const ast = parse('e^(i pi)');
+    expect(ast.type).toBe('attach');
+    const a = ast as AttachNode;
+    expect(a.sup?.type).not.toBe('lr');
+  });
+
+  it('parses sum_(k=0)^n with transparent paren grouping in sub', () => {
+    const ast = parse('sum_(k=0)^n');
+    expect(ast.type).toBe('attach');
+    const a = ast as AttachNode;
+    expect(a.sub?.type).not.toBe('lr');
+  });
+
+  it('parses n! without error', () => {
+    expect(() => parse('frac(x^n, n!)')).not.toThrow();
+  });
+
+  it('parses hat(f) as accent node', () => {
+    const ast = parse('hat(f)');
+    expect(ast.type).toBe('accent');
+  });
+
+  it('paren group as base still shows delimiters: (x+y)^2', () => {
+    const ast = parse('(x + y)^2');
+    expect(ast.type).toBe('attach');
+    const a = ast as AttachNode;
+    expect(a.base.type).toBe('lr');
+    expect(a.sup?.type).not.toBe('lr');
   });
 });

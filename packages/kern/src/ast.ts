@@ -14,7 +14,8 @@ export type AstNode =
   | LRNode
   | SpacingNode
   | AlignNode
-  | BinomNode;
+  | BinomNode
+  | AccentNode;
 
 export interface SeqNode {
   type: 'seq';
@@ -113,6 +114,12 @@ export interface BinomNode {
   type: 'binom';
   top: AstNode;
   bot: AstNode;
+}
+
+export interface AccentNode {
+  type: 'accent';
+  kind: string;
+  body: AstNode;
 }
 
 export function seq(nodes: AstNode[]): AstNode {

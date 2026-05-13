@@ -3,13 +3,16 @@ import { tokenize, TK, Token, isAddOp } from './lexer.js';
 import {
   AstNode, SeqNode, AtomNode, NumberNode, SymbolNode, OperatorNode,
   FracNode, SqrtNode, RootNode, AttachNode, MatrixNode, StyleNode,
-  LRNode, SpacingNode, BinomNode, MatrixKind, StyleKind, LRKind,
+  LRNode, SpacingNode, BinomNode, AccentNode, MatrixKind, StyleKind, LRKind,
   seq,
 } from './ast.js';
 import { lookupSymbol, isSpacing } from './symbols.js';
 
 const STYLE_FUNCS = new Set<string>(['cal', 'bb', 'frak', 'bold', 'italic', 'upright', 'sans', 'mono']);
 const MATRIX_FUNCS = new Set<string>(['vec', 'mat', 'cases', 'bmat', 'pmat', 'vmat', 'Vmat']);
+const ACCENT_MAP: Record<string, string> = {
+  hat: '^', tilde: '~', dot: '˙', overline: '‾', bar: '‾', arrow: '→',
+};
 
 const SPACING_MAP: Record<string, SpacingNode['kind']> = {
   thin: 'thin', med: 'med', thick: 'thick',
@@ -140,7 +143,9 @@ class Parser {
 
     while (this.peek().kind === TK.Under || this.peek().kind === TK.Caret) {
       const t = this.consume();
-      const arg = this.parsePrime();
+      let arg = this.parsePrime();
+      // In Typst, ^(expr) and _(expr) use parens as transparent grouping, not delimiters.
+      if (arg.type === 'lr' && arg.kind === 'paren') arg = arg.body;
       if (t.kind === TK.Under) {
         sub = sub ? seq([sub, arg]) : arg;
       } else {
@@ -294,6 +299,7 @@ class Parser {
     if (name === 'binom') return this.parseBinom();
     if (name === 'lr') return this.parseLr();
     if (name in LR_MAP) return this.parseLrShorthand(name);
+    if (name in ACCENT_MAP) return this.parseAccent(name);
     if (STYLE_FUNCS.has(name)) return this.parseStyle(name as StyleKind);
     if (MATRIX_FUNCS.has(name)) return this.parseMatrix(name as MatrixKind);
 
@@ -368,6 +374,12 @@ class Parser {
     return { type: 'lr', kind: info.kind, open: info.open, close: info.close, body };
   }
 
+  private parseAccent(kind: string): AccentNode {
+    const body = this.parseAlign();
+    this.expect(TK.RParen);
+    return { type: 'accent', kind, body };
+  }
+
   private parseStyle(kind: StyleKind): StyleNode {
     const body = this.parseAlign();
     this.expect(TK.RParen);
@@ -377,23 +389,25 @@ class Parser {
   private parseMatrix(kind: MatrixKind): MatrixNode {
     const rows: AstNode[][] = [];
     let row: AstNode[] = [];
+    // For vec/cases, commas separate rows (single-column items).
+    // For mat/bmat/pmat/vmat/Vmat, commas separate columns within a row.
+    const commaIsRowSep = kind === 'vec' || kind === 'cases';
 
     while (this.peek().kind !== TK.RParen && this.peek().kind !== TK.EOF) {
-      if (this.peek().kind === TK.Semicolon) {
+      const t = this.peek();
+      if (t.kind === TK.Semicolon) {
         this.consume();
         rows.push(row);
         row = [];
-        continue;
-      }
-      if (this.peek().kind === TK.Comma) {
+      } else if (t.kind === TK.Comma) {
         this.consume();
-        const cell = this.parseAlign();
-        row.push(cell);
-        continue;
+        if (commaIsRowSep) {
+          rows.push(row);
+          row = [];
+        }
+      } else {
+        row.push(this.parseAlign());
       }
-      // First cell in a row
-      const cell = this.parseAlign();
-      row.push(cell);
     }
 
     if (row.length > 0) rows.push(row);
