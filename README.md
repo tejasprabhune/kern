@@ -10,18 +10,22 @@ kern.render('sum_(i=0)^n i = frac(n(n+1), 2)', el);
 ## Installation
 
 ```bash
-npm install kern
+npm install kern-typ
 # or
-pnpm add kern
+pnpm add kern-typ
 ```
+
+> The npm package is `kern-typ` because `kern` was already registered. The
+> library still calls itself kern everywhere else: CSS class prefix `kern-`,
+> UMD global `kern`, import path `kern-typ`.
 
 ## Quick start
 
 ### Browser (CDN)
 
 ```html
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/kern/styles/kern.css">
-<script src="https://cdn.jsdelivr.net/npm/kern/dist/kern.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/kern-typ/styles/kern.css">
+<script src="https://cdn.jsdelivr.net/npm/kern-typ/dist/kern.min.js"></script>
 
 <div id="math"></div>
 <script>
@@ -32,8 +36,8 @@ pnpm add kern
 ### ESM
 
 ```js
-import { render, renderToString } from 'kern';
-import 'kern/kern.css';  // for HTML output
+import { render, renderToString } from 'kern-typ';
+import 'kern-typ/kern.css';  // for HTML output
 
 render('x^2 + y^2 = r^2', el);
 const html = renderToString('e^(i pi) + 1 = 0');
@@ -44,7 +48,7 @@ const html = renderToString('e^(i pi) + 1 = 0');
 Automatically render all math in a page:
 
 ```js
-import renderMathInElement from 'kern/auto-render';
+import renderMathInElement from 'kern-typ/auto-render';
 
 renderMathInElement(document.body, {
   delimiters: [
@@ -139,7 +143,7 @@ upright(d)       – upright/roman
 By default, kern uses KaTeX's web fonts (loaded from cdnjs). For Typst visual parity, include `kern-newcm.css` instead:
 
 ```html
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/kern/styles/kern-newcm.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/kern-typ/styles/kern-newcm.css">
 ```
 
 ## Migration from KaTeX

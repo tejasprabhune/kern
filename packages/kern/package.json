@@ -1,8 +1,15 @@
 {
-  "name": "kern",
+  "name": "kern-typ",
   "version": "0.1.0",
   "description": "Fast, zero-dependency Typst math renderer for the browser",
   "license": "MIT",
+  "author": "Tejas Prabhune",
+  "homepage": "https://tejasprabhune.github.io/kern/",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/tejasprabhune/kern.git"
+  },
+  "keywords": ["typst", "math", "renderer", "mathml", "katex"],
   "type": "module",
   "main": "./dist/kern.cjs",
   "module": "./dist/kern.js",
@@ -23,7 +30,9 @@
   },
   "files": [
     "dist",
-    "styles"
+    "styles",
+    "README.md",
+    "LICENSE"
   ],
   "scripts": {
     "build": "vite build && vite build --config vite.umd.config.ts && tsc --emitDeclarationOnly",
@@ -31,7 +40,9 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "lint": "tsc --noEmit",
-    "bench": "vitest bench"
+    "bench": "vitest bench",
+    "prepack": "cp ../../README.md . && cp ../../LICENSE .",
+    "prepublishOnly": "pnpm run build && pnpm run test"
   },
   "devDependencies": {
     "@vitest/coverage-v8": "^1.6.0",

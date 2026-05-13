@@ -66,23 +66,27 @@
     <section id="install">
       <h2>Install</h2>
       <p>Via npm or pnpm:</p>
-      <pre><code>npm install kern
-pnpm add kern</code></pre>
+      <pre><code>npm install kern-typ
+pnpm add kern-typ</code></pre>
+      <p style="font-size:0.85rem;color:var(--muted)">
+        The npm package is <code>kern-typ</code> because <code>kern</code> was already registered.
+        The UMD global, CSS prefix, and everything else is still <code>kern</code>.
+      </p>
 
       <p>Via CDN (jsDelivr):</p>
       <pre><code>&lt;!-- CSS for HTML output mode --&gt;
-&lt;link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/kern/styles/kern.css"&gt;
+&lt;link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/kern-typ/styles/kern.css"&gt;
 
 &lt;!-- UMD bundle, exposes global `kern` --&gt;
-&lt;script src="https://cdn.jsdelivr.net/npm/kern/dist/kern.min.js"&gt;&lt;/script&gt;</code></pre>
+&lt;script src="https://cdn.jsdelivr.net/npm/kern-typ/dist/kern.min.js"&gt;&lt;/script&gt;</code></pre>
 
       <p>Via unpkg:</p>
-      <pre><code>&lt;script src="https://unpkg.com/kern/dist/kern.min.js"&gt;&lt;/script&gt;</code></pre>
+      <pre><code>&lt;script src="https://unpkg.com/kern-typ/dist/kern.min.js"&gt;&lt;/script&gt;</code></pre>
     </section>
 
     <section id="quickstart">
       <h2>Quick start</h2>
-      <pre><code>import { render, renderToString } from 'kern';
+      <pre><code>import { render, renderToString } from 'kern-typ';
 
 // Render into a DOM element
 render('frac(a, b)', document.getElementById('math'));
@@ -93,7 +97,7 @@ const html = renderToString('x^2 + y^2 = r^2');
 document.getElementById('math').innerHTML = html;</code></pre>
 
       <p>UMD (script tag):</p>
-      <pre><code>&lt;script src="https://cdn.jsdelivr.net/npm/kern/dist/kern.min.js"&gt;&lt;/script&gt;
+      <pre><code>&lt;script src="https://cdn.jsdelivr.net/npm/kern-typ/dist/kern.min.js"&gt;&lt;/script&gt;
 &lt;script&gt;
   kern.render('e^(i pi) + 1 = 0', document.getElementById('math'));
 &lt;/script&gt;</code></pre>
@@ -183,7 +187,7 @@ kern.render('frac(x, y)', el, { displayMode: true });</code></pre>
         Automatically find and render all math delimiters in a DOM subtree.
         Same interface as KaTeX's auto-render extension.
       </p>
-      <pre><code>import renderMathInElement from 'kern/auto-render';
+      <pre><code>import renderMathInElement from 'kern-typ/auto-render';
 
 renderMathInElement(document.body, {
   delimiters: [
@@ -349,7 +353,7 @@ try {
         New Computer Modern Math:
       </p>
       <pre><code>&lt;link rel="stylesheet"
-  href="https://cdn.jsdelivr.net/npm/kern/styles/kern-newcm.css"&gt;</code></pre>
+  href="https://cdn.jsdelivr.net/npm/kern-typ/styles/kern-newcm.css"&gt;</code></pre>
     </section>
 
   </main>
