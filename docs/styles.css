@@ -1,3 +1,5 @@
+@import url("https://cdn.jsdelivr.net/npm/newcomputermodern@1.0.5/fonts/newcmmath-regular-webfont.css");
+
 *, *::before, *::after {
   box-sizing: border-box;
   margin: 0;
@@ -164,6 +166,12 @@ pre code {
   color: inherit;
   padding: 0;
   font-size: inherit;
+}
+
+/* MathML font: use NewCMMath (Typst's font) for all math elements */
+math {
+  font-family: "NewCMMath-Regular", "New Computer Modern Math", "Latin Modern Math",
+    "STIX Two Math", "Times New Roman", serif;
 }
 
 /* Math demo on landing page */

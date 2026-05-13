@@ -36,8 +36,22 @@ function renderNode(node: AstNode, ctx: RenderCtx): string {
 
 function renderSeq(nodes: AstNode[], ctx: RenderCtx): string {
   if (nodes.length === 0) return '<mrow></mrow>';
-  const inner = nodes.map(n => renderNode(n, ctx)).join('');
-  return `<mrow>${inner}</mrow>`;
+  const THIN = '<mspace width="0.1667em"/>';
+  const parts: string[] = [];
+  for (let i = 0; i < nodes.length; i++) {
+    const n = nodes[i]!;
+    const prev = nodes[i - 1];
+    const next = nodes[i + 1];
+    // Thin space before/after text nodes that are adjacent to math atoms.
+    if (n.type === 'text' && prev !== undefined && prev.type !== 'spacing') {
+      parts.push(THIN);
+    }
+    parts.push(renderNode(n, ctx));
+    if (n.type === 'text' && next !== undefined && next.type !== 'spacing') {
+      parts.push(THIN);
+    }
+  }
+  return `<mrow>${parts.join('')}</mrow>`;
 }
 
 function renderAtom(text: string, italic: boolean): string {

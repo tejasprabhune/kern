@@ -1,17 +1,17 @@
-class u extends Error {
+class m extends Error {
   constructor(t, r, s) {
     super(t), this.name = "ParseError", this.position = r, this.source = s;
   }
 }
 var a = /* @__PURE__ */ ((e) => (e[e.Ident = 0] = "Ident", e[e.Number = 1] = "Number", e[e.Op = 2] = "Op", e[e.Slash = 3] = "Slash", e[e.LParen = 4] = "LParen", e[e.RParen = 5] = "RParen", e[e.LBracket = 6] = "LBracket", e[e.RBracket = 7] = "RBracket", e[e.Under = 8] = "Under", e[e.Caret = 9] = "Caret", e[e.Amp = 10] = "Amp", e[e.Semicolon = 11] = "Semicolon", e[e.Comma = 12] = "Comma", e[e.Dot = 13] = "Dot", e[e.Str = 14] = "Str", e[e.Prime = 15] = "Prime", e[e.EOF = 16] = "EOF", e))(a || {});
-function y(e) {
+function $(e) {
   return e >= 65 && e <= 90 || e >= 97 && e <= 122;
 }
 function d(e) {
   return e >= 48 && e <= 57;
 }
 function v(e) {
-  return y(e) || d(e);
+  return $(e) || d(e);
 }
 function A(e) {
   return e === 32 || e === 9 || e === 10 || e === 13;
@@ -72,7 +72,7 @@ function C(e) {
       r++;
       continue;
     }
-    if (y(o)) {
+    if ($(o)) {
       for (; r < s && v(e.charCodeAt(r)); ) r++;
       t.push({ kind: 0, text: e.slice(n, r), pos: n });
       continue;
@@ -88,7 +88,7 @@ function C(e) {
       case 34: {
         for (r++; r < s && e.charCodeAt(r) !== 34; )
           e.charCodeAt(r) === 92 && r++, r++;
-        if (r >= s) throw new u("Unterminated string literal", n, e);
+        if (r >= s) throw new m("Unterminated string literal", n, e);
         r++, t.push({ kind: 14, text: e.slice(n + 1, r - 1), pos: n });
         break;
       }
@@ -137,7 +137,7 @@ function C(e) {
   }
   return t.push({ kind: 16, text: "", pos: s }), t;
 }
-function m(e) {
+function h(e) {
   return e.length === 0 ? { type: "seq", nodes: [] } : e.length === 1 ? e[0] : { type: "seq", nodes: e };
 }
 const P = {
@@ -520,7 +520,7 @@ const M = /* @__PURE__ */ new Set(["cal", "bb", "frak", "bold", "italic", "uprig
 function F(e) {
   const t = C(e), r = new I(t, e), s = r.parseAlign();
   if (r.peek().kind !== a.EOF)
-    throw new u(`Unexpected token '${r.peek().text}'`, r.peek().pos, e);
+    throw new m(`Unexpected token '${r.peek().text}'`, r.peek().pos, e);
   return s;
 }
 class I {
@@ -538,7 +538,7 @@ class I {
   expect(t) {
     const r = this.peek();
     if (r.kind !== t)
-      throw new u(
+      throw new m(
         `Expected ${a[t] ?? t} but got '${r.text}'`,
         r.pos,
         this.src
@@ -561,7 +561,7 @@ class I {
       const r = this.consume();
       t.push({ type: "operator", text: r.text }), t.push(...this.collectFrac());
     }
-    return m(t);
+    return h(t);
   }
   // Returns the flat nodes produced by one fracExpr (may be multiple from seq)
   collectFrac() {
@@ -582,8 +582,8 @@ class I {
       t.push(s);
     }
     if (t.length === 0)
-      throw new u("Expected expression", this.peek().pos, this.src);
-    return m(t);
+      throw new m("Expected expression", this.peek().pos, this.src);
+    return h(t);
   }
   // attachExpr := primeExpr (('_' | '^') primeExpr)*
   parseAttach() {
@@ -591,7 +591,7 @@ class I {
     for (; this.peek().kind === a.Under || this.peek().kind === a.Caret; ) {
       const n = this.consume();
       let o = this.parsePrime();
-      o.type === "lr" && o.kind === "paren" && (o = o.body), n.kind === a.Under ? r = r ? m([r, o]) : o : s = s ? m([s, o]) : o;
+      o.type === "lr" && o.kind === "paren" && (o = o.body), n.kind === a.Under ? r = r ? h([r, o]) : o : s = s ? h([s, o]) : o;
     }
     return r !== void 0 && s !== void 0 ? { type: "attach", base: t, sub: r, sup: s } : r !== void 0 ? { type: "attach", base: t, sub: r } : s !== void 0 ? { type: "attach", base: t, sup: s } : t;
   }
@@ -620,13 +620,13 @@ class I {
       return this.parseGroup("[", "]");
     if (t.kind === a.Ident)
       return this.parseIdent();
-    throw new u(`Unexpected token '${t.text}'`, t.pos, this.src);
+    throw new m(`Unexpected token '${t.text}'`, t.pos, this.src);
   }
   parseGroup(t, r) {
     this.consume();
     const s = r === ")" ? a.RParen : a.RBracket, n = this.parseAlign();
     if (this.peek().kind !== s)
-      throw new u(
+      throw new m(
         `Expected '${r}' but got '${this.peek().text}'`,
         this.peek().pos,
         this.src
@@ -668,7 +668,7 @@ class I {
     if (M.has(t)) return this.parseStyle(t);
     if (N.has(t)) return this.parseMatrix(t);
     const r = this.parseAlign();
-    return this.expect(a.RParen), m([{ type: "atom", text: t, italic: !1 }, { type: "lr", kind: "paren", open: "(", close: ")", body: r }]);
+    return this.expect(a.RParen), h([{ type: "atom", text: t, italic: !1 }, { type: "lr", kind: "paren", open: "(", close: ")", body: r }]);
   }
   parseFrac() {
     const t = this.parseAlign();
@@ -701,7 +701,7 @@ class I {
         const n = r.text, o = s.text;
         if (B(n) === o) {
           const l = t.nodes.slice(1, -1);
-          return { type: "lr", kind: "custom", open: n, close: o, body: m(l) };
+          return { type: "lr", kind: "custom", open: n, close: o, body: h(l) };
         }
       }
     }
@@ -750,7 +750,7 @@ function i(e) {
   }
   return t;
 }
-function D(e) {
+function H(e) {
   switch (e) {
     case "cal":
       return "script";
@@ -799,7 +799,7 @@ function x(e, t) {
 function c(e, t) {
   switch (e.type) {
     case "seq":
-      return H(e.nodes);
+      return D(e.nodes);
     case "atom":
       return _(e.text, e.italic);
     case "number":
@@ -834,8 +834,14 @@ function c(e, t) {
       return T(e.kind, e.body);
   }
 }
-function H(e, t) {
-  return e.length === 0 ? "<mrow></mrow>" : `<mrow>${e.map((s) => c(s)).join("")}</mrow>`;
+function D(e, t) {
+  if (e.length === 0) return "<mrow></mrow>";
+  const r = '<mspace width="0.1667em"/>', s = [];
+  for (let n = 0; n < e.length; n++) {
+    const o = e[n], l = e[n - 1], u = e[n + 1];
+    o.type === "text" && l !== void 0 && l.type !== "spacing" && s.push(r), s.push(c(o)), o.type === "text" && u !== void 0 && u.type !== "spacing" && s.push(r);
+  }
+  return `<mrow>${s.join("")}</mrow>`;
 }
 function _(e, t) {
   return `<mi${t ? "" : ' mathvariant="normal"'}>${i(e)}</mi>`;
@@ -863,7 +869,7 @@ function V(e, t) {
   return e.sub !== void 0 && e.sup !== void 0 ? `<msubsup>${r}${c(e.sub)}${c(e.sup)}</msubsup>` : e.sub !== void 0 ? `<msub>${r}${c(e.sub)}</msub>` : e.sup !== void 0 ? `<msup>${r}${c(e.sup)}</msup>` : r;
 }
 function Y(e, t, r) {
-  const { open: s, close: n } = Q(e), o = t.map((h) => `<mtr>${h.map((k) => `<mtd>${c(k)}</mtd>`).join("")}</mtr>`).join("");
+  const { open: s, close: n } = Q(e), o = t.map((u) => `<mtr>${u.map((k) => `<mtd>${c(k)}</mtd>`).join("")}</mtr>`).join("");
   let l = `<mtable>${o}</mtable>`;
   return e === "cases" ? `<mrow><mo>{</mo><mtable columnalign="left">${o}</mtable></mrow>` : s || n ? `<mrow><mo>${i(s)}</mo>${l}<mo>${i(n)}</mo></mrow>` : l;
 }
@@ -888,7 +894,7 @@ function Q(e) {
   }
 }
 function W(e, t, r) {
-  const s = D(e), n = c(t);
+  const s = H(e), n = c(t);
   return `<mstyle mathvariant="${s}">${n}</mstyle>`;
 }
 function X(e, t, r, s) {
@@ -907,7 +913,7 @@ function T(e, t, r) {
   const s = J[e] ?? "^";
   return `<mover accent="true">${c(t)}<mo>${i(s)}</mo></mover>`;
 }
-function $(e, t) {
+function y(e, t) {
   const r = p(e);
   return `<span class="${t ? "kern kern-display" : "kern kern-inline"}">${r}</span>`;
 }
@@ -975,7 +981,7 @@ function oe(e, t) {
   return e.sub !== void 0 && e.sup !== void 0 ? `<span class="kern-msubsup"><span class="kern-msubsup-base">${r}</span><span class="kern-msubsup-scripts"><span class="kern-msup">${p(e.sup)}</span><span class="kern-msub">${p(e.sub)}</span></span></span>` : e.sub !== void 0 ? `<span class="kern-msub">${r}<span class="kern-msub-script">${p(e.sub)}</span></span>` : e.sup !== void 0 ? `<span class="kern-msup">${r}<span class="kern-msup-script">${p(e.sup)}</span></span>` : r;
 }
 function ie(e, t, r) {
-  const { open: s, close: n } = ce(e), l = `<span class="kern-mtable">${t.map((h) => `<span class="kern-mtr">${h.map(
+  const { open: s, close: n } = ce(e), l = `<span class="kern-mtable">${t.map((u) => `<span class="kern-mtr">${u.map(
     (k) => `<span class="kern-mtd">${p(k)}</span>`
   ).join("")}</span>`).join("")}</span>`;
   return s || n ? '<span class="kern-mrow">' + (s ? `<span class="kern-mo kern-delimiter">${i(s)}</span>` : "") + l + (n ? `<span class="kern-mo kern-delimiter">${i(n)}</span>` : "") + "</span>" : l;
@@ -1056,11 +1062,11 @@ function be(e, t) {
     if (o === "mathml")
       return x(s, n);
     if (o === "html")
-      return $(s, n);
-    const l = x(s, n), h = $(s, n);
-    return `<span class="${n ? "kern kern-display" : "kern kern-inline"}" aria-hidden="true">${h}</span>${l}`;
+      return y(s, n);
+    const l = x(s, n), u = y(s, n);
+    return `<span class="${n ? "kern kern-display" : "kern kern-inline"}" aria-hidden="true">${u}</span>${l}`;
   } catch (s) {
-    if (s instanceof u) {
+    if (s instanceof m) {
       if (r.throwOnError) throw s;
       const n = fe(s.message);
       return `<span class="kern-error" style="color:${r.errorColor}">${n}</span>`;
@@ -1072,7 +1078,7 @@ function fe(e) {
   return e.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
 export {
-  u as ParseError,
+  m as ParseError,
   we as render,
   be as renderToString
 };
