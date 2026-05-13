@@ -4,195 +4,160 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>kern &middot; docs</title>
-  <link rel="preload" href="https://use.typekit.net/bsk0vur.css" as="style">
   <link rel="stylesheet" href="https://use.typekit.net/bsk0vur.css">
   <link rel="stylesheet" href="styles.css">
   <link rel="stylesheet" href="kern/kern.css">
 </head>
 <body>
 
-<nav>
-  <a href="index.html" class="nav-wordmark">kern</a>
-  <span class="nav-sep">·</span>
-  <a href="index.html">about</a>
-  <span class="nav-sep">·</span>
-  <a href="docs.html" class="active">docs</a>
-  <span class="nav-sep">·</span>
-  <a href="examples.html">examples</a>
-  <span class="nav-sep">·</span>
-  <a href="https://github.com/tejasprabhune/kern" target="_blank" rel="noopener">github</a>
-</nav>
+  <header>
+    <a class="wordmark" href="index.html">kern</a>
+    <p class="tagline">Typst math, in the browser.</p>
+    <nav>
+      <a href="index.html">Overview</a>
+      <a href="docs.html" class="active">Docs</a>
+      <a href="examples.html">Examples</a>
+      <a href="https://github.com/tejasprabhune/kern" target="_blank" rel="noopener">GitHub</a>
+    </nav>
+  </header>
 
-<div class="docs-layout">
+  <ul class="toc-list">
+    <li><a href="#install">Install</a></li>
+    <li><a href="#quickstart">Quick start</a></li>
+    <li><a href="#api">API</a></li>
+    <li><a href="#options">Options</a></li>
+    <li><a href="#auto-render">Auto-render</a></li>
+    <li><a href="#output-modes">Output modes</a></li>
+    <li><a href="#errors">Errors</a></li>
+    <li><a href="#migration">Migration from KaTeX</a></li>
+    <li><a href="#syntax">Syntax cheat sheet</a></li>
+    <li><a href="#fonts">Fonts</a></li>
+  </ul>
 
-  <!-- TOC sidebar (desktop) -->
-  <aside class="docs-toc" aria-label="On this page">
-    <h4>On this page</h4>
-    <ol>
-      <li><a href="#install">Install</a></li>
-      <li><a href="#quickstart">Quick start</a></li>
-      <li><a href="#api">API</a></li>
-      <li><a href="#options">Options</a></li>
-      <li><a href="#auto-render">Auto-render</a></li>
-      <li><a href="#output-modes">Output modes</a></li>
-      <li><a href="#errors">Errors</a></li>
-      <li><a href="#migration">Migration from KaTeX</a></li>
-      <li><a href="#syntax">Syntax cheat sheet</a></li>
-      <li><a href="#fonts">Fonts</a></li>
-    </ol>
-  </aside>
-
-  <main class="docs-content">
-
-    <!-- TOC on narrow screens -->
-    <details class="toc-mobile" aria-label="On this page">
-      <summary>On this page</summary>
-      <ol style="margin-top:0.75rem;list-style:none;padding:0;font-size:0.88rem;">
-        <li><a href="#install">Install</a></li>
-        <li><a href="#quickstart">Quick start</a></li>
-        <li><a href="#api">API</a></li>
-        <li><a href="#options">Options</a></li>
-        <li><a href="#auto-render">Auto-render</a></li>
-        <li><a href="#output-modes">Output modes</a></li>
-        <li><a href="#errors">Errors</a></li>
-        <li><a href="#migration">Migration from KaTeX</a></li>
-        <li><a href="#syntax">Syntax cheat sheet</a></li>
-        <li><a href="#fonts">Fonts</a></li>
-      </ol>
-    </details>
-
-    <h1>Documentation</h1>
-
-    <section id="install">
-      <h2>Install</h2>
-      <p>Via npm or pnpm:</p>
-      <pre><code>npm install kern-typ
+  <section id="install">
+    <h2>Install</h2>
+    <pre><code>npm install kern-typ
 pnpm add kern-typ</code></pre>
-      <p style="font-size:0.85rem;color:var(--muted)">
-        The npm package is <code>kern-typ</code> because <code>kern</code> was already registered.
-        The UMD global, CSS prefix, and everything else is still <code>kern</code>.
-      </p>
-
-      <p>Via CDN (jsDelivr):</p>
-      <pre><code>&lt;!-- CSS for HTML output mode --&gt;
-&lt;link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/kern-typ/styles/kern.css"&gt;
-
-&lt;!-- UMD bundle, exposes global `kern` --&gt;
+    <p>
+      The npm package is <code>kern-typ</code> because <code>kern</code> was already
+      registered. The UMD global, CSS prefix, and everything else is still
+      <code>kern</code>.
+    </p>
+    <p>Via CDN (jsDelivr):</p>
+    <pre><code>&lt;link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/kern-typ/styles/kern.css"&gt;
 &lt;script src="https://cdn.jsdelivr.net/npm/kern-typ/dist/kern.min.js"&gt;&lt;/script&gt;</code></pre>
+    <p>Via unpkg:</p>
+    <pre><code>&lt;script src="https://unpkg.com/kern-typ/dist/kern.min.js"&gt;&lt;/script&gt;</code></pre>
+  </section>
 
-      <p>Via unpkg:</p>
-      <pre><code>&lt;script src="https://unpkg.com/kern-typ/dist/kern.min.js"&gt;&lt;/script&gt;</code></pre>
-    </section>
-
-    <section id="quickstart">
-      <h2>Quick start</h2>
-      <pre><code>import { render, renderToString } from 'kern-typ';
+  <section id="quickstart">
+    <h2>Quick start</h2>
+    <pre><code>import { render, renderToString } from 'kern-typ';
 
 // Render into a DOM element
 render('frac(a, b)', document.getElementById('math'));
 
-// Render to string (e.g. for SSR or innerHTML)
+// Render to string (for SSR or innerHTML)
 const html = renderToString('x^2 + y^2 = r^2');
-
 document.getElementById('math').innerHTML = html;</code></pre>
 
-      <p>UMD (script tag):</p>
-      <pre><code>&lt;script src="https://cdn.jsdelivr.net/npm/kern-typ/dist/kern.min.js"&gt;&lt;/script&gt;
+    <p>UMD (script tag):</p>
+    <pre><code>&lt;script src="https://cdn.jsdelivr.net/npm/kern-typ/dist/kern.min.js"&gt;&lt;/script&gt;
 &lt;script&gt;
   kern.render('e^(i pi) + 1 = 0', document.getElementById('math'));
 &lt;/script&gt;</code></pre>
-    </section>
+  </section>
 
-    <section id="api">
-      <h2>API</h2>
+  <section id="api">
+    <h2>API</h2>
 
-      <h3><code>render(source, element, options?)</code></h3>
-      <p>
-        Renders Typst math <code>source</code> into <code>element</code>, replacing its
-        contents. Throws <code>ParseError</code> on invalid input unless
-        <code>throwOnError: false</code>.
-      </p>
-      <pre><code>kern.render('sum_(i=0)^n i^2', el);
+    <h3><code>render(source, element, options?)</code></h3>
+    <p>
+      Renders Typst math <code>source</code> into <code>element</code>, replacing its
+      contents. Throws <code>ParseError</code> on invalid input unless
+      <code>throwOnError: false</code>.
+    </p>
+    <pre><code>kern.render('sum_(i=0)^n i^2', el);
 kern.render('frac(x, y)', el, { displayMode: true });</code></pre>
 
-      <h3><code>renderToString(source, options?)</code></h3>
-      <p>Returns the rendered HTML string without touching the DOM.</p>
-      <pre><code>const html = kern.renderToString('alpha + beta = gamma', {
+    <h3><code>renderToString(source, options?)</code></h3>
+    <p>Returns the rendered HTML string without touching the DOM.</p>
+    <pre><code>const html = kern.renderToString('alpha + beta = gamma', {
   output: 'mathml',
   displayMode: false,
 });</code></pre>
-    </section>
+  </section>
 
-    <section id="options">
-      <h2>Options</h2>
-      <table>
-        <thead>
-          <tr>
-            <th>Option</th>
-            <th>Type</th>
-            <th>Default</th>
-            <th>Description</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td><code>displayMode</code></td>
-            <td><code>boolean</code></td>
-            <td><code>false</code></td>
-            <td>Block (display) vs. inline rendering</td>
-          </tr>
-          <tr>
-            <td><code>output</code></td>
-            <td><code>'mathml' | 'html' | 'htmlAndMathml'</code></td>
-            <td><code>'mathml'</code></td>
-            <td>Output format</td>
-          </tr>
-          <tr>
-            <td><code>throwOnError</code></td>
-            <td><code>boolean</code></td>
-            <td><code>true</code></td>
-            <td>Throw <code>ParseError</code> on invalid input</td>
-          </tr>
-          <tr>
-            <td><code>errorColor</code></td>
-            <td><code>string</code></td>
-            <td><code>'#cc0000'</code></td>
-            <td>Error message color when <code>throwOnError</code> is false</td>
-          </tr>
-          <tr>
-            <td><code>macros</code></td>
-            <td><code>Record&lt;string, string&gt;</code></td>
-            <td><code>{}</code></td>
-            <td>Custom macro definitions</td>
-          </tr>
-          <tr>
-            <td><code>strict</code></td>
-            <td><code>boolean | 'ignore' | 'warn' | 'error'</code></td>
-            <td><code>'warn'</code></td>
-            <td>Strictness level for unrecognized input</td>
-          </tr>
-          <tr>
-            <td><code>trust</code></td>
-            <td><code>boolean | function</code></td>
-            <td><code>false</code></td>
-            <td>Trust level for security-sensitive features</td>
-          </tr>
-        </tbody>
-      </table>
-    </section>
+  <section id="options">
+    <h2>Options</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Option</th>
+          <th>Type</th>
+          <th>Default</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>displayMode</code></td>
+          <td><code>boolean</code></td>
+          <td><code>false</code></td>
+          <td>Block (display) vs. inline rendering</td>
+        </tr>
+        <tr>
+          <td><code>output</code></td>
+          <td><code>'mathml' | 'html' | 'htmlAndMathml'</code></td>
+          <td><code>'mathml'</code></td>
+          <td>Output format</td>
+        </tr>
+        <tr>
+          <td><code>throwOnError</code></td>
+          <td><code>boolean</code></td>
+          <td><code>true</code></td>
+          <td>Throw <code>ParseError</code> on invalid input</td>
+        </tr>
+        <tr>
+          <td><code>errorColor</code></td>
+          <td><code>string</code></td>
+          <td><code>'#cc0000'</code></td>
+          <td>Error message color when <code>throwOnError</code> is false</td>
+        </tr>
+        <tr>
+          <td><code>macros</code></td>
+          <td><code>Record&lt;string, string&gt;</code></td>
+          <td><code>{}</code></td>
+          <td>Custom macro definitions</td>
+        </tr>
+        <tr>
+          <td><code>strict</code></td>
+          <td><code>boolean | 'ignore' | 'warn' | 'error'</code></td>
+          <td><code>'warn'</code></td>
+          <td>Strictness level for unrecognized input</td>
+        </tr>
+        <tr>
+          <td><code>trust</code></td>
+          <td><code>boolean | function</code></td>
+          <td><code>false</code></td>
+          <td>Trust level for security-sensitive features</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
 
-    <section id="auto-render">
-      <h2>Auto-render</h2>
-      <p>
-        Automatically find and render all math delimiters in a DOM subtree.
-        Same interface as KaTeX's auto-render extension.
-      </p>
-      <pre><code>import renderMathInElement from 'kern-typ/auto-render';
+  <section id="auto-render">
+    <h2>Auto-render</h2>
+    <p>
+      Automatically find and render all math delimiters in a DOM subtree.
+      Same interface as KaTeX's auto-render extension.
+    </p>
+    <pre><code>import renderMathInElement from 'kern-typ/auto-render';
 
 renderMathInElement(document.body, {
   delimiters: [
     { left: '$$', right: '$$', display: true },
-    { left: '$', right: '$', display: false },
+    { left: '$',  right: '$',  display: false },
     { left: '\\[', right: '\\]', display: true },
     { left: '\\(', right: '\\)', display: false },
   ],
@@ -200,62 +165,61 @@ renderMathInElement(document.body, {
   errorCallback: (msg, err) =&gt; console.warn(msg, err),
 });</code></pre>
 
-      <h3>Auto-render options</h3>
-      <table>
-        <thead>
-          <tr><th>Option</th><th>Description</th></tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td><code>delimiters</code></td>
-            <td>Array of <code>{ left, right, display }</code> objects</td>
-          </tr>
-          <tr>
-            <td><code>ignoredTags</code></td>
-            <td>Tag names whose content is skipped</td>
-          </tr>
-          <tr>
-            <td><code>ignoredClasses</code></td>
-            <td>Elements with these classes are skipped</td>
-          </tr>
-          <tr>
-            <td><code>errorCallback</code></td>
-            <td>Called with <code>(message, error)</code> on parse failure</td>
-          </tr>
-          <tr>
-            <td><code>preProcess</code></td>
-            <td>Transform math string before rendering</td>
-          </tr>
-        </tbody>
-      </table>
-    </section>
+    <h3>Auto-render options</h3>
+    <table>
+      <thead>
+        <tr><th>Option</th><th>Description</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>delimiters</code></td>
+          <td>Array of <code>{ left, right, display }</code> objects</td>
+        </tr>
+        <tr>
+          <td><code>ignoredTags</code></td>
+          <td>Tag names whose content is skipped</td>
+        </tr>
+        <tr>
+          <td><code>ignoredClasses</code></td>
+          <td>Elements with these classes are skipped</td>
+        </tr>
+        <tr>
+          <td><code>errorCallback</code></td>
+          <td>Called with <code>(message, error)</code> on parse failure</td>
+        </tr>
+        <tr>
+          <td><code>preProcess</code></td>
+          <td>Transform math string before rendering</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
 
-    <section id="output-modes">
-      <h2>Output modes</h2>
-      <p>
-        <code>output: 'mathml'</code> (default) emits a native
-        <code>&lt;math&gt;</code> element. All major browsers support MathML as
-        of 2023. This is the recommended mode.
-      </p>
-      <p>
-        <code>output: 'html'</code> emits a span tree using <code>kern-*</code>
-        CSS classes, styled by <code>kern.css</code>. Useful for environments
-        that don't support MathML (older webviews, PDF renderers).
-      </p>
-      <p>
-        <code>output: 'htmlAndMathml'</code> emits both: the HTML tree is
-        aria-hidden and the MathML element provides accessible semantics.
-      </p>
-    </section>
+  <section id="output-modes">
+    <h2>Output modes</h2>
+    <p>
+      <code>output: 'mathml'</code> (default) emits a native <code>&lt;math&gt;</code>
+      element. All major browsers support MathML as of 2023. This is the recommended mode.
+    </p>
+    <p>
+      <code>output: 'html'</code> emits a span tree using <code>kern-*</code> CSS classes,
+      styled by <code>kern.css</code>. Useful for environments that don't support MathML
+      (older webviews, PDF renderers).
+    </p>
+    <p>
+      <code>output: 'htmlAndMathml'</code> emits both: the HTML tree is aria-hidden and the
+      MathML element provides accessible semantics.
+    </p>
+  </section>
 
-    <section id="errors">
-      <h2>Errors</h2>
-      <p>
-        kern throws a <code>ParseError</code> (subclass of <code>Error</code>)
-        with two extra fields: <code>position</code> (byte offset in the source
-        string) and <code>source</code> (the original input).
-      </p>
-      <pre><code>import { ParseError } from 'kern';
+  <section id="errors">
+    <h2>Errors</h2>
+    <p>
+      kern throws a <code>ParseError</code> (subclass of <code>Error</code>) with two extra
+      fields: <code>position</code> (byte offset in the source string) and
+      <code>source</code> (the original input).
+    </p>
+    <pre><code>import { ParseError } from 'kern-typ';
 
 try {
   kern.renderToString('frac(x,');
@@ -265,105 +229,98 @@ try {
     console.log(e.source);   // the original input string
   }
 }</code></pre>
-      <p>
-        Set <code>throwOnError: false</code> to render a styled error span
-        instead of throwing.
-      </p>
-    </section>
+    <p>
+      Set <code>throwOnError: false</code> to render a styled error span instead of
+      throwing.
+    </p>
+  </section>
 
-    <section id="migration">
-      <h2>Migration from KaTeX</h2>
-      <p>
-        kern's API is intentionally identical to KaTeX's. The only change is the
-        import name and the math source syntax.
-      </p>
-      <table class="migration-table">
-        <thead>
-          <tr><th>KaTeX</th><th>kern</th></tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td><code>katex.render(src, el)</code></td>
-            <td><code>kern.render(src, el)</code></td>
-          </tr>
-          <tr>
-            <td><code>katex.renderToString(src)</code></td>
-            <td><code>kern.renderToString(src)</code></td>
-          </tr>
-          <tr>
-            <td><code>renderMathInElement(el, opts)</code></td>
-            <td><code>renderMathInElement(el, opts)</code></td>
-          </tr>
-          <tr>
-            <td><code>\frac{a}{b}</code></td>
-            <td><code>frac(a, b)</code></td>
-          </tr>
-          <tr>
-            <td><code>\sqrt{x}</code></td>
-            <td><code>sqrt(x)</code></td>
-          </tr>
-          <tr>
-            <td><code>x_{n+1}</code></td>
-            <td><code>x_(n+1)</code></td>
-          </tr>
-          <tr>
-            <td><code>\mathbf{x}</code></td>
-            <td><code>bold(x)</code></td>
-          </tr>
-          <tr>
-            <td><code>\mathcal{A}</code></td>
-            <td><code>cal(A)</code></td>
-          </tr>
-          <tr>
-            <td><code>\mathbb{R}</code></td>
-            <td><code>bb(R)</code></td>
-          </tr>
-          <tr>
-            <td><code>\text{hello}</code></td>
-            <td><code>"hello"</code></td>
-          </tr>
-          <tr>
-            <td><code>\alpha, \beta</code></td>
-            <td><code>alpha, beta</code></td>
-          </tr>
-          <tr>
-            <td><code>\infty</code></td>
-            <td><code>infinity</code></td>
-          </tr>
-        </tbody>
-      </table>
-    </section>
+  <section id="migration">
+    <h2>Migration from KaTeX</h2>
+    <p>
+      kern's API is intentionally identical to KaTeX's. The only changes are the import
+      name and the math source syntax.
+    </p>
+    <table>
+      <thead>
+        <tr><th>KaTeX</th><th>kern</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>katex.render(src, el)</code></td>
+          <td><code>kern.render(src, el)</code></td>
+        </tr>
+        <tr>
+          <td><code>\frac{a}{b}</code></td>
+          <td><code>frac(a, b)</code></td>
+        </tr>
+        <tr>
+          <td><code>\sqrt{x}</code></td>
+          <td><code>sqrt(x)</code></td>
+        </tr>
+        <tr>
+          <td><code>x_{n+1}</code></td>
+          <td><code>x_(n+1)</code></td>
+        </tr>
+        <tr>
+          <td><code>\hat{f}</code></td>
+          <td><code>hat(f)</code></td>
+        </tr>
+        <tr>
+          <td><code>\mathbf{x}</code></td>
+          <td><code>bold(x)</code></td>
+        </tr>
+        <tr>
+          <td><code>\mathcal{A}</code></td>
+          <td><code>cal(A)</code></td>
+        </tr>
+        <tr>
+          <td><code>\mathbb{R}</code></td>
+          <td><code>bb(R)</code></td>
+        </tr>
+        <tr>
+          <td><code>\text{hello}</code></td>
+          <td><code>"hello"</code></td>
+        </tr>
+        <tr>
+          <td><code>\alpha, \beta</code></td>
+          <td><code>alpha, beta</code></td>
+        </tr>
+        <tr>
+          <td><code>\infty</code></td>
+          <td><code>infinity</code></td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
 
-    <section id="syntax">
-      <h2>Syntax cheat sheet</h2>
-      <p>Each example is rendered live by kern:</p>
-      <div id="cheat-sheet"></div>
-    </section>
+  <section id="syntax">
+    <h2>Syntax cheat sheet</h2>
+    <p>Each example is rendered live by kern:</p>
+    <div id="cheat-sheet"></div>
+  </section>
 
-    <section id="fonts">
-      <h2>Fonts</h2>
-      <p>
-        By default, kern.css references KaTeX's web fonts by family name. Include
-        KaTeX's CSS to load them:
-      </p>
-      <pre><code>&lt;link rel="stylesheet"
+  <section id="fonts">
+    <h2>Fonts</h2>
+    <p>
+      By default, <code>kern.css</code> references KaTeX's web fonts by family name.
+      Include KaTeX's CSS to load them:
+    </p>
+    <pre><code>&lt;link rel="stylesheet"
   href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.11/katex.min.css"&gt;</code></pre>
-      <p>
-        For Typst visual parity, include <code>kern-newcm.css</code> instead to use
-        New Computer Modern Math:
-      </p>
-      <pre><code>&lt;link rel="stylesheet"
+    <p>
+      For Typst visual parity, include <code>kern-newcm.css</code> to use New Computer
+      Modern Math instead:
+    </p>
+    <pre><code>&lt;link rel="stylesheet"
   href="https://cdn.jsdelivr.net/npm/kern-typ/styles/kern-newcm.css"&gt;</code></pre>
-    </section>
+  </section>
 
-  </main>
-</div>
-
-<footer>
-  <a href="index.html">kern</a> &nbsp;&middot;&nbsp;
-  <a href="https://github.com/tejasprabhune/kern/blob/main/LICENSE" target="_blank" rel="noopener">MIT</a> &nbsp;&middot;&nbsp;
-  <a href="https://github.com/tejasprabhune/kern" target="_blank" rel="noopener">github</a>
-</footer>
+  <footer>
+    <a href="https://github.com/tejasprabhune/kern" target="_blank" rel="noopener">GitHub</a>
+    <a href="https://github.com/tejasprabhune/kern/blob/main/LICENSE" target="_blank" rel="noopener">MIT</a>
+    <a href="https://www.npmjs.com/package/kern-typ" target="_blank" rel="noopener">npm</a>
+  </footer>
 
 <script type="module">
   import { renderToString } from './kern/kern.js';
@@ -382,6 +339,9 @@ try {
     ['vec(a, b, c)', 'Column vector'],
     ['mat(1, 0; 0, 1)', 'Matrix'],
     ['cases(x "if" x > 0, -x "otherwise")', 'Cases'],
+    ['hat(f)', 'Hat accent'],
+    ['tilde(x)', 'Tilde accent'],
+    ['overline(x)', 'Overline'],
     ['cal(A)', 'Calligraphic'],
     ['bb(R)', 'Blackboard bold'],
     ['frak(g)', 'Fraktur'],
@@ -402,12 +362,15 @@ try {
   for (const [src, label] of CHEAT) {
     const row = document.createElement('div');
     row.className = 'cheat-row';
+
     const srcEl = document.createElement('span');
     srcEl.className = 'cheat-src';
     srcEl.textContent = src;
+
     const arrow = document.createElement('span');
     arrow.className = 'cheat-arrow';
     arrow.textContent = '→';
+
     const out = document.createElement('span');
     out.className = 'cheat-out';
     try {
@@ -415,25 +378,12 @@ try {
     } catch {
       out.textContent = '(error)';
     }
+
     row.appendChild(srcEl);
     row.appendChild(arrow);
     row.appendChild(out);
     container.appendChild(row);
   }
-
-  // Highlight TOC on scroll
-  const sections = document.querySelectorAll('section[id]');
-  const links = document.querySelectorAll('.docs-toc a');
-  const obs = new IntersectionObserver(entries => {
-    for (const e of entries) {
-      if (e.isIntersecting) {
-        links.forEach(l => l.classList.remove('active'));
-        const link = document.querySelector(`.docs-toc a[href="#${e.target.id}"]`);
-        if (link) link.classList.add('active');
-      }
-    }
-  }, { rootMargin: '-30% 0px -60% 0px' });
-  sections.forEach(s => obs.observe(s));
 </script>
 
 </body>
