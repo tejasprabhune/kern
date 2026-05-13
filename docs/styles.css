@@ -1,10 +1,4 @@
-@font-face {
-  font-family: 'NewCMMath-Regular';
-  src: url('https://cdn.jsdelivr.net/gh/fred-wang/MathFonts@master/NewComputerModern/fonts/NewCMMath-Regular.woff2') format('woff2'),
-       url('https://cdn.jsdelivr.net/gh/fred-wang/MathFonts@master/NewComputerModern/fonts/NewCMMath-Regular.woff') format('woff');
-  font-weight: normal;
-  font-style: normal;
-}
+/* NewCMMath @font-face lives in kern/kern-newcm.css now. */
 
 *, *::before, *::after {
   box-sizing: border-box;
@@ -147,7 +141,7 @@ a:hover {
 /* Code */
 
 code {
-  font-family: "SF Mono", "Menlo", "Consolas", monospace;
+  font-family: "calling-code", "SF Mono", "Menlo", "Consolas", monospace;
   font-size: 13.5px;
   background: rgba(75, 78, 109, 0.08);
   color: var(--dark);
@@ -162,7 +156,7 @@ pre {
   border-radius: 6px;
   overflow-x: auto;
   margin: 12px 0 20px;
-  font-family: "SF Mono", "Menlo", "Consolas", monospace;
+  font-family: "calling-code", "SF Mono", "Menlo", "Consolas", monospace;
   font-size: 13px;
   line-height: 1.7;
 }
@@ -189,7 +183,7 @@ math {
 }
 
 .demo-label {
-  font-family: "SF Mono", "Menlo", "Consolas", monospace;
+  font-family: "calling-code", "SF Mono", "Menlo", "Consolas", monospace;
   font-size: 12px;
   color: var(--muted);
   text-align: center;
@@ -280,7 +274,7 @@ tr:last-child td {
 }
 
 .cheat-src {
-  font-family: "SF Mono", "Menlo", "Consolas", monospace;
+  font-family: "calling-code", "SF Mono", "Menlo", "Consolas", monospace;
   font-size: 12.5px;
   background: rgba(75, 78, 109, 0.07);
   padding: 2px 6px;
@@ -324,7 +318,7 @@ tr:last-child td {
   letter-spacing: 0.06em;
   text-transform: uppercase;
   color: var(--muted);
-  font-family: "SF Mono", "Menlo", "Consolas", monospace;
+  font-family: "calling-code", "SF Mono", "Menlo", "Consolas", monospace;
   padding: 8px 12px;
   border-bottom: 1px solid rgba(75, 78, 109, 0.15);
 }
@@ -333,7 +327,7 @@ tr:last-child td {
   flex: 1;
   min-height: 140px;
   padding: 12px;
-  font-family: "SF Mono", "Menlo", "Consolas", monospace;
+  font-family: "calling-code", "SF Mono", "Menlo", "Consolas", monospace;
   font-size: 13px;
   line-height: 1.5;
   background: transparent;
@@ -413,7 +407,7 @@ tr:last-child td {
 }
 
 .gallery-card-src {
-  font-family: "SF Mono", "Menlo", "Consolas", monospace;
+  font-family: "calling-code", "SF Mono", "Menlo", "Consolas", monospace;
   font-size: 11px;
   color: var(--muted);
   margin-bottom: 10px;

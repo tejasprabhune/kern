@@ -107,17 +107,18 @@ function isLetterChar(cp: number): boolean {
 }
 
 function renderFrac(num: AstNode, den: AstNode, ctx: RenderCtx): string {
-  const ds = ctx.display ? ' displaystyle="true"' : '';
-  const childCtx: RenderCtx = ctx.display ? ctx : ctx;
-  return `<mfrac${ds}>${renderNode(num, childCtx)}${renderNode(den, childCtx)}</mfrac>`;
+  // Don't emit displaystyle here: when ctx.display is true, the root
+  // <math display="block"> already cascades displaystyle to descendants,
+  // and adding it redundantly on <mfrac> can knock script-level scaling
+  // off on nested msup/msub in some Chromium builds.
+  return `<mfrac>${renderNode(num, ctx)}${renderNode(den, ctx)}</mfrac>`;
 }
 
 function renderBinom(top: AstNode, bot: AstNode, ctx: RenderCtx): string {
-  const ds = ctx.display ? ' displaystyle="true"' : '';
   return (
     `<mrow>` +
     `<mo form="prefix" stretchy="true">(</mo>` +
-    `<mfrac linethickness="0"${ds}>${renderNode(top, ctx)}${renderNode(bot, ctx)}</mfrac>` +
+    `<mfrac linethickness="0">${renderNode(top, ctx)}${renderNode(bot, ctx)}</mfrac>` +
     `<mo form="postfix" stretchy="true">)</mo>` +
     `</mrow>`
   );

@@ -23,25 +23,14 @@
   font-family: "NewCMMath-Regular", "New Computer Modern Math", "Times New Roman", serif;
 }
 
-/* MathML output. Browsers pick a math font from the system by default,
-   which varies wildly (Cambria Math on Windows, Latin Modern Math on Linux,
-   nothing on most macOS installs). Forcing NewCMMath here gives the same
-   look the HTML renderer gets. */
-math,
-math mi,
-math mn,
-math mo,
-math mtext,
-math mfrac,
-math msqrt,
-math mroot,
-math msub,
-math msup,
-math msubsup,
-math munder,
-math mover,
-math munderover {
-  font-family: "NewCMMath-Regular", "New Computer Modern Math", "Times New Roman", serif;
+/* MathML output. Only set font-family on the root <math>; descendants
+   inherit it. Setting it explicitly on every child (msub, msup, mfrac, ...)
+   confuses Chromium's OpenType MATH table consultation and breaks
+   script-level scaling for some nested constructs (e.g. b^2 inside an
+   msqrt inside an mfrac would lose its superscript scaling). */
+math {
+  font-family: "NewCMMath-Regular", "New Computer Modern Math",
+    "Latin Modern Math", "STIX Two Math", "Times New Roman", serif;
 }
 
 .kern-cal {

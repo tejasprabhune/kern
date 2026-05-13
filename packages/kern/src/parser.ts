@@ -280,7 +280,20 @@ class Parser {
     this.consume(); // consume open
     const closeKind = close === ')' ? TK.RParen : close === ']' ? TK.RBracket : TK.RBrace;
 
-    const body = this.parseAlign();
+    // Bare paren/bracket/brace groups can contain comma- or semicolon-
+    // separated math expressions ((0, sigma^2), [1, 2, 3], {a; b}). We keep
+    // the separators in the rendered output as math punctuation.
+    const parts: AstNode[] = [];
+    if (this.peek().kind !== closeKind) {
+      parts.push(this.parseAlign());
+      while (this.peek().kind === TK.Comma || this.peek().kind === TK.Semicolon) {
+        const sep = this.consume();
+        parts.push({ type: 'operator', text: sep.text });
+        if (this.peek().kind === closeKind) break;
+        parts.push(this.parseAlign());
+      }
+    }
+
     if (this.peek().kind !== closeKind) {
       throw new ParseError(
         `Expected '${close}' but got '${this.peek().text}'`,
@@ -295,7 +308,7 @@ class Parser {
       kind: open === '(' ? 'paren' : open === '[' ? 'bracket' : 'brace',
       open,
       close,
-      body,
+      body: seq(parts),
     };
     return lr;
   }
