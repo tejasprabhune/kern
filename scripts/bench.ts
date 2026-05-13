@@ -20,7 +20,7 @@ const CORPUS = [
 
 const ITERATIONS = 10_000;
 
-console.log(`Benchmarking kern — ${ITERATIONS.toLocaleString()} iterations per expression\n`);
+console.log(`Benchmarking kern: ${ITERATIONS.toLocaleString()} iterations per expression\n`);
 
 for (const src of CORPUS) {
   const start = performance.now();

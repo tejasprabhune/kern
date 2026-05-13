@@ -336,7 +336,7 @@ class Parser {
   }
 
   private parseLr(): LRNode {
-    // lr(expr) — parse the body as a full expression, then consume the ')' of
+    // lr(expr): parse the body as a full expression, then consume the ')' of
     // the lr() call itself. If the body is already an LR node (from a parsed
     // paren or bracket group), return it directly. Otherwise inspect the seq
     // head and tail for matching delimiter characters.

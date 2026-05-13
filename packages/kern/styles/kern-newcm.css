@@ -1,4 +1,4 @@
-/* kern-newcm.css — Swaps to New Computer Modern Math for Typst visual parity. */
+/* kern-newcm.css: Swaps to New Computer Modern Math for Typst visual parity. */
 /* Include this after kern.css to override font stacks. */
 
 @import url("https://cdn.jsdelivr.net/npm/newcomputermodern@1.0.5/fonts/newcmmath-regular-webfont.css");

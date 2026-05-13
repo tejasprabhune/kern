@@ -78,7 +78,7 @@ export const SYMBOLS: Record<string, string> = {
   QQ: 'ℚ',
   RR: 'ℝ',
   CC: 'ℂ',
-  FF: '\U0001D53D',
+  FF: '𝔽',
   HH: 'ℍ',
 
   // Logic

@@ -156,7 +156,7 @@ kern.render('frac(a, b)', el);
 
 Main differences:
 - Source syntax is Typst, not LaTeX
-- No backslash commands — use function call syntax instead
+- No backslash commands; use function call syntax instead
 - Spaces separate atoms (no `{}` grouping required for single-character args)
 
 ## License

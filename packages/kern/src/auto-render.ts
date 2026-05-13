@@ -119,7 +119,7 @@ function splitAtDelimiters(text: string, delimiters: Delimiter[]): Fragment[] {
       const contentStart = idx + delim.left.length;
       const end = remaining.indexOf(delim.right, contentStart);
       if (end === -1) {
-        // Unmatched delimiter — treat as text
+        // Unmatched delimiter; treat as text
         fragments.push({ type: 'text', value: remaining.slice(pos) });
         pos = remaining.length;
         continue outer;
