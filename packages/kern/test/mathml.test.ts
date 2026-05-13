@@ -87,7 +87,7 @@ describe('MathML renderer', () => {
 
   it('renders vec with parens', () => {
     const out = ml('vec(a, b, c)');
-    expect(out).toContain('<mo>(</mo>');
+    expect(out).toMatch(/<mo[^>]*>\(<\/mo>/);
   });
 
   it('renders cal style', () => {
@@ -134,13 +134,13 @@ describe('MathML renderer', () => {
 
   it('renders lr paren', () => {
     const out = ml('(x + y)');
-    expect(out).toContain('<mo>(</mo>');
-    expect(out).toContain('<mo>)</mo>');
+    expect(out).toMatch(/<mo[^>]*>\(<\/mo>/);
+    expect(out).toMatch(/<mo[^>]*>\)<\/mo>/);
   });
 
   it('renders abs with bars', () => {
     const out = ml('abs(x)');
-    expect(out).toContain('<mo>|</mo>');
+    expect(out).toMatch(/<mo[^>]*>\|<\/mo>/);
   });
 
   it('sum with limits', () => {

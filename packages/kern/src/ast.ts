@@ -15,7 +15,13 @@ export type AstNode =
   | SpacingNode
   | AlignNode
   | BinomNode
-  | AccentNode;
+  | AccentNode
+  | UnderOverNode
+  | CancelNode
+  | OpNode
+  | ClassNode
+  | SizeNode
+  | LimitsNode;
 
 export interface SeqNode {
   type: 'seq';
@@ -26,6 +32,9 @@ export interface AtomNode {
   type: 'atom';
   text: string;
   italic: boolean;
+  // Marks named operators (sin, cos, lim, etc.) so the renderer can apply
+  // limit placement and operator spacing.
+  operator?: boolean;
 }
 
 export interface NumberNode {
@@ -71,6 +80,10 @@ export interface AttachNode {
   base: AstNode;
   sub?: AstNode;
   sup?: AstNode;
+  // 'auto' (default): under/over in display mode when the base is a large
+  // operator or limits operator; otherwise sub/sup.
+  // 'limits' / 'scripts': forced by limits()/scripts() functions.
+  limits?: 'auto' | 'limits' | 'scripts';
 }
 
 export type MatrixKind = 'vec' | 'mat' | 'cases' | 'bmat' | 'pmat' | 'vmat' | 'Vmat';
@@ -79,6 +92,8 @@ export interface MatrixNode {
   type: 'matrix';
   kind: MatrixKind;
   rows: AstNode[][];
+  // Optional explicit delimiters from `mat(..., delim: "[")` etc.
+  delim?: { open: string; close: string };
 }
 
 export type StyleKind = 'cal' | 'bb' | 'frak' | 'bold' | 'italic' | 'upright' | 'sans' | 'mono';
@@ -119,6 +134,61 @@ export interface BinomNode {
 export interface AccentNode {
   type: 'accent';
   kind: string;
+  body: AstNode;
+}
+
+// overbrace / underbrace / overline / underline as a structural construct
+// distinct from a single combining accent: these stretch across the body.
+export type UnderOverKind =
+  | 'overbrace' | 'underbrace'
+  | 'overline.stretch' | 'underline.stretch'
+  | 'overparen' | 'underparen'
+  | 'overbracket' | 'underbracket';
+
+export interface UnderOverNode {
+  type: 'underover';
+  kind: UnderOverKind;
+  body: AstNode;
+  // Optional annotation drawn above/below the brace.
+  annotation?: AstNode;
+}
+
+export type CancelKind = 'cancel' | 'bcancel' | 'xcancel';
+
+export interface CancelNode {
+  type: 'cancel';
+  kind: CancelKind;
+  body: AstNode;
+}
+
+// op("text", limits: bool) — declares an operator-name atom.
+export interface OpNode {
+  type: 'op';
+  text: string;
+  limits: boolean;
+}
+
+export type MathClass = 'normal' | 'op' | 'bin' | 'rel' | 'open' | 'close' | 'punct';
+
+export interface ClassNode {
+  type: 'class';
+  cls: MathClass;
+  body: AstNode;
+}
+
+export type MathSize = 'display' | 'inline' | 'script' | 'sscript';
+
+export interface SizeNode {
+  type: 'size';
+  size: MathSize;
+  body: AstNode;
+}
+
+// limits(x) / scripts(x): force placement on the wrapped expression's
+// next attach.
+export interface LimitsNode {
+  type: 'limits-hint';
+  mode: 'limits' | 'scripts';
   body: AstNode;
 }
 

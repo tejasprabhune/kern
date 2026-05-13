@@ -9,14 +9,21 @@ export enum TK {
   RParen,
   LBracket,
   RBracket,
+  LBrace,
+  RBrace,
   Under,
   Caret,
   Amp,
   Semicolon,
   Comma,
+  Colon,
   Dot,
+  DotDot,
   Str,
   Prime,
+  Bang,
+  Escape,
+  Shorthand,
   EOF,
 }
 
@@ -53,11 +60,45 @@ const OP_CHARS = new Set([
   '±', '∓', '×', '÷', '·', '∧', '∨', '⊕', '⊗',
   '≤', '≥', '≠', '≈', '≡', '∈', '∉', '∼', '≃', '≅',
   '⊂', '⊃', '⊆', '⊇', '←', '→', '↔', '⇐', '⇒', '⇔',
-  '⟵', '⟶', '⟷', '⟸', '⟹', '⟺',
+  '⟵', '⟶', '⟷', '⟸', '⟹', '⟺', '↦',
 ]);
 
 export function isAddOp(text: string): boolean {
   return OP_CHARS.has(text);
+}
+
+// Typst math shorthands. Multi-char ASCII sequences that map to a single
+// Unicode symbol token. Longest match wins.
+const SHORTHANDS: Array<[string, string]> = [
+  ['<==>', '⟺'],
+  ['<-->', '⟷'],
+  ['-->', '⟶'],
+  ['==>', '⟹'],
+  ['<==', '⟸'],
+  ['<->', '↔'],
+  ['<=>', '⇔'],
+  ['->>', '↠'],
+  ['|->', '↦'],
+  ['::=', '⩴'],
+  ['->', '→'],
+  ['=>', '⇒'],
+  ['<-', '←'],
+  ['<=', '≤'],
+  ['>=', '≥'],
+  ['!=', '≠'],
+  [':=', '≔'],
+  ['~~', '≈'],
+  ['~=', '≅'],
+  ['>>', '≫'],
+  ['<<', '≪'],
+  ['...', '…'],
+];
+
+function matchShorthand(src: string, i: number): [string, string] | null {
+  for (const [seq, sym] of SHORTHANDS) {
+    if (src.startsWith(seq, i)) return [seq, sym];
+  }
+  return null;
 }
 
 export function tokenize(src: string): Token[] {
@@ -90,6 +131,51 @@ export function tokenize(src: string): Token[] {
       continue;
     }
 
+    // Backslash escapes: \alpha, \(, \\, etc. Emit an Escape token whose
+    // text is the *content* (without the leading backslash). The parser
+    // tries the symbol table first, then falls back to atom/operator.
+    if (c === 92) { // '\'
+      i++;
+      if (i >= len) {
+        throw new ParseError('Unexpected end after backslash', start, src);
+      }
+      const nc = src.charCodeAt(i);
+      if (isLetter(nc)) {
+        const idStart = i;
+        while (i < len && isIdentContinue(src.charCodeAt(i))) i++;
+        let name = src.slice(idStart, i);
+        // Optional dotted suffix (\arrow.r.long).
+        while (
+          i + 1 < len &&
+          src.charCodeAt(i) === 46 &&
+          isLetter(src.charCodeAt(i + 1))
+        ) {
+          const dotPos = i;
+          i++;
+          const partStart = i;
+          while (i < len && isIdentContinue(src.charCodeAt(i))) i++;
+          name = name + '.' + src.slice(partStart, i);
+          void dotPos;
+        }
+        tokens.push({ kind: TK.Escape, text: name, pos: start });
+      } else {
+        // Single-char escape (e.g. \( \) \\ \{ \})
+        const ch = src[i]!;
+        i++;
+        tokens.push({ kind: TK.Escape, text: ch, pos: start });
+      }
+      continue;
+    }
+
+    // Shorthand multi-char operators take precedence over single-char ops.
+    const sh = matchShorthand(src, i);
+    if (sh !== null) {
+      const [seq, sym] = sh;
+      tokens.push({ kind: TK.Shorthand, text: sym, pos: start });
+      i += seq.length;
+      continue;
+    }
+
     switch (c) {
       case 34: { // "
         i++;
@@ -106,13 +192,27 @@ export function tokenize(src: string): Token[] {
       case 41: tokens.push({ kind: TK.RParen, text: ')', pos: start }); i++; break;
       case 91: tokens.push({ kind: TK.LBracket, text: '[', pos: start }); i++; break;
       case 93: tokens.push({ kind: TK.RBracket, text: ']', pos: start }); i++; break;
+      case 123: tokens.push({ kind: TK.LBrace, text: '{', pos: start }); i++; break;
+      case 125: tokens.push({ kind: TK.RBrace, text: '}', pos: start }); i++; break;
       case 95: tokens.push({ kind: TK.Under, text: '_', pos: start }); i++; break;
       case 94: tokens.push({ kind: TK.Caret, text: '^', pos: start }); i++; break;
       case 38: tokens.push({ kind: TK.Amp, text: '&', pos: start }); i++; break;
       case 59: tokens.push({ kind: TK.Semicolon, text: ';', pos: start }); i++; break;
       case 44: tokens.push({ kind: TK.Comma, text: ',', pos: start }); i++; break;
-      case 46: tokens.push({ kind: TK.Dot, text: '.', pos: start }); i++; break;
+      case 58: tokens.push({ kind: TK.Colon, text: ':', pos: start }); i++; break;
+      case 46: {
+        // '..' (spread) vs single '.' (field access / stop).
+        if (i + 1 < len && src.charCodeAt(i + 1) === 46) {
+          tokens.push({ kind: TK.DotDot, text: '..', pos: start });
+          i += 2;
+        } else {
+          tokens.push({ kind: TK.Dot, text: '.', pos: start });
+          i++;
+        }
+        break;
+      }
       case 39: tokens.push({ kind: TK.Prime, text: "'", pos: start }); i++; break;
+      case 33: tokens.push({ kind: TK.Bang, text: '!', pos: start }); i++; break;
       case 47: tokens.push({ kind: TK.Slash, text: '/', pos: start }); i++; break;
       default: {
         const ch = src[i]!;

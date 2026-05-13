@@ -15,7 +15,7 @@ export function renderHTML(node: AstNode, display: boolean): string {
 function renderNode(node: AstNode, ctx: RenderCtx): string {
   switch (node.type) {
     case 'seq': return renderSeq(node.nodes, ctx);
-    case 'atom': return renderAtom(node.text, node.italic);
+    case 'atom': return renderAtom(node.text, node.italic, node.operator === true);
     case 'number': return `<span class="kern-mn">${escapeHtml(node.value)}</span>`;
     case 'symbol': return renderSymbol(node.char);
     case 'operator': return `<span class="kern-mo">${escapeHtml(node.text)}</span>`;
@@ -31,6 +31,12 @@ function renderNode(node: AstNode, ctx: RenderCtx): string {
     case 'align': return `<span class="kern-align"></span>`;
     case 'binom': return renderBinom(node.top, node.bot, ctx);
     case 'accent': return renderAccent(node.kind, node.body, ctx);
+    case 'underover': return renderUnderOver(node.kind, node.body, node.annotation, ctx);
+    case 'cancel': return renderCancel(node.kind, node.body, ctx);
+    case 'op': return renderOpName(node.text);
+    case 'class': return renderNode(node.body, ctx);
+    case 'size': return renderNode(node.body, ctx);
+    case 'limits-hint': return renderNode(node.body, ctx);
   }
 }
 
@@ -38,7 +44,13 @@ function renderSeq(nodes: AstNode[], ctx: RenderCtx): string {
   return `<span class="kern-mrow">${nodes.map(n => renderNode(n, ctx)).join('')}</span>`;
 }
 
-function renderAtom(text: string, italic: boolean): string {
+function renderAtom(text: string, italic: boolean, isOperator: boolean): string {
+  if (isOperator) {
+    return (
+      `<span class="kern-mi kern-mathrm kern-op">${escapeHtml(text)}</span>` +
+      `<span class="kern-mspace" style="display:inline-block;width:0.1667em"></span>`
+    );
+  }
   const cls = italic ? 'kern-mi kern-mathnormal' : 'kern-mi kern-mathrm';
   return `<span class="${cls}">${escapeHtml(text)}</span>`;
 }
@@ -190,4 +202,52 @@ function renderAccent(kind: string, body: AstNode, ctx: RenderCtx): string {
 function renderSpacing(kind: string): string {
   const w = mspaceWidth(kind);
   return `<span class="kern-mspace" style="display:inline-block;width:${w}"></span>`;
+}
+
+const UNDEROVER_CHARS: Record<string, { ch: string; over: boolean }> = {
+  overbrace: { ch: '⏞', over: true },
+  underbrace: { ch: '⏟', over: false },
+  'overline.stretch': { ch: '‾', over: true },
+  'underline.stretch': { ch: '_', over: false },
+  overparen: { ch: '⏜', over: true },
+  underparen: { ch: '⏝', over: false },
+  overbracket: { ch: '⎴', over: true },
+  underbracket: { ch: '⎵', over: false },
+};
+
+function renderUnderOver(
+  kind: string,
+  body: AstNode,
+  annotation: AstNode | undefined,
+  ctx: RenderCtx,
+): string {
+  const info = UNDEROVER_CHARS[kind] ?? UNDEROVER_CHARS.overbrace!;
+  const cls = info.over ? 'kern-mover' : 'kern-munder';
+  const markCls = info.over ? 'kern-mover-mark' : 'kern-munder-mark';
+  const bodyCls = info.over ? 'kern-mover-body' : 'kern-munder-body';
+  const annHtml = annotation !== undefined
+    ? `<span class="${markCls} kern-ann">${renderNode(annotation, ctx)}</span>`
+    : '';
+  return (
+    `<span class="${cls}">` +
+    `<span class="${bodyCls}">${renderNode(body, ctx)}</span>` +
+    `<span class="${markCls}">${escapeHtml(info.ch)}</span>` +
+    annHtml +
+    `</span>`
+  );
+}
+
+function renderCancel(kind: string, body: AstNode, ctx: RenderCtx): string {
+  const cls =
+    kind === 'bcancel' ? 'kern-cancel kern-bcancel' :
+    kind === 'xcancel' ? 'kern-cancel kern-xcancel' :
+    'kern-cancel';
+  return `<span class="${cls}">${renderNode(body, ctx)}</span>`;
+}
+
+function renderOpName(text: string): string {
+  return (
+    `<span class="kern-mi kern-mathrm kern-op">${escapeHtml(text)}</span>` +
+    `<span class="kern-mspace" style="display:inline-block;width:0.1667em"></span>`
+  );
 }

@@ -1,17 +1,49 @@
 import { ParseError } from './errors.js';
 import { tokenize, TK, Token, isAddOp } from './lexer.js';
 import {
-  AstNode, SeqNode, AtomNode, NumberNode, SymbolNode, OperatorNode,
+  AstNode, AtomNode, SymbolNode,
   FracNode, SqrtNode, RootNode, AttachNode, MatrixNode, StyleNode,
-  LRNode, SpacingNode, BinomNode, AccentNode, MatrixKind, StyleKind, LRKind,
+  LRNode, SpacingNode, BinomNode, AccentNode,
+  UnderOverNode, CancelNode, OpNode, ClassNode, SizeNode, LimitsNode,
+  MatrixKind, StyleKind, LRKind, UnderOverKind, CancelKind, MathClass, MathSize,
   seq,
 } from './ast.js';
-import { lookupSymbol, isSpacing } from './symbols.js';
+import {
+  lookupSymbol, isSpacing, isNamedOperator, isLimitsOperator,
+} from './symbols.js';
 
 const STYLE_FUNCS = new Set<string>(['cal', 'bb', 'frak', 'bold', 'italic', 'upright', 'sans', 'mono']);
 const MATRIX_FUNCS = new Set<string>(['vec', 'mat', 'cases', 'bmat', 'pmat', 'vmat', 'Vmat']);
-const ACCENT_MAP: Record<string, string> = {
-  hat: '^', tilde: '~', dot: '˙', overline: '‾', bar: '‾', arrow: '→',
+
+const ACCENT_NAMES = new Set<string>([
+  'hat', 'tilde', 'dot', 'overline', 'bar', 'arrow',
+  'breve', 'grave', 'acute', 'macron', 'caron', 'circle',
+  'dot.double', 'dot.triple', 'arrow.l', 'arrow.l.r',
+]);
+
+const UNDEROVER_MAP: Record<string, UnderOverKind> = {
+  overbrace: 'overbrace',
+  underbrace: 'underbrace',
+  overline: 'overline.stretch',
+  underline: 'underline.stretch',
+  overparen: 'overparen',
+  underparen: 'underparen',
+  overbracket: 'overbracket',
+  underbracket: 'underbracket',
+};
+
+const CANCEL_MAP: Record<string, CancelKind> = {
+  cancel: 'cancel',
+  bcancel: 'bcancel',
+  xcancel: 'xcancel',
+};
+
+const MATH_CLASS_VALUES = new Set<MathClass>(['normal', 'op', 'bin', 'rel', 'open', 'close', 'punct']);
+const SIZE_FUNCS: Record<string, MathSize> = {
+  display: 'display',
+  inline: 'inline',
+  script: 'script',
+  sscript: 'sscript',
 };
 
 const SPACING_MAP: Record<string, SpacingNode['kind']> = {
@@ -83,7 +115,10 @@ class Parser {
     const nodes: AstNode[] = [];
     nodes.push(...this.collectFrac());
 
-    while (this.peek().kind === TK.Op && isAddOp(this.peek().text)) {
+    while (
+      (this.peek().kind === TK.Op || this.peek().kind === TK.Shorthand) &&
+      isAddOpText(this.peek().text)
+    ) {
       const op = this.consume();
       nodes.push({ type: 'operator', text: op.text });
       nodes.push(...this.collectFrac());
@@ -115,13 +150,14 @@ class Parser {
       if (t.kind === TK.EOF) break;
       if (t.kind === TK.RParen) break;
       if (t.kind === TK.RBracket) break;
+      if (t.kind === TK.RBrace) break;
       if (t.kind === TK.Amp) break;
       if (t.kind === TK.Semicolon) break;
       if (t.kind === TK.Comma) break;
       if (t.kind === TK.Slash) break;
       // Only stop on addOp when there are already atoms to the left.
       // At the start of a seq (nodes empty), addOp chars like '-' are unary.
-      if (nodes.length > 0 && t.kind === TK.Op && isAddOp(t.text)) break;
+      if (nodes.length > 0 && (t.kind === TK.Op || t.kind === TK.Shorthand) && isAddOpText(t.text)) break;
 
       const node = this.parseAttach();
       nodes.push(node);
@@ -206,12 +242,31 @@ class Parser {
       return { type: 'operator', text: t.text };
     }
 
+    if (t.kind === TK.Shorthand) {
+      this.consume();
+      return { type: 'operator', text: t.text };
+    }
+
+    if (t.kind === TK.Bang) {
+      this.consume();
+      return { type: 'operator', text: '!' };
+    }
+
+    if (t.kind === TK.Escape) {
+      this.consume();
+      return this.resolveName(t.text);
+    }
+
     if (t.kind === TK.LParen) {
       return this.parseGroup('(', ')');
     }
 
     if (t.kind === TK.LBracket) {
       return this.parseGroup('[', ']');
+    }
+
+    if (t.kind === TK.LBrace) {
+      return this.parseGroup('{', '}');
     }
 
     if (t.kind === TK.Ident) {
@@ -223,7 +278,7 @@ class Parser {
 
   private parseGroup(open: string, close: string): AstNode {
     this.consume(); // consume open
-    const closeKind = close === ')' ? TK.RParen : TK.RBracket;
+    const closeKind = close === ')' ? TK.RParen : close === ']' ? TK.RBracket : TK.RBrace;
 
     const body = this.parseAlign();
     if (this.peek().kind !== closeKind) {
@@ -237,7 +292,7 @@ class Parser {
 
     const lr: LRNode = {
       type: 'lr',
-      kind: open === '(' ? 'paren' : 'bracket',
+      kind: open === '(' ? 'paren' : open === '[' ? 'bracket' : 'brace',
       open,
       close,
       body,
@@ -247,29 +302,37 @@ class Parser {
 
   private parseIdent(): AstNode {
     const name = this.assembleDottedIdent();
+    return this.resolveName(name);
+  }
 
-    // Check spacing keywords
+  // Resolves a (possibly dotted) identifier or escape name to a node.
+  private resolveName(name: string): AstNode {
+    // Check spacing keywords first.
     if (name in SPACING_MAP) {
       const kind = SPACING_MAP[name]!;
       return { type: 'spacing', kind };
     }
 
-    // Check if it's a function call
+    // Function call?
     if (this.peek().kind === TK.LParen) {
       return this.parseCall(name);
     }
 
-    // Check symbol table (dotted or plain)
+    // Symbol table lookup (dotted or plain).
     const symChar = lookupSymbol(name);
     if (symChar !== undefined) {
-      // spacing symbols (thin, quad, etc.) stored as empty string
       if (isSpacing(name)) {
         return { type: 'spacing', kind: name as SpacingNode['kind'] };
       }
       return { type: 'symbol', name, char: symChar };
     }
 
-    // Single letter → italic variable; multi-letter → upright operator name
+    // Named operator (sin, cos, lim, ...): upright atom with operator flag.
+    if (isNamedOperator(name)) {
+      return { type: 'atom', text: name, italic: false, operator: true };
+    }
+
+    // Single letter -> italic variable; multi-letter -> upright text.
     const italic = name.length === 1 && /[a-zA-Z]/.test(name);
     return { type: 'atom', text: name, italic };
   }
@@ -292,23 +355,76 @@ class Parser {
   private parseCall(name: string): AstNode {
     this.consume(); // consume '('
 
-    // Special-cased functions
     if (name === 'frac') return this.parseFrac();
     if (name === 'sqrt') return this.parseSqrt();
     if (name === 'root') return this.parseRoot();
     if (name === 'binom') return this.parseBinom();
     if (name === 'lr') return this.parseLr();
+    if (name === 'op') return this.parseOp();
+    if (name === 'class') return this.parseClass();
+    if (name === 'limits') return this.parseLimitsHint('limits');
+    if (name === 'scripts') return this.parseLimitsHint('scripts');
+    if (name === 'mid') return this.parseMid();
+    if (name === 'cancel' || name === 'bcancel' || name === 'xcancel') {
+      return this.parseCancel(name);
+    }
+    if (name in SIZE_FUNCS) return this.parseSize(SIZE_FUNCS[name]!);
+    if (name in UNDEROVER_MAP) return this.parseUnderOver(UNDEROVER_MAP[name]!);
     if (name in LR_MAP) return this.parseLrShorthand(name);
-    if (name in ACCENT_MAP) return this.parseAccent(name);
+    if (ACCENT_NAMES.has(name)) return this.parseAccent(name);
     if (STYLE_FUNCS.has(name)) return this.parseStyle(name as StyleKind);
     if (MATRIX_FUNCS.has(name)) return this.parseMatrix(name as MatrixKind);
 
-    // Fallback: treat as function application (upright name + paren group)
-    const body = this.parseAlign();
-    this.expect(TK.RParen);
+    // Fallback: treat as function application (upright name + paren group).
+    // Use parseArgs so named/spread arguments still parse.
+    const args = this.parseArgs();
     const fnName: AtomNode = { type: 'atom', text: name, italic: false };
-    const arg: LRNode = { type: 'lr', kind: 'paren', open: '(', close: ')', body };
+    const bodyExpr = argsToSeq(args);
+    const arg: LRNode = { type: 'lr', kind: 'paren', open: '(', close: ')', body: bodyExpr };
     return seq([fnName, arg]);
+  }
+
+  // Parses a comma-separated argument list, handling named args (k: v) and
+  // spread args (..expr). Returns the positional and named pieces; the
+  // closing ')' is consumed.
+  private parseArgs(): { positional: AstNode[]; named: Record<string, AstNode> } {
+    const positional: AstNode[] = [];
+    const named: Record<string, AstNode> = {};
+
+    while (this.peek().kind !== TK.RParen && this.peek().kind !== TK.EOF) {
+      // Skip leading commas (allows mat(1, 0; 0, 1) inner tokenization that
+      // accidentally yields a comma here in some recovery paths).
+      if (this.peek().kind === TK.Comma) {
+        this.consume();
+        continue;
+      }
+
+      // Spread: ..expr — we just keep the inner expression for now.
+      if (this.peek().kind === TK.DotDot) {
+        this.consume();
+        positional.push(this.parseAlign());
+        if (this.peek().kind === TK.Comma) this.consume();
+        continue;
+      }
+
+      // Named argument: ident ':' expr
+      if (
+        this.peek().kind === TK.Ident &&
+        this.peek(1).kind === TK.Colon
+      ) {
+        const key = this.consume().text;
+        this.consume(); // ':'
+        named[key] = this.parseAlign();
+        if (this.peek().kind === TK.Comma) this.consume();
+        continue;
+      }
+
+      positional.push(this.parseAlign());
+      if (this.peek().kind === TK.Comma) this.consume();
+    }
+
+    this.expect(TK.RParen);
+    return { positional, named };
   }
 
   private parseFrac(): FracNode {
@@ -342,10 +458,6 @@ class Parser {
   }
 
   private parseLr(): LRNode {
-    // lr(expr): parse the body as a full expression, then consume the ')' of
-    // the lr() call itself. If the body is already an LR node (from a parsed
-    // paren or bracket group), return it directly. Otherwise inspect the seq
-    // head and tail for matching delimiter characters.
     const body = this.parseAlign();
     this.expect(TK.RParen);
 
@@ -386,12 +498,105 @@ class Parser {
     return { type: 'style', kind, body };
   }
 
+  private parseUnderOver(kind: UnderOverKind): UnderOverNode {
+    const body = this.parseAlign();
+    let annotation: AstNode | undefined;
+    if (this.peek().kind === TK.Comma) {
+      this.consume();
+      annotation = this.parseAlign();
+    }
+    this.expect(TK.RParen);
+    const out: UnderOverNode = { type: 'underover', kind, body };
+    if (annotation !== undefined) out.annotation = annotation;
+    return out;
+  }
+
+  private parseCancel(name: string): CancelNode {
+    const body = this.parseAlign();
+    this.expect(TK.RParen);
+    return { type: 'cancel', kind: CANCEL_MAP[name]!, body };
+  }
+
+  private parseOp(): OpNode {
+    // op("text") or op("text", limits: true). The text becomes the operator
+    // name; missing text falls back to a marker atom.
+    let text = '';
+    let limits = false;
+    if (this.peek().kind === TK.RParen) {
+      this.consume();
+      return { type: 'op', text: '', limits: false };
+    }
+    const first = this.parseAlign();
+    if (first.type === 'text') {
+      text = first.value;
+    } else if (first.type === 'atom') {
+      text = first.text;
+    }
+    while (this.peek().kind === TK.Comma) {
+      this.consume();
+      if (
+        this.peek().kind === TK.Ident &&
+        this.peek().text === 'limits' &&
+        this.peek(1).kind === TK.Colon
+      ) {
+        this.consume(); // limits
+        this.consume(); // :
+        const v = this.parseAlign();
+        if (v.type === 'atom') limits = v.text === 'true';
+      } else {
+        // Drop extra positional args.
+        this.parseAlign();
+      }
+    }
+    this.expect(TK.RParen);
+    return { type: 'op', text, limits };
+  }
+
+  private parseClass(): ClassNode {
+    // class("name", body)
+    const first = this.parseAlign();
+    this.expect(TK.Comma);
+    const body = this.parseAlign();
+    this.expect(TK.RParen);
+    let cls: MathClass = 'normal';
+    const candidate =
+      first.type === 'text' ? first.value :
+      first.type === 'atom' ? first.text : '';
+    if (MATH_CLASS_VALUES.has(candidate as MathClass)) {
+      cls = candidate as MathClass;
+    }
+    return { type: 'class', cls, body };
+  }
+
+  private parseSize(size: MathSize): SizeNode {
+    const body = this.parseAlign();
+    this.expect(TK.RParen);
+    return { type: 'size', size, body };
+  }
+
+  private parseLimitsHint(mode: 'limits' | 'scripts'): LimitsNode {
+    const body = this.parseAlign();
+    this.expect(TK.RParen);
+    return { type: 'limits-hint', mode, body };
+  }
+
+  private parseMid(): AstNode {
+    // mid(x): a separator inside lr(), rendered as a stretched relation.
+    // For now we wrap as a relation operator.
+    const body = this.parseAlign();
+    this.expect(TK.RParen);
+    return { type: 'class', cls: 'rel', body };
+  }
+
   private parseMatrix(kind: MatrixKind): MatrixNode {
     const rows: AstNode[][] = [];
     let row: AstNode[] = [];
     // For vec/cases, commas separate rows (single-column items).
     // For mat/bmat/pmat/vmat/Vmat, commas separate columns within a row.
     const commaIsRowSep = kind === 'vec' || kind === 'cases';
+
+    // Track named args (delim:, align:, gap:, ...). We only honor `delim`.
+    let delim: { open: string; close: string } | undefined;
 
     while (this.peek().kind !== TK.RParen && this.peek().kind !== TK.EOF) {
       const t = this.peek();
@@ -405,6 +610,16 @@ class Parser {
           rows.push(row);
           row = [];
         }
+      } else if (t.kind === TK.Ident && this.peek(1).kind === TK.Colon) {
+        const key = this.consume().text;
+        this.consume(); // ':'
+        const val = this.parseAlign();
+        if (key === 'delim') {
+          delim = delimFromValue(val);
+        }
+      } else if (t.kind === TK.DotDot) {
+        this.consume();
+        row.push(this.parseAlign());
       } else {
         row.push(this.parseAlign());
       }
@@ -412,8 +627,45 @@ class Parser {
 
     if (row.length > 0) rows.push(row);
     this.expect(TK.RParen);
-    return { type: 'matrix', kind, rows };
+    const out: MatrixNode = { type: 'matrix', kind, rows };
+    if (delim !== undefined) out.delim = delim;
+    return out;
   }
+}
+
+function delimFromValue(node: AstNode): { open: string; close: string } | undefined {
+  const s =
+    node.type === 'text' ? node.value :
+    node.type === 'atom' ? node.text :
+    node.type === 'symbol' ? node.char :
+    node.type === 'operator' ? node.text : '';
+  switch (s) {
+    case '(':
+      return { open: '(', close: ')' };
+    case '[':
+      return { open: '[', close: ']' };
+    case '{':
+      return { open: '{', close: '}' };
+    case '|':
+      return { open: '|', close: '|' };
+    case '||':
+      return { open: '‖', close: '‖' };
+    default:
+      return undefined;
+  }
+}
+
+function argsToSeq(args: { positional: AstNode[]; named: Record<string, AstNode> }): AstNode {
+  // Flatten positional args separated by commas for the "treat as function
+  // application" fallback path.
+  if (args.positional.length === 0) return { type: 'seq', nodes: [] };
+  if (args.positional.length === 1) return args.positional[0]!;
+  const nodes: AstNode[] = [];
+  for (let i = 0; i < args.positional.length; i++) {
+    if (i > 0) nodes.push({ type: 'operator', text: ',' });
+    nodes.push(args.positional[i]!);
+  }
+  return seq(nodes);
 }
 
 function mirrorDelimiter(open: string): string {
@@ -424,3 +676,10 @@ function mirrorDelimiter(open: string): string {
   };
   return mirrors[open] ?? open;
 }
+
+function isAddOpText(text: string): boolean {
+  return isAddOp(text);
+}
+
+// Re-export so the auto-render utility can probe operator names.
+export { isLimitsOperator };

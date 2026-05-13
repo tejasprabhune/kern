@@ -1,12 +1,20 @@
-import type { AstNode, MatrixKind } from '../ast.js';
+import type { AstNode, AttachNode, MatrixKind, UnderOverNode, MathClass, MathSize } from '../ast.js';
+import { isBigOperator, isLimitsOperator } from '../symbols.js';
 import { escapeHtml, mathvariantForStyle, mspaceWidth } from './shared.js';
 
 interface RenderCtx {
   display: boolean;
+  // The current script level. 0 is text/inline, +1 is a sub/sup, etc.
+  scriptLevel: number;
+  // Forced limit placement: 'limits' = under/over, 'scripts' = sub/sup,
+  // 'auto' or undefined = decide based on base + display.
+  limitsHint?: 'limits' | 'scripts';
 }
 
+const BIG_OP_RE = /^[∑∏∐∫∬∭⨌∮∯∰∱∲∳⋃⋂⨆⨅⨀⨁⨂⨃⨄⨊⨋]$/u;
+
 export function renderMathML(node: AstNode, display: boolean): string {
-  const ctx: RenderCtx = { display };
+  const ctx: RenderCtx = { display, scriptLevel: 0 };
   const inner = renderNode(node, ctx);
   const displayAttr = display ? ' display="block"' : '';
   return `<math xmlns="http://www.w3.org/1998/Math/MathML"${displayAttr}>${inner}</math>`;
@@ -15,7 +23,7 @@ export function renderMathML(node: AstNode, display: boolean): string {
 function renderNode(node: AstNode, ctx: RenderCtx): string {
   switch (node.type) {
     case 'seq': return renderSeq(node.nodes, ctx);
-    case 'atom': return renderAtom(node.text, node.italic);
+    case 'atom': return renderAtom(node.text, node.italic, node.operator === true);
     case 'number': return `<mn>${escapeHtml(node.value)}</mn>`;
     case 'symbol': return renderSymbol(node.char);
     case 'operator': return `<mo>${escapeHtml(node.text)}</mo>`;
@@ -24,13 +32,19 @@ function renderNode(node: AstNode, ctx: RenderCtx): string {
     case 'sqrt': return `<msqrt>${renderNode(node.body, ctx)}</msqrt>`;
     case 'root': return `<mroot>${renderNode(node.body, ctx)}${renderNode(node.index, ctx)}</mroot>`;
     case 'attach': return renderAttach(node, ctx);
-    case 'matrix': return renderMatrix(node.kind, node.rows, ctx);
+    case 'matrix': return renderMatrix(node.kind, node.rows, node.delim, ctx);
     case 'style': return renderStyle(node.kind, node.body, ctx);
     case 'lr': return renderLR(node.open, node.close, node.body, ctx);
     case 'spacing': return `<mspace width="${mspaceWidth(node.kind)}"/>`;
     case 'align': return `<mo>&#x200B;</mo>`;
     case 'binom': return renderBinom(node.top, node.bot, ctx);
     case 'accent': return renderAccent(node.kind, node.body, ctx);
+    case 'underover': return renderUnderOver(node, ctx);
+    case 'cancel': return renderCancel(node.kind, renderNode(node.body, ctx));
+    case 'op': return renderOpName(node.text, node.limits);
+    case 'class': return renderClass(node.cls, node.body, ctx);
+    case 'size': return renderSize(node.size, node.body, ctx);
+    case 'limits-hint': return renderNode(node.body, { ...ctx, limitsHint: node.mode });
   }
 }
 
@@ -54,7 +68,12 @@ function renderSeq(nodes: AstNode[], ctx: RenderCtx): string {
   return `<mrow>${parts.join('')}</mrow>`;
 }
 
-function renderAtom(text: string, italic: boolean): string {
+function renderAtom(text: string, italic: boolean, isOperator: boolean): string {
+  // Operator names (sin, cos, lim, ...) render upright with a trailing thin
+  // space so `sin x` reads as "sin x".
+  if (isOperator) {
+    return `<mi mathvariant="normal">${escapeHtml(text)}</mi><mspace width="0.1667em"/>`;
+  }
   const variant = italic ? '' : ' mathvariant="normal"';
   return `<mi${variant}>${escapeHtml(text)}</mi>`;
 }
@@ -62,70 +81,120 @@ function renderAtom(text: string, italic: boolean): string {
 function renderSymbol(char: string): string {
   if (char === '') return '<mspace width="0em"/>';
 
-  // Decide tag: operators vs identifiers vs numbers
   const cp = char.codePointAt(0) ?? 0;
 
-  // Arrows, relations, binary operators → <mo>
+  // Big operators: emit largeop + movablelimits so the browser stretches
+  // and (where possible) stacks limits in display mode.
+  if (isBigOperator(char) || BIG_OP_RE.test(char)) {
+    return `<mo largeop="true" movablelimits="true">${escapeHtml(char)}</mo>`;
+  }
+
   if (isOperatorChar(cp)) return `<mo>${escapeHtml(char)}</mo>`;
-
-  // Letters (Greek, script, etc.) → <mi>
   if (isLetterChar(cp)) return `<mi>${escapeHtml(char)}</mi>`;
-
-  // Default → <mo>
   return `<mo>${escapeHtml(char)}</mo>`;
 }
 
 function isOperatorChar(cp: number): boolean {
-  // Arrows (U+2190–U+21FF), operators (U+2200–U+22FF), misc (U+2300–U+27FF)
   return (cp >= 0x2190 && cp <= 0x27FF) ||
-    cp === 0x00B1 || cp === 0x00D7 || cp === 0x00F7 || // ±×÷
+    cp === 0x00B1 || cp === 0x00D7 || cp === 0x00F7 ||
     (cp >= 0x2A00 && cp <= 0x2AFF);
 }
 
 function isLetterChar(cp: number): boolean {
-  // Greek (U+0391–U+03FF), letterlike (U+2100–U+214F), math alpha (U+1D400–U+1D7FF)
   return (cp >= 0x0391 && cp <= 0x03FF) ||
     (cp >= 0x2100 && cp <= 0x214F) ||
     (cp >= 0x1D400 && cp <= 0x1D7FF);
 }
 
 function renderFrac(num: AstNode, den: AstNode, ctx: RenderCtx): string {
-  return `<mfrac>${renderNode(num, ctx)}${renderNode(den, ctx)}</mfrac>`;
+  const ds = ctx.display ? ' displaystyle="true"' : '';
+  const childCtx: RenderCtx = ctx.display ? ctx : ctx;
+  return `<mfrac${ds}>${renderNode(num, childCtx)}${renderNode(den, childCtx)}</mfrac>`;
 }
 
 function renderBinom(top: AstNode, bot: AstNode, ctx: RenderCtx): string {
-  return `<mrow><mo>(</mo><mfrac linethickness="0">${renderNode(top, ctx)}${renderNode(bot, ctx)}</mfrac><mo>)</mo></mrow>`;
+  const ds = ctx.display ? ' displaystyle="true"' : '';
+  return (
+    `<mrow>` +
+    `<mo form="prefix" stretchy="true">(</mo>` +
+    `<mfrac linethickness="0"${ds}>${renderNode(top, ctx)}${renderNode(bot, ctx)}</mfrac>` +
+    `<mo form="postfix" stretchy="true">)</mo>` +
+    `</mrow>`
+  );
 }
 
-function renderAttach(node: { base: AstNode; sub?: AstNode; sup?: AstNode }, ctx: RenderCtx): string {
-  const base = renderNode(node.base, ctx);
-  if (node.sub !== undefined && node.sup !== undefined) {
-    return `<msubsup>${base}${renderNode(node.sub, ctx)}${renderNode(node.sup, ctx)}</msubsup>`;
-  }
-  if (node.sub !== undefined) {
-    return `<msub>${base}${renderNode(node.sub, ctx)}</msub>`;
-  }
-  if (node.sup !== undefined) {
-    return `<msup>${base}${renderNode(node.sup, ctx)}</msup>`;
-  }
-  return base;
+// Returns true if this base should put attachments under/over instead of
+// sub/sup, given current display state and any explicit hint.
+function baseUsesLimits(base: AstNode, ctx: RenderCtx): boolean {
+  if (ctx.limitsHint === 'limits') return true;
+  if (ctx.limitsHint === 'scripts') return false;
+  if (!ctx.display) return false;
+  if (base.type === 'symbol' && isBigOperator(base.char)) return true;
+  if (base.type === 'atom' && base.operator === true && isLimitsOperator(base.text)) return true;
+  if (base.type === 'op' && base.limits) return true;
+  if (base.type === 'op' && isLimitsOperator(base.text)) return true;
+  return false;
 }
 
-function renderMatrix(kind: MatrixKind, rows: AstNode[][], ctx: RenderCtx): string {
-  const { open, close } = matrixDelimiters(kind);
+function renderAttach(node: AttachNode, ctx: RenderCtx): string {
+  // Operator-atom bases append a trailing <mspace>; strip that before
+  // wrapping so the script attaches to the letterform.
+  const baseHtml = renderBaseForAttach(node.base, ctx);
+  const subHtml = node.sub !== undefined ? renderNode(node.sub, ctx) : undefined;
+  const supHtml = node.sup !== undefined ? renderNode(node.sup, ctx) : undefined;
+
+  const useLimits = baseUsesLimits(node.base, ctx);
+
+  if (subHtml !== undefined && supHtml !== undefined) {
+    return useLimits
+      ? `<munderover>${baseHtml}${subHtml}${supHtml}</munderover>`
+      : `<msubsup>${baseHtml}${subHtml}${supHtml}</msubsup>`;
+  }
+  if (subHtml !== undefined) {
+    return useLimits
+      ? `<munder>${baseHtml}${subHtml}</munder>`
+      : `<msub>${baseHtml}${subHtml}</msub>`;
+  }
+  if (supHtml !== undefined) {
+    return useLimits
+      ? `<mover>${baseHtml}${supHtml}</mover>`
+      : `<msup>${baseHtml}${supHtml}</msup>`;
+  }
+  return baseHtml;
+}
+
+// Render the base of an attach without the trailing operator-name thin space.
+function renderBaseForAttach(base: AstNode, ctx: RenderCtx): string {
+  if (base.type === 'atom' && base.operator === true) {
+    return `<mi mathvariant="normal">${escapeHtml(base.text)}</mi>`;
+  }
+  if (base.type === 'op') {
+    return `<mi mathvariant="normal">${escapeHtml(base.text)}</mi>`;
+  }
+  return renderNode(base, ctx);
+}
+
+function renderMatrix(
+  kind: MatrixKind,
+  rows: AstNode[][],
+  delim: { open: string; close: string } | undefined,
+  ctx: RenderCtx,
+): string {
+  const { open, close } = delim ?? matrixDelimiters(kind);
   const tableRows = rows.map(row => {
     const cells = row.map(cell => `<mtd>${renderNode(cell, ctx)}</mtd>`).join('');
     return `<mtr>${cells}</mtr>`;
   }).join('');
 
-  let table = `<mtable>${tableRows}</mtable>`;
-
   if (kind === 'cases') {
-    return `<mrow><mo>{</mo><mtable columnalign="left">${tableRows}</mtable></mrow>`;
+    return `<mrow><mo form="prefix" stretchy="true">{</mo><mtable columnalign="left left">${tableRows}</mtable></mrow>`;
   }
 
+  const table = `<mtable>${tableRows}</mtable>`;
   if (open || close) {
-    return `<mrow><mo>${escapeHtml(open)}</mo>${table}<mo>${escapeHtml(close)}</mo></mrow>`;
+    const o = open ? `<mo form="prefix" stretchy="true">${escapeHtml(open)}</mo>` : '';
+    const c = close ? `<mo form="postfix" stretchy="true">${escapeHtml(close)}</mo>` : '';
+    return `<mrow>${o}${table}${c}</mrow>`;
   }
   return table;
 }
@@ -138,7 +207,7 @@ function matrixDelimiters(kind: MatrixKind): { open: string; close: string } {
     case 'bmat': return { open: '[', close: ']' };
     case 'vmat': return { open: '|', close: '|' };
     case 'Vmat': return { open: '‖', close: '‖' };
-    case 'cases': return { open: '', close: '' };
+    case 'cases': return { open: '{', close: '' };
     default: return { open: '(', close: ')' };
   }
 }
@@ -146,22 +215,124 @@ function matrixDelimiters(kind: MatrixKind): { open: string; close: string } {
 function renderStyle(kind: string, body: AstNode, ctx: RenderCtx): string {
   const variant = mathvariantForStyle(kind);
   const inner = renderNode(body, ctx);
-
-  // Wrap in mstyle with mathvariant
   return `<mstyle mathvariant="${variant}">${inner}</mstyle>`;
 }
 
 function renderLR(open: string, close: string, body: AstNode, ctx: RenderCtx): string {
-  const openMo = open ? `<mo>${escapeHtml(open)}</mo>` : '';
-  const closeMo = close ? `<mo>${escapeHtml(close)}</mo>` : '';
+  const openMo = open
+    ? `<mo form="prefix" stretchy="true" fence="true">${escapeHtml(open)}</mo>`
+    : '';
+  const closeMo = close
+    ? `<mo form="postfix" stretchy="true" fence="true">${escapeHtml(close)}</mo>`
+    : '';
   return `<mrow>${openMo}${renderNode(body, ctx)}${closeMo}</mrow>`;
 }
 
 const ACCENT_CHARS: Record<string, string> = {
-  hat: '^', tilde: '~', dot: '˙', overline: '‾', bar: '‾', arrow: '⃗',
+  hat: '^',
+  tilde: '~',
+  dot: '˙',
+  'dot.double': '¨',
+  'dot.triple': '⃛',
+  overline: '‾',
+  bar: '‾',
+  arrow: '⃗',
+  'arrow.l': '⃖',
+  'arrow.l.r': '⃡',
+  breve: '˘',
+  grave: '`',
+  acute: '´',
+  macron: '¯',
+  caron: 'ˇ',
+  circle: '˚',
 };
 
 function renderAccent(kind: string, body: AstNode, ctx: RenderCtx): string {
   const ch = ACCENT_CHARS[kind] ?? '^';
   return `<mover accent="true">${renderNode(body, ctx)}<mo>${escapeHtml(ch)}</mo></mover>`;
+}
+
+const UNDEROVER_CHARS: Record<UnderOverNode['kind'], { ch: string; over: boolean }> = {
+  overbrace: { ch: '⏞', over: true },
+  underbrace: { ch: '⏟', over: false },
+  'overline.stretch': { ch: '‾', over: true },
+  'underline.stretch': { ch: '_', over: false },
+  overparen: { ch: '⏜', over: true },
+  underparen: { ch: '⏝', over: false },
+  overbracket: { ch: '⎴', over: true },
+  underbracket: { ch: '⎵', over: false },
+};
+
+function renderUnderOver(node: UnderOverNode, ctx: RenderCtx): string {
+  const info = UNDEROVER_CHARS[node.kind];
+  const tag = info.over ? 'mover' : 'munder';
+  const body = renderNode(node.body, ctx);
+  const mark = `<mo stretchy="true">${escapeHtml(info.ch)}</mo>`;
+  const inner = `<${tag} accent="true">${body}${mark}</${tag}>`;
+  if (node.annotation === undefined) return inner;
+  const ann = renderNode(node.annotation, ctx);
+  // overbrace(body, ann) -> body with brace, with annotation on top of brace.
+  // MathML expresses this with a nested mover/munder.
+  if (info.over) {
+    return `<mover>${inner}${ann}</mover>`;
+  }
+  return `<munder>${inner}${ann}</munder>`;
+}
+
+function renderCancel(kind: string, inner: string): string {
+  const notation =
+    kind === 'bcancel' ? 'downdiagonalstrike' :
+    kind === 'xcancel' ? 'updiagonalstrike downdiagonalstrike' :
+    'updiagonalstrike';
+  return `<menclose notation="${notation}">${inner}</menclose>`;
+}
+
+function renderOpName(text: string, _limits: boolean): string {
+  return `<mi mathvariant="normal">${escapeHtml(text)}</mi><mspace width="0.1667em"/>`;
+}
+
+function renderClass(cls: MathClass, body: AstNode, ctx: RenderCtx): string {
+  // For inline classes we just pass the body through, since MathML doesn't
+  // have a first-class "class override" element. For binary/relation/op we
+  // could wrap a single character in a tagged <mo>, but the common useful
+  // case is wrapping an arbitrary expression. Keep it simple: passthrough.
+  if (body.type === 'atom' || body.type === 'symbol' || body.type === 'operator') {
+    const text =
+      body.type === 'atom' ? body.text :
+      body.type === 'symbol' ? body.char :
+      body.text;
+    if (cls === 'op') {
+      return `<mo largeop="true" movablelimits="true">${escapeHtml(text)}</mo>`;
+    }
+    if (cls === 'bin' || cls === 'rel' || cls === 'punct') {
+      return `<mo>${escapeHtml(text)}</mo>`;
+    }
+    if (cls === 'open') {
+      return `<mo form="prefix" stretchy="true">${escapeHtml(text)}</mo>`;
+    }
+    if (cls === 'close') {
+      return `<mo form="postfix" stretchy="true">${escapeHtml(text)}</mo>`;
+    }
+    if (cls === 'normal') {
+      return `<mi mathvariant="normal">${escapeHtml(text)}</mi>`;
+    }
+  }
+  return renderNode(body, ctx);
+}
+
+function renderSize(size: MathSize, body: AstNode, ctx: RenderCtx): string {
+  const ds = size === 'display' ? 'true' : size === 'inline' ? 'false' : undefined;
+  const sl =
+    size === 'display' || size === 'inline' ? '0' :
+    size === 'script' ? '1' :
+    size === 'sscript' ? '2' : undefined;
+  const attrs = [
+    ds !== undefined ? `displaystyle="${ds}"` : '',
+    sl !== undefined ? `scriptlevel="${sl}"` : '',
+  ].filter(Boolean).join(' ');
+  const next: RenderCtx = {
+    ...ctx,
+    display: size === 'display' ? true : size === 'inline' ? false : ctx.display,
+  };
+  return `<mstyle ${attrs}>${renderNode(body, next)}</mstyle>`;
 }

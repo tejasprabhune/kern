@@ -93,7 +93,8 @@ export const SYMBOLS: Record<string, string> = {
   tack: '⊢',
   'tack.r': '⊢',
   'tack.l': '⊣',
-  'tack.r.double': '⊨',
+  'tack.r.double': '⫤',
+  'tack.l.double': '⊨',
 
   // Set operations
   'in': '∈',
@@ -302,6 +303,43 @@ export const SYMBOLS: Record<string, string> = {
   'bar.v': '|',
   'bar.v.double': '‖',
 
+  // Suits
+  'suit.heart': '♥',
+  'suit.club': '♣',
+  'suit.diamond': '♦',
+  'suit.spade': '♠',
+  'suit.heart.stroked': '♡',
+  'suit.club.stroked': '♧',
+  'suit.diamond.stroked': '♢',
+  'suit.spade.stroked': '♤',
+
+  // Chevrons
+  'chevron.l': '⟨',
+  'chevron.r': '⟩',
+  'chevron.l.double': '⟪',
+  'chevron.r.double': '⟫',
+
+  // Stroked / extra brackets
+  'bracket.stroked.l': '⟦',
+  'bracket.stroked.r': '⟧',
+
+  // Diamonds
+  'diamond.small': '⋄',
+  'diamond.filled': '◆',
+  'diamond.stroked': '◇',
+
+  // Misc symbols
+  amp: '&',
+  'amp.inv': '⅋',
+  percent: '%',
+  permille: '‰',
+  'dotless.i': 'ı',
+  'dotless.j': 'ȷ',
+  'space.nobreak': ' ',
+  'space.nobreak.narrow': ' ',
+  'space.figure': ' ',
+  'space.med': ' ',
+
   // Miscellaneous
   aleph: 'ℵ',
   beth: 'ℶ',
@@ -382,4 +420,46 @@ export function isSpacing(name: string): boolean {
 
 export function lookupSymbol(name: string): string | undefined {
   return SYMBOLS[name];
+}
+
+// Named operator functions in Typst's `op` module. These render upright with
+// thin spacing after, and some of them (LIMITS_OPERATORS below) place
+// attachments under/over in display style instead of as sub/sup.
+export const NAMED_OPERATORS = new Set<string>([
+  'sin', 'cos', 'tan', 'cot', 'sec', 'csc',
+  'sinh', 'cosh', 'tanh', 'coth', 'sech', 'csch',
+  'arcsin', 'arccos', 'arctan',
+  'log', 'ln', 'lg', 'exp',
+  'lim', 'liminf', 'limsup',
+  'inf', 'sup',
+  'max', 'min',
+  'det', 'gcd', 'lcm', 'mod',
+  'arg', 'deg', 'dim',
+  'hom', 'id', 'im', 'ker', 'tr', 'Pr',
+]);
+
+// Operators that take limits (under/over placement) in display mode.
+export const LIMITS_OPERATORS = new Set<string>([
+  'lim', 'liminf', 'limsup',
+  'inf', 'sup',
+  'max', 'min',
+  'det', 'gcd', 'arg',
+]);
+
+export function isNamedOperator(name: string): boolean {
+  return NAMED_OPERATORS.has(name);
+}
+
+export function isLimitsOperator(name: string): boolean {
+  return LIMITS_OPERATORS.has(name);
+}
+
+// Unicode codepoint sets for big operators (∑ ∏ ∫ ⋃ ⋂ ⨆ ...).
+const BIG_OPERATOR_CHARS = new Set<string>([
+  '∑', '∏', '∐', '∫', '∬', '∭', '⨌', '∮', '∯', '∰', '∱', '∲', '∳',
+  '⋃', '⋂', '⨆', '⨅', '⨀', '⨁', '⨂', '⨃', '⨄', '⨊', '⨋',
+]);
+
+export function isBigOperator(ch: string): boolean {
+  return BIG_OPERATOR_CHARS.has(ch);
 }
