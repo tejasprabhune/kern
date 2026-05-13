@@ -1,0 +1,239 @@
+/* kern.css: HTML/CSS renderer styles. Reuses KaTeX web fonts. */
+/* @import url("https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.11/katex.min.css"); */
+
+.kern {
+  font: normal 1.21em KaTeX_Math, "Times New Roman", serif;
+  line-height: 1.2;
+  text-indent: 0;
+  text-rendering: auto;
+  white-space: nowrap;
+}
+
+.kern-display {
+  display: block;
+  text-align: center;
+  margin: 1em 0;
+}
+
+.kern-inline {
+  display: inline-block;
+}
+
+.kern-mrow {
+  display: inline-block;
+  position: relative;
+}
+
+/* Identifiers */
+.kern-mi {
+  display: inline-block;
+  font-style: italic;
+  font-family: KaTeX_Math, "Times New Roman", serif;
+}
+
+.kern-mi.kern-mathrm {
+  font-style: normal;
+  font-family: KaTeX_Main, "Times New Roman", serif;
+}
+
+/* Numbers */
+.kern-mn {
+  display: inline-block;
+  font-style: normal;
+  font-family: KaTeX_Main, "Times New Roman", serif;
+}
+
+/* Operators */
+.kern-mo {
+  display: inline-block;
+  font-style: normal;
+  font-family: KaTeX_Main, "Times New Roman", serif;
+  padding: 0 0.2em;
+}
+
+.kern-mo.kern-delimiter {
+  padding: 0;
+  font-family: KaTeX_Size1, KaTeX_Main, "Times New Roman", serif;
+}
+
+/* Text */
+.kern-mtext {
+  display: inline-block;
+  font-style: normal;
+  font-family: KaTeX_Main, "Times New Roman", serif;
+}
+
+/* Fractions */
+.kern-mfrac {
+  display: inline-block;
+  vertical-align: middle;
+  text-align: center;
+}
+
+.kern-mfrac-num {
+  display: block;
+  font-size: 0.9em;
+  border-bottom: 0.05em solid currentColor;
+  padding-bottom: 0.1em;
+}
+
+.kern-mfrac-den {
+  display: block;
+  font-size: 0.9em;
+  padding-top: 0.1em;
+}
+
+.kern-mfrac-binom .kern-mfrac-num,
+.kern-mfrac-binom .kern-mfrac-den {
+  border-bottom: none;
+}
+
+/* Square root */
+.kern-sqrt {
+  display: inline-block;
+  vertical-align: middle;
+  position: relative;
+}
+
+.kern-sqrt-sign {
+  display: inline-block;
+  font-family: KaTeX_Size1, KaTeX_Main, serif;
+  vertical-align: middle;
+}
+
+.kern-sqrt-body {
+  display: inline-block;
+  border-top: 0.05em solid currentColor;
+  padding: 0.1em 0.1em 0 0.2em;
+  vertical-align: middle;
+}
+
+/* Nth root */
+.kern-nroot {
+  position: relative;
+}
+
+.kern-nroot-index {
+  display: inline-block;
+  vertical-align: super;
+  font-size: 0.65em;
+  margin-right: -0.3em;
+  position: relative;
+  z-index: 1;
+}
+
+/* Sub/superscripts */
+.kern-msub {
+  display: inline-block;
+  vertical-align: baseline;
+}
+
+.kern-msub-script {
+  display: inline-block;
+  vertical-align: sub;
+  font-size: 0.75em;
+}
+
+.kern-msup {
+  display: inline-block;
+  vertical-align: baseline;
+}
+
+.kern-msup-script {
+  display: inline-block;
+  vertical-align: super;
+  font-size: 0.75em;
+}
+
+.kern-msubsup {
+  display: inline-flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.kern-msubsup-base {
+  display: inline-block;
+}
+
+.kern-msubsup-scripts {
+  display: inline-flex;
+  flex-direction: column;
+  font-size: 0.75em;
+}
+
+.kern-msubsup-scripts .kern-msup {
+  vertical-align: super;
+  display: block;
+  line-height: 1;
+}
+
+.kern-msubsup-scripts .kern-msub {
+  vertical-align: sub;
+  display: block;
+  line-height: 1;
+}
+
+/* Matrices */
+.kern-mtable {
+  display: inline-table;
+  vertical-align: middle;
+}
+
+.kern-mtr {
+  display: table-row;
+}
+
+.kern-mtd {
+  display: table-cell;
+  padding: 0.2em 0.4em;
+  text-align: center;
+}
+
+/* Style variants */
+.kern-cal {
+  font-family: KaTeX_Caligraphic, cursive;
+  font-style: normal;
+}
+
+.kern-bb {
+  font-family: KaTeX_AMS, "Times New Roman", serif;
+  font-style: normal;
+}
+
+.kern-frak {
+  font-family: KaTeX_Fraktur, fantasy;
+  font-style: normal;
+}
+
+.kern-bold {
+  font-weight: bold;
+}
+
+.kern-italic {
+  font-style: italic;
+}
+
+.kern-upright {
+  font-style: normal;
+  font-family: KaTeX_Main, "Times New Roman", serif;
+}
+
+.kern-sans {
+  font-family: KaTeX_SansSerif, sans-serif;
+}
+
+.kern-mono {
+  font-family: KaTeX_Typewriter, monospace;
+}
+
+/* Error */
+.kern-error {
+  color: #cc0000;
+  font-family: monospace;
+}
+
+/* Alignment marker (zero-width) */
+.kern-align {
+  display: inline-block;
+  width: 0;
+}
