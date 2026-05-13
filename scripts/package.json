@@ -1,0 +1,13 @@
+{
+  "name": "kern-scripts",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "gen-symbols": "tsx gen-symbols.ts",
+    "bench": "tsx bench.ts"
+  },
+  "devDependencies": {
+    "tsx": "^4.7.2",
+    "typescript": "^5.4.5"
+  }
+}
