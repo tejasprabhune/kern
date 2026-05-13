@@ -99,10 +99,14 @@ render('sum_(i=0)^n i = frac(n(n+1), 2)', document.getElementById('math'));</cod
   import { renderToString } from './kern/kern.js';
 
   const DEMOS = [
-    'x = frac(-b plus.minus sqrt(b^2 - 4 a c), 2 a)',
-    'sum_(i=0)^n i = frac(n(n+1), 2)',
-    'e^(i pi) + 1 = 0',
-    'integral_0^infinity e^(-x) d x = 1',
+    // PPO clipped objective.
+    'L^"CLIP"(theta) = EE_t [min(r_t(theta) hat(A)_t, "clip"(r_t(theta), 1 - epsilon, 1 + epsilon) hat(A)_t)]',
+    // Conditional flow matching objective.
+    'L_"CFM"(theta) = EE_(t, x_1, x_t) norm(v_theta(x_t, t) - u_t(x_t | x_1))^2',
+    // Soft actor-critic value target.
+    'V(s) = EE_(a ~ pi) [Q(s, a) - alpha log pi(a | s)]',
+    // Bellman optimality.
+    'V^*(s) = max_a [r(s, a) + gamma sum_(s\') P(s\' | s, a) V^*(s\')]',
   ];
 
   const demo = DEMOS[Math.floor(Math.random() * DEMOS.length)];
