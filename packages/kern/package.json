@@ -1,0 +1,43 @@
+{
+  "name": "kern",
+  "version": "0.1.0",
+  "description": "Fast, zero-dependency Typst math renderer for the browser",
+  "license": "MIT",
+  "type": "module",
+  "main": "./dist/kern.cjs",
+  "module": "./dist/kern.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/kern.js",
+      "require": "./dist/kern.cjs",
+      "types": "./dist/index.d.ts"
+    },
+    "./auto-render": {
+      "import": "./dist/auto-render.js",
+      "require": "./dist/auto-render.cjs",
+      "types": "./dist/auto-render.d.ts"
+    },
+    "./kern.css": "./styles/kern.css",
+    "./kern-newcm.css": "./styles/kern-newcm.css"
+  },
+  "files": [
+    "dist",
+    "styles"
+  ],
+  "scripts": {
+    "build": "vite build && vite build --config vite.umd.config.ts && tsc --emitDeclarationOnly",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "lint": "tsc --noEmit",
+    "bench": "vitest bench"
+  },
+  "devDependencies": {
+    "@vitest/coverage-v8": "^1.6.0",
+    "typescript": "^5.4.5",
+    "vite": "^5.2.12",
+    "vite-plugin-dts": "^3.9.1",
+    "vitest": "^1.6.0"
+  }
+}

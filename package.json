@@ -1,0 +1,14 @@
+{
+  "name": "kern-workspace",
+  "private": true,
+  "scripts": {
+    "build": "pnpm -r build",
+    "test": "pnpm -r test",
+    "typecheck": "pnpm -r typecheck",
+    "lint": "pnpm -r lint",
+    "bench": "pnpm -r bench"
+  },
+  "devDependencies": {
+    "typescript": "^5.4.5"
+  }
+}
