@@ -132,6 +132,11 @@ x in RR
 A subset B
 A union B
 
+# Angle brackets / chevrons (deprecated + canonical Typst names)
+angle.l x angle.r
+chevron.l psi chevron.r
+chevron.l.double a chevron.r.double
+
 # Showcase
 x = frac(-b plus.minus sqrt(b^2 - 4 a c), 2 a) [display]
 e^(i pi) + 1 = 0

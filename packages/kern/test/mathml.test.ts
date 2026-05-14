@@ -271,6 +271,19 @@ describe('MathML renderer', () => {
     // arrow.r.long is U+27F6 LONG RIGHTWARDS ARROW.
     expect(out).toContain('⟶');
   });
+
+  it('angle.l and angle.r render as Unicode angle brackets', () => {
+    const out = ml('angle.l x angle.r');
+    expect(out).toContain('⟨');
+    expect(out).toContain('⟩');
+    expect(out).not.toMatch(/<mi[^>]*>angle\.l<\/mi>/);
+  });
+
+  it('chevron.l / chevron.r (current codex name) also resolve', () => {
+    const out = ml('chevron.l y chevron.r');
+    expect(out).toContain('⟨');
+    expect(out).toContain('⟩');
+  });
 });
 
 describe('renderToString error handling', () => {
