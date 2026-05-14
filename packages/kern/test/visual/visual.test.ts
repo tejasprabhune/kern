@@ -8,6 +8,7 @@ import { existsSync, writeFileSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 import { CORPUS } from './corpus.js';
+import { DEFAULT_THRESHOLD } from './visual.config.js';
 import {
   BASELINE_DIR,
   KERN_DIST,
@@ -23,13 +24,9 @@ import {
 import { comparePngs } from './compare.js';
 
 const UPDATE_BASELINES = process.env.UPDATE_BASELINES === '1';
-// Pixel-for-pixel parity between Chromium's MathML engine and Typst's own
-// renderer isn't achievable (different fonts, hinting, baseline alignment).
-// The threshold is calibrated to today's renderer with enough headroom that
-// a sizable regression (missing limit, dropped delimiter, mis-stretched
-// fence) trips it. Tighten per-case via the corpus when the renderer
-// improves.
-const DEFAULT_THRESHOLD = Number(process.env.KERN_VISUAL_THRESHOLD ?? '1.0');
+// Threshold lives in visual.config.ts as a committed constant. The
+// tester never mutates it; a regression must be investigated and the
+// underlying renderer fixed, not papered over by raising the floor.
 
 const havePlaywright = hasPlaywright();
 const haveTypst = hasTypstCli();
@@ -98,6 +95,22 @@ suite('visual: kern MathML vs Typst PNG', () => {
       // Always log so we can spot creep in passing cases too.
       // eslint-disable-next-line no-console
       console.log(`${tc.name}${tag}: ratio=${diff.ratio.toFixed(3)} (${diff.diffPixels}/${diff.nonWhiteRefPixels})`);
+
+      if (diff.ratio > threshold) {
+        // Print the expression and the top diff regions so a human can
+        // start fixing without opening the diff PNG.
+        const regions = diff.topRegions
+          .map(r => `  [${r.x0},${r.y0}]-[${r.x1},${r.y1}] x${r.count}`)
+          .join('\n');
+        // eslint-disable-next-line no-console
+        console.error(
+          `FAIL ${tc.name}${tag}\n` +
+          `  expression: ${tc.src}${tc.display ? ' [display]' : ''}\n` +
+          `  ratio: ${diff.ratio.toFixed(4)} > ${threshold}\n` +
+          `  diff: ${diffFile}\n` +
+          `  top regions:\n${regions}`,
+        );
+      }
 
       expect(
         diff.ratio,

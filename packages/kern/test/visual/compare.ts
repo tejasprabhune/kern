@@ -3,6 +3,16 @@
 // pixelmatch packages are loaded lazily so this module is safe to import even
 // when the visual deps aren't installed (the suite skip path).
 
+export interface DiffRegion {
+  // Bounding box (inclusive) of a contiguous diff cluster.
+  x0: number;
+  y0: number;
+  x1: number;
+  y1: number;
+  // Number of diff pixels inside the box.
+  count: number;
+}
+
 export interface DiffResult {
   width: number;
   height: number;
@@ -12,6 +22,10 @@ export interface DiffResult {
   // diffPixels / max(nonWhiteRefPixels, 1): the metric used for thresholding.
   ratio: number;
   diffPng: Buffer;
+  // Top diff clusters, largest first. Helps a human locate which part
+  // of the rendering broke (a slipped limit, a mis-sized fence, etc.)
+  // without eyeballing the diff PNG.
+  topRegions: DiffRegion[];
 }
 
 const WHITE_THRESHOLD = 250;
@@ -24,6 +38,8 @@ async function loadDeps(): Promise<void> {
   _PNG = (await import('pngjs')).PNG;
   _pixelmatch = ((await import('pixelmatch')) as any).default ?? (await import('pixelmatch'));
 }
+
+import { PIXEL_THRESHOLD, BLUR_RADIUS } from './visual.config.js';
 
 function isWhiteish(data: Uint8Array, idx: number): boolean {
   return data[idx]! >= WHITE_THRESHOLD
@@ -118,17 +134,18 @@ export async function comparePngs(refBuf: Buffer, candBuf: Buffer): Promise<Diff
   // layout differences like a limit jumping from sub/sup to under/over.
   const aBlur = new _PNG({ width: W, height: H });
   aBlur.data.set(a.data);
-  boxBlur(aBlur, 1);
+  boxBlur(aBlur, BLUR_RADIUS);
   const bBlur = new _PNG({ width: W, height: H });
   bBlur.data.set(b.data);
-  boxBlur(bBlur, 1);
+  boxBlur(bBlur, BLUR_RADIUS);
 
   const diff = new _PNG({ width: W, height: H });
-  // High per-pixel threshold so anti-aliasing differences between Chromium's
-  // MathML engine and Typst's own renderer don't dominate the diff. The
-  // overall ratio is then judged against a separate threshold by the caller.
+  // PIXEL_THRESHOLD is cranked up so anti-aliasing differences between
+  // Chromium's MathML engine and Typst's own renderer don't dominate the
+  // diff. The overall ratio is judged against DEFAULT_THRESHOLD (or a
+  // per-case override) by the caller.
   const diffPixels: number = _pixelmatch(aBlur.data, bBlur.data, diff.data, W, H, {
-    threshold: 0.35,
+    threshold: PIXEL_THRESHOLD,
     includeAA: true,
     alpha: 0.3,
     diffColor: [255, 0, 0],
@@ -154,5 +171,44 @@ export async function comparePngs(refBuf: Buffer, candBuf: Buffer): Promise<Diff
     nonWhiteRefPixels: denom,
     ratio: diffPixels / denom,
     diffPng: _PNG.sync.write(diff),
+    topRegions: extractTopRegions(diff.data, W, H, 5),
   };
+}
+
+// Group diff pixels into coarse 16-pixel buckets and report the densest
+// ones. Avoids a real connected-components pass (which would dominate
+// runtime) while still giving a useful spatial hint.
+function extractTopRegions(diffData: Uint8Array, W: number, H: number, count: number): DiffRegion[] {
+  const BUCKET = 16;
+  const bw = Math.ceil(W / BUCKET);
+  const bh = Math.ceil(H / BUCKET);
+  const buckets = new Int32Array(bw * bh);
+  for (let y = 0; y < H; y++) {
+    for (let x = 0; x < W; x++) {
+      const i = (y * W + x) * 4;
+      // pixelmatch marks diff pixels red with full alpha; ignore the
+      // semi-transparent grey AA marks left from `alpha: 0.3`.
+      if (diffData[i] === 255 && diffData[i + 1] === 0 && diffData[i + 2] === 0 && diffData[i + 3]! >= 200) {
+        const bx = Math.floor(x / BUCKET);
+        const by = Math.floor(y / BUCKET);
+        buckets[by * bw + bx]!++;
+      }
+    }
+  }
+  const ranked: DiffRegion[] = [];
+  for (let by = 0; by < bh; by++) {
+    for (let bx = 0; bx < bw; bx++) {
+      const n = buckets[by * bw + bx]!;
+      if (n === 0) continue;
+      ranked.push({
+        x0: bx * BUCKET,
+        y0: by * BUCKET,
+        x1: Math.min(W - 1, (bx + 1) * BUCKET - 1),
+        y1: Math.min(H - 1, (by + 1) * BUCKET - 1),
+        count: n,
+      });
+    }
+  }
+  ranked.sort((a, b) => b.count - a.count);
+  return ranked.slice(0, count);
 }
