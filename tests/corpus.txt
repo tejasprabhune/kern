@@ -60,7 +60,7 @@ integral_M dif omega = integral_(partial M) omega [display]
 
 # Differential (Bug 1 regression)
 integral f(x) dif x [display]
-(diff f)/(diff x)
+(partial f)/(partial x)
 dif y / dif x
 
 # Delimiters
@@ -109,7 +109,7 @@ hat(f)
 tilde(x)
 bar(x)
 dot(x)
-ddot(x)
+dot.double(x)
 arrow(x)
 
 # Under/Over

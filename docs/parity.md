@@ -216,6 +216,35 @@ correctness:
 This keeps the runtime-vs-spec gap measurable without dragging the
 spec's implementation into the runtime.
 
+## How we catch missing-symbol gaps
+
+Typst's symbol module exports several thousand names, and many of them
+are addressed by modifier sets rather than fixed dotted paths:
+`dots.c` and `dots.h.c` both resolve to `⋯` because Typst treats the
+modifiers after the base as an unordered set, matching the variant
+whose modifier set is the smallest superset of what the user typed.
+**kern** mirrors that in `lookupSymbol`: a direct hit wins, otherwise
+we fall back to a modifier-set match against the indexed symbol table.
+This closes whole classes of shorthand ambiguity (`arrow.long.r` finds
+`arrow.r.long`, `dots.c` finds `dots.h.c`, etc.) without enumerating
+every permutation.
+
+For the small but unavoidable set of gaps that remain, the parity
+script flags suspicious renders. `scripts/check-parity.ts` runs every
+corpus entry through kern, walks the emitted MathML, and warns on any
+upright `<mi mathvariant="normal">word</mi>` whose text is a
+multi-letter identifier present verbatim in the source - that pattern
+is the smoking gun for a symbol kern silently fell through to "render
+the literal name" on. The parity report surfaces those with an
+`unresolved names:` callout per row, so adding new corpus entries
+doubles as a regression net for new gaps. A warn never becomes a pass
+until the heuristic stops firing for it.
+
+The corpus itself is the other lever. `tests/corpus.txt` should mirror
+the constructs Typst's own test suite exercises
+(`../typst/tests/suite/math/`); expanding it catches gaps before users
+do.
+
 ## Visual regression
 
 Visual tests live at `packages/kern/test/visual/`. Pixel-level

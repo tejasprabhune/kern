@@ -22,6 +22,7 @@ import { fileURLToPath } from 'node:url';
 import { execFileSync, spawnSync } from 'node:child_process';
 
 import { renderToString } from '../packages/kern/src/index.js';
+import { NAMED_OPERATORS } from '../packages/kern/src/symbols.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = resolve(__dirname, '..');
@@ -184,12 +185,39 @@ function diff(a: MNode, b: MNode, path: string, out: DiffMsg[]): void {
   }
 }
 
+// Heuristic: a multi-letter identifier that kern emitted as a plain
+// `<mi mathvariant="normal">word</mi>` is usually a symbol that didn't
+// resolve. Real text-in-math wraps in `<mtext>`; real operators come
+// out of the named-operator set with a trailing thin space. So an
+// upright `<mi>` whose text is a non-operator word that *also* appears
+// in the source as a bare identifier likely means kern fell through to
+// the "render the literal name" path. Surfacing those catches the
+// `dots`/`dots.c` class of bug without needing a Typst oracle.
+function flagUnresolvedNames(source: string, mathml: string, namedOperators: Set<string>): string[] {
+  const flagged: string[] = [];
+  // Words written in the source as bare identifiers (allow dotted forms).
+  const sourceIdents = new Set<string>();
+  const idRe = /(?<![A-Za-z0-9_])([A-Za-z][A-Za-z0-9]*(?:\.[A-Za-z][A-Za-z0-9]*)*)/g;
+  let m: RegExpExecArray | null;
+  while ((m = idRe.exec(source)) !== null) sourceIdents.add(m[1]);
+  // Upright <mi> texts kern emitted.
+  const miRe = /<mi mathvariant="normal">([A-Za-z][A-Za-z0-9.]*)<\/mi>/g;
+  while ((m = miRe.exec(mathml)) !== null) {
+    const word = m[1]!;
+    if (word.length === 1) continue;
+    if (namedOperators.has(word)) continue;
+    if (sourceIdents.has(word)) flagged.push(word);
+  }
+  return flagged;
+}
+
 interface Row {
   entry: Entry;
   kernMathml: string;
   typstMathml: string | null;
   status: 'pass' | 'warn' | 'fail' | 'kern-only' | 'error';
   diffs: DiffMsg[];
+  unresolved: string[];
   error?: string;
 }
 
@@ -202,15 +230,18 @@ function checkOne(entry: Entry, oracleAvailable: boolean): Row {
   } catch (e) {
     return {
       entry, kernMathml: '', typstMathml: null,
-      status: 'error', diffs: [], error: (e as Error).message,
+      status: 'error', diffs: [], unresolved: [], error: (e as Error).message,
     };
   }
+  const unresolved = flagUnresolvedNames(entry.src, kernMathml, NAMED_OPERATORS);
   if (!oracleAvailable) {
-    return { entry, kernMathml, typstMathml: null, status: 'kern-only', diffs: [] };
+    const status: Row['status'] = unresolved.length > 0 ? 'warn' : 'kern-only';
+    return { entry, kernMathml, typstMathml: null, status, diffs: [], unresolved };
   }
   const typstMathml = runTypst(entry);
   if (typstMathml === null) {
-    return { entry, kernMathml, typstMathml: null, status: 'kern-only', diffs: [] };
+    const status: Row['status'] = unresolved.length > 0 ? 'warn' : 'kern-only';
+    return { entry, kernMathml, typstMathml: null, status, diffs: [], unresolved };
   }
   const diffs: DiffMsg[] = [];
   try {
@@ -220,11 +251,12 @@ function checkOne(entry: Entry, oracleAvailable: boolean): Row {
   } catch (e) {
     return {
       entry, kernMathml, typstMathml,
-      status: 'error', diffs: [], error: (e as Error).message,
+      status: 'error', diffs: [], unresolved, error: (e as Error).message,
     };
   }
-  const status: Row['status'] = diffs.length === 0 ? 'pass' : diffs.length < 4 ? 'warn' : 'fail';
-  return { entry, kernMathml, typstMathml, status, diffs };
+  let status: Row['status'] = diffs.length === 0 ? 'pass' : diffs.length < 4 ? 'warn' : 'fail';
+  if (status === 'pass' && unresolved.length > 0) status = 'warn';
+  return { entry, kernMathml, typstMathml, status, diffs, unresolved };
 }
 
 function escapeHtml(s: string): string {
@@ -235,9 +267,13 @@ function renderReport(rows: Row[], oracleAvailable: boolean): string {
   const counts = { pass: 0, warn: 0, fail: 0, 'kern-only': 0, error: 0 };
   for (const r of rows) counts[r.status]++;
   const tbody = rows.map(r => {
-    const diffsHtml = r.diffs.length
+    const unresolvedHtml = r.unresolved.length
+      ? `<p class="unresolved"><strong>unresolved names:</strong> ${r.unresolved.map(u => `<code>${escapeHtml(u)}</code>`).join(', ')}</p>`
+      : '';
+    const diffsHtml = (r.diffs.length
       ? `<ul>${r.diffs.slice(0, 8).map(d => `<li><code>${escapeHtml(d.path)}</code> ${escapeHtml(d.msg)}</li>`).join('')}</ul>`
-      : r.error ? `<pre class="err">${escapeHtml(r.error)}</pre>` : '';
+      : r.error ? `<pre class="err">${escapeHtml(r.error)}</pre>` : '')
+      + unresolvedHtml;
     return `<tr class="row ${r.status}">
   <td class="src"><code>${escapeHtml(r.entry.src)}${r.entry.display ? ' <span class="badge">display</span>' : ''}</code></td>
   <td class="rendered">${r.kernMathml}</td>

@@ -1173,10 +1173,58 @@ export function isSpacing(name: string): boolean {
 
 export function lookupSymbol(name: string): string | undefined {
   const raw = SYMBOLS[name];
-  if (raw === undefined) return undefined;
-  // Spacing tokens are stored as empty strings; the parser handles them.
-  if (raw === '' && SPACING_KINDS.has(name)) return raw;
-  return raw;
+  if (raw !== undefined) {
+    if (raw === '' && SPACING_KINDS.has(name)) return raw;
+    return raw;
+  }
+  // Modifier-set fallback. Typst's symbol resolution treats a dotted
+  // name as `base.{modifier, modifier, ...}`: modifiers form an
+  // unordered set, and the best match is the variant whose modifier set
+  // is a superset of what the user typed, preferring the smallest
+  // extra-modifier delta. This lets `dots.c` resolve to `dots.h.c`,
+  // `arrow.long.r` to `arrow.r.long`, etc., without the kern symbol
+  // table having to enumerate every permutation.
+  const dot = name.indexOf('.');
+  if (dot < 0) return undefined;
+  const base = name.slice(0, dot);
+  const wantedList = name.slice(dot + 1).split('.');
+  const wanted = new Set(wantedList);
+  const index = modifierIndex();
+  const candidates = index.get(base);
+  if (!candidates) return undefined;
+  let best: { value: string; extra: number } | undefined;
+  for (const { mods, value } of candidates) {
+    let ok = true;
+    for (const m of wanted) {
+      if (!mods.has(m)) { ok = false; break; }
+    }
+    if (!ok) continue;
+    const extra = mods.size - wanted.size;
+    if (best === undefined || extra < best.extra) {
+      best = { value, extra };
+    }
+  }
+  return best?.value;
+}
+
+// Lazily indexes SYMBOLS by base name so the modifier-set fallback
+// doesn't scan ~1100 entries per lookup. Built on first miss.
+let _modifierIndex: Map<string, Array<{ mods: Set<string>; value: string }>> | undefined;
+function modifierIndex(): Map<string, Array<{ mods: Set<string>; value: string }>> {
+  if (_modifierIndex !== undefined) return _modifierIndex;
+  const idx = new Map<string, Array<{ mods: Set<string>; value: string }>>();
+  for (const key of Object.keys(SYMBOLS)) {
+    const dot = key.indexOf('.');
+    if (dot < 0) continue;
+    const base = key.slice(0, dot);
+    const mods = new Set(key.slice(dot + 1).split('.'));
+    const value = SYMBOLS[key]!;
+    let bucket = idx.get(base);
+    if (!bucket) { bucket = []; idx.set(base, bucket); }
+    bucket.push({ mods, value });
+  }
+  _modifierIndex = idx;
+  return idx;
 }
 
 // Named operator functions in Typst's `op` module. These render upright with

@@ -259,6 +259,18 @@ describe('MathML renderer', () => {
     expect(out).toContain('…');
     expect(out).not.toMatch(/<mi[^>]*>dots<\/mi>/);
   });
+
+  it('dots.c resolves to centered dots via modifier-set match', () => {
+    const out = ml('a + b + dots.c + n');
+    expect(out).toContain('⋯');
+    expect(out).not.toMatch(/<mi[^>]*>dots<\/mi>/);
+  });
+
+  it('arrow.long.r resolves to arrow.r.long (modifier order)', () => {
+    const out = ml('arrow.long.r');
+    // arrow.r.long is U+27F6 LONG RIGHTWARDS ARROW.
+    expect(out).toContain('⟶');
+  });
 });
 
 describe('renderToString error handling', () => {
