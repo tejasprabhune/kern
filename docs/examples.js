@@ -149,6 +149,24 @@ export const GALLERY = [
     src: 'sgn(x) = cases(1 "if" x > 0, 0 "if" x = 0, -1 "if" x < 0)',
   },
 
+  // Multi-line equations.
+  {
+    name: 'Completing the square',
+    src: 'a x^2 + b x + c &= a (x^2 + b/a x) + c \\ &= a (x + b/(2 a))^2 + c - b^2/(4 a)',
+  },
+  {
+    name: 'Binomial expansion',
+    src: '(a + b)^2 &= (a + b)(a + b) \\ &= a^2 + 2 a b + b^2',
+  },
+  {
+    name: 'Geometric series',
+    src: 'S_n &= 1 + r + r^2 + dots + r^(n-1) \\ r S_n &= r + r^2 + dots + r^n \\ (1 - r) S_n &= 1 - r^n',
+  },
+  {
+    name: 'Augmented matrix',
+    src: 'mat(1, 2, 3; 4, 5, 6; 7, 8, 9, augment: 2)',
+  },
+
   // Style showcases.
   {
     name: 'Style functions',
