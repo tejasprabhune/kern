@@ -155,7 +155,7 @@ function baseUsesLimits(base: AstNode, ctx: RenderCtx): boolean {
 function renderAttach(node: AttachNode, ctx: RenderCtx): string {
   // Operator-atom bases append a trailing <mspace>; strip that before
   // wrapping so the script attaches to the letterform.
-  const baseHtml = renderBaseForAttach(node.base, ctx);
+  const baseHtml = withItalicCorrection(renderBaseForAttach(node.base, ctx), node.base);
   const subHtml = node.sub !== undefined ? renderNode(node.sub, ctx) : undefined;
   const supHtml = node.sup !== undefined ? renderNode(node.sup, ctx) : undefined;
 
@@ -188,6 +188,27 @@ function renderBaseForAttach(base: AstNode, ctx: RenderCtx): string {
     return `<mi mathvariant="normal">${escapeHtml(base.text)}</mi>`;
   }
   return renderNode(base, ctx);
+}
+
+// Chrome's MathML doesn't apply italic correction from the font's MATH
+// table, so accents over italic letters drift left and scripts on italic
+// letters drift left. Append a small <mspace> after italic single-letter
+// bases so their bounding box catches up to the visual right edge. Firefox
+// and Safari already correct for this; the mspace is harmless there.
+function isItalicSingleLetter(node: AstNode): boolean {
+  if (node.type === 'atom') return node.italic === true && node.text.length === 1;
+  if (node.type === 'symbol') {
+    // Greek letters and the script-letter Unicode blocks render italic by
+    // default and benefit from the same correction.
+    const cp = node.char.codePointAt(0) ?? 0;
+    return (cp >= 0x03B1 && cp <= 0x03C9) || (cp >= 0x1D400 && cp <= 0x1D7FF);
+  }
+  return false;
+}
+
+function withItalicCorrection(html: string, base: AstNode): string {
+  if (!isItalicSingleLetter(base)) return html;
+  return `<mrow>${html}<mspace width="0.08em"/></mrow>`;
 }
 
 function renderMatrix(
@@ -274,7 +295,8 @@ const ACCENT_CHARS: Record<string, string> = {
 
 function renderAccent(kind: string, body: AstNode, ctx: RenderCtx): string {
   const ch = ACCENT_CHARS[kind] ?? '^';
-  return `<mover accent="true">${renderNode(body, ctx)}<mo>${escapeHtml(ch)}</mo></mover>`;
+  const bodyHtml = withItalicCorrection(renderNode(body, ctx), body);
+  return `<mover accent="true">${bodyHtml}<mo>${escapeHtml(ch)}</mo></mover>`;
 }
 
 const UNDEROVER_CHARS: Record<UnderOverNode['kind'], { ch: string; over: boolean }> = {
