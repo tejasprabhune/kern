@@ -92,7 +92,7 @@ exports[`MathML snapshots > htmlAndMathml 1`] = `"<span class="kern kern-inline"
 
 exports[`MathML snapshots > infinity 1`] = `"<math xmlns="http://www.w3.org/1998/Math/MathML"><mo>∞</mo></math>"`;
 
-exports[`MathML snapshots > integral 1`] = `"<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msubsup><mo largeop="true" movablelimits="true">∫</mo><mn>0</mn><mo>∞</mo></msubsup><msup><mi>e</mi><mrow><mo>-</mo><mi>x</mi></mrow></msup><mi>d</mi><mi>x</mi></mrow></math>"`;
+exports[`MathML snapshots > integral 1`] = `"<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msubsup><mo largeop="true" movablelimits="false">∫</mo><mn>0</mn><mo>∞</mo></msubsup><msup><mi>e</mi><mrow><mo>-</mo><mi>x</mi></mrow></msup><mi>d</mi><mi>x</mi></mrow></math>"`;
 
 exports[`MathML snapshots > lr-bracket 1`] = `"<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo form="prefix" stretchy="true" fence="true">[</mo><mrow><mi>x</mi><mo>+</mo><mi>y</mi></mrow><mo form="postfix" stretchy="true" fence="true">]</mo></mrow></math>"`;
 

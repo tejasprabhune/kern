@@ -1216,6 +1216,16 @@ const BIG_OPERATOR_CHARS = new Set<string>([
   '⨃', '⨄', '⨊', '⨋',
 ]);
 
+// Integrals keep their bounds as sub/sup even in display mode; sums,
+// products, unions, and coproducts move them under/over.
+const INTEGRAL_CHARS = new Set<string>([
+  '∫', '∬', '∭', '⨌', '∮', '∯', '∰', '∱', '∲', '∳',
+]);
+
 export function isBigOperator(ch: string): boolean {
   return BIG_OPERATOR_CHARS.has(ch);
+}
+
+export function isIntegralOperator(ch: string): boolean {
+  return INTEGRAL_CHARS.has(ch);
 }

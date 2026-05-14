@@ -148,6 +148,24 @@ describe('MathML renderer', () => {
     expect(out).toContain('<msubsup>');
     expect(out).toContain('∑');
   });
+
+  it('sum in display mode places limits under and over', () => {
+    const out = renderToString('sum_(i=0)^n', { output: 'mathml', displayMode: true });
+    expect(out).toContain('<munderover>');
+    expect(out).not.toContain('<msubsup>');
+  });
+
+  it('integral in display mode keeps bounds as sub/sup', () => {
+    const out = renderToString('integral_0^1 x', { output: 'mathml', displayMode: true });
+    expect(out).toContain('<msubsup>');
+    expect(out).not.toContain('<munderover>');
+    expect(out).toMatch(/movablelimits="false"/);
+  });
+
+  it('lim in display mode places under', () => {
+    const out = renderToString('lim_(n -> oo) f', { output: 'mathml', displayMode: true });
+    expect(out).toContain('<munder>');
+  });
 });
 
 describe('renderToString error handling', () => {

@@ -1,5 +1,5 @@
 import type { AstNode, AttachNode, MatrixKind, UnderOverNode, MathClass, MathSize } from '../ast.js';
-import { isBigOperator, isLimitsOperator } from '../symbols.js';
+import { isBigOperator, isIntegralOperator, isLimitsOperator } from '../symbols.js';
 import { escapeHtml, mathvariantForStyle, mspaceWidth } from './shared.js';
 
 interface RenderCtx {
@@ -83,10 +83,12 @@ function renderSymbol(char: string): string {
 
   const cp = char.codePointAt(0) ?? 0;
 
-  // Big operators: emit largeop + movablelimits so the browser stretches
-  // and (where possible) stacks limits in display mode.
+  // Big operators: emit largeop so the browser uses the OpenType MATH
+  // table's display variant. movablelimits only applies to sums, products,
+  // and similar; integrals keep their bounds on the side in both modes.
   if (isBigOperator(char) || BIG_OP_RE.test(char)) {
-    return `<mo largeop="true" movablelimits="true">${escapeHtml(char)}</mo>`;
+    const ml = isIntegralOperator(char) ? 'false' : 'true';
+    return `<mo largeop="true" movablelimits="${ml}">${escapeHtml(char)}</mo>`;
   }
 
   if (isOperatorChar(cp)) return `<mo>${escapeHtml(char)}</mo>`;
@@ -130,7 +132,7 @@ function baseUsesLimits(base: AstNode, ctx: RenderCtx): boolean {
   if (ctx.limitsHint === 'limits') return true;
   if (ctx.limitsHint === 'scripts') return false;
   if (!ctx.display) return false;
-  if (base.type === 'symbol' && isBigOperator(base.char)) return true;
+  if (base.type === 'symbol' && isBigOperator(base.char) && !isIntegralOperator(base.char)) return true;
   if (base.type === 'atom' && base.operator === true && isLimitsOperator(base.text)) return true;
   if (base.type === 'op' && base.limits) return true;
   if (base.type === 'op' && isLimitsOperator(base.text)) return true;
