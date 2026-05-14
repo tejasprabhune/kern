@@ -18,6 +18,7 @@
       <a href="index.html" class="active">Overview</a>
       <a href="docs.html">Docs</a>
       <a href="examples.html">Examples</a>
+      <a href="parity.html">Parity</a>
       <a href="https://github.com/tejasprabhune/kern" target="_blank" rel="noopener">GitHub</a>
     </nav>
   </header>
@@ -33,9 +34,9 @@
       projects that prefer Typst's cleaner syntax.
     </p>
     <p>
-      Writing <code>frac(a, b)</code> instead of <code>\frac{a}{b}</code>, or
+      Writing <code>a / b</code> instead of <code>\frac{a}{b}</code>, or
       <code>sum_(i=0)^n</code> instead of <code>\sum_{i=0}^{n}</code>, adds up over a long
-      document. The core bundle is under 10&nbsp;KB gzipped. No WASM, no web workers.
+      document. The core bundle is under 10&nbsp;KB gzipped.
     </p>
   </section>
 
@@ -70,18 +71,19 @@ render('sum_(i=0)^n i = frac(n(n+1), 2)', document.getElementById('math'));</cod
       since 2023) or a KaTeX-compatible HTML+CSS fallback.
     </p>
     <p>
-      Pipeline: source text &rarr; lexer &rarr; parser &rarr; AST &rarr; MathML string.
-      Sub-millisecond for typical expressions.
+      Source text runs through a lexer and parser into an AST, then the renderer walks
+      the AST and produces a MathML string. Typical expressions render in well under a
+      millisecond.
     </p>
   </section>
 
   <section>
     <h2>Status</h2>
     <p>
-      Pre-1.0. All core Typst math features are implemented: fractions, roots,
-      sub/superscripts, matrices, cases, style functions (<code>cal</code>, <code>bb</code>,
-      <code>frak</code>), accents (<code>hat</code>, <code>tilde</code>), the full Typst
-      symbol table, and auto-render.
+      kern is pre-1.0, but all core Typst math features are already implemented:
+      fractions, roots, sub/superscripts, matrices, cases, style functions
+      (<code>cal</code>, <code>bb</code>, <code>frak</code>), accents (<code>hat</code>,
+      <code>tilde</code>), the full Typst symbol table, and auto-render.
     </p>
     <p>
       Source on <a href="https://github.com/tejasprabhune/kern" target="_blank" rel="noopener">GitHub</a>

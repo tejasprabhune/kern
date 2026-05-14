@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>kern &middot; parity</title>
+  <link rel="stylesheet" href="https://use.typekit.net/bsk0vur.css">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="kern/kern.css">
+  <link rel="stylesheet" href="kern/kern-newcm.css">
+  <style>
+    table.parity {
+      border-collapse: collapse;
+      width: 100%;
+      margin: 1.5rem 0;
+    }
+    table.parity th, table.parity td {
+      padding: 0.5rem 0.75rem;
+      border-bottom: 1px solid #e5e5e5;
+      vertical-align: top;
+      text-align: left;
+    }
+    table.parity th { background: #f7f7f7; font-weight: 600; }
+    table.parity code { font-family: ui-monospace, monospace; font-size: 0.92em; }
+    .status { font-weight: 600; padding: 0.1em 0.45em; border-radius: 3px; font-size: 0.85em; white-space: nowrap; }
+    .status.ok { background: #d6f5d6; color: #14532d; }
+    .status.partial { background: #fff3cd; color: #714900; }
+    .status.no { background: #fdd; color: #8a1f1f; }
+    .status.skip { background: #e6e6e6; color: #555; }
+    .legend .status { margin-right: 0.5em; }
+    .parity-section { margin-top: 2rem; }
+  </style>
+</head>
+<body>
+
+  <header>
+    <a class="wordmark" href="index.html">kern</a>
+    <p class="tagline">Typst math, in the browser.</p>
+    <nav>
+      <a href="index.html">Overview</a>
+      <a href="docs.html">Docs</a>
+      <a href="examples.html">Examples</a>
+      <a href="parity.html" class="active">Parity</a>
+      <a href="https://github.com/tejasprabhune/kern" target="_blank" rel="noopener">GitHub</a>
+    </nav>
+  </header>
+
+  <section>
+    <h1>Typst parity</h1>
+    <p>
+      kern's job is to render Typst math syntax to MathML that matches what
+      Typst itself would produce. This page tracks which constructs are
+      supported, where kern diverges, and how we measure correctness.
+    </p>
+    <p>
+      Last reviewed against Typst commit
+      <code>de6f40097</code> (0.14.2). Run
+      <code>pnpm -C scripts check-parity</code> to regenerate the
+      <a href="parity-report.html">structural diff report</a>.
+    </p>
+
+    <p class="legend">
+      <span class="status ok">ok</span> a passing test exercises the construct.
+      <span class="status partial">partial</span> renders but diverges from Typst in a documented way.
+      <span class="status no">no</span> not yet supported.
+      <span class="status skip">skip</span> requires the full Typst layout engine.
+    </p>
+  </section>
+
+  <section class="parity-section">
+    <h2>Atoms &amp; symbols</h2>
+    <table class="parity">
+      <thead><tr><th>Construct</th><th>Status</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td><code>x</code>, <code>n</code> (italic var)</td><td><span class="status ok">ok</span></td><td><code>&lt;mi&gt;</code></td></tr>
+        <tr><td><code>sin</code>, <code>cos</code>, <code>log</code></td><td><span class="status ok">ok</span></td><td>Upright, with trailing thin space</td></tr>
+        <tr><td><code>42</code>, <code>3.14</code></td><td><span class="status ok">ok</span></td><td><code>&lt;mn&gt;</code></td></tr>
+        <tr><td><code>alpha</code>, <code>Sigma</code>, <code>omega</code></td><td><span class="status ok">ok</span></td><td>From the symbol table</td></tr>
+        <tr><td><code>dif</code> / <code>Dif</code></td><td><span class="status ok">ok</span></td><td>Thin space + upright <code>d</code>, used as <code>integral f dif x</code></td></tr>
+        <tr><td><code>plus.minus</code>, <code>arrow.r.long</code></td><td><span class="status ok">ok</span></td><td>Dotted names traversed</td></tr>
+        <tr><td>Hex literals (<code>0xff</code>)</td><td><span class="status no">no</span></td><td>Typst's code-mode form, not in math</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section class="parity-section">
+    <h2>Style</h2>
+    <table class="parity">
+      <thead><tr><th>Construct</th><th>Status</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td><code>cal(A)</code></td><td><span class="status ok">ok</span></td><td><code>mathvariant="script"</code></td></tr>
+        <tr><td><code>bb(R)</code></td><td><span class="status ok">ok</span></td><td><code>mathvariant="double-struck"</code></td></tr>
+        <tr><td><code>frak(g)</code></td><td><span class="status ok">ok</span></td><td><code>mathvariant="fraktur"</code></td></tr>
+        <tr><td><code>bold(x)</code></td><td><span class="status ok">ok</span></td><td>Bold-italic for single letters</td></tr>
+        <tr><td><code>italic(x)</code>, <code>upright(d)</code>, <code>sans</code>, <code>mono</code></td><td><span class="status ok">ok</span></td><td></td></tr>
+        <tr><td><code>scr(A)</code></td><td><span class="status partial">partial</span></td><td>Aliased to <code>cal</code>; MathML only exposes one script variant</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section class="parity-section">
+    <h2>Structure</h2>
+    <table class="parity">
+      <thead><tr><th>Construct</th><th>Status</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td><code>frac(a, b)</code>, <code>a / b</code></td><td><span class="status ok">ok</span></td><td><code>&lt;mfrac&gt;</code></td></tr>
+        <tr><td><code>binom(n, k)</code></td><td><span class="status ok">ok</span></td><td><code>linethickness="0"</code> inside stretched parens</td></tr>
+        <tr><td><code>x^2</code>, <code>x_i</code>, <code>x_i^2</code></td><td><span class="status ok">ok</span></td><td><code>msup</code>/<code>msub</code>/<code>msubsup</code></td></tr>
+        <tr><td><code>sqrt(x)</code>, <code>root(n, x)</code></td><td><span class="status ok">ok</span></td><td><code>msqrt</code>/<code>mroot</code></td></tr>
+        <tr><td>Primes (<code>f'</code>, <code>f''</code>)</td><td><span class="status ok">ok</span></td><td>Promoted to a sup atom</td></tr>
+        <tr><td>Explicit <code>attach(b, tl: ..., br: ...)</code></td><td><span class="status no">no</span></td><td>Pre-scripts via <code>&lt;mmultiscripts&gt;</code> still pending</td></tr>
+        <tr><td><code>stretch(glyph, size: ...)</code></td><td><span class="status no">no</span></td><td>Needs glyph-variant selection from the OpenType MATH table</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section class="parity-section">
+    <h2>Limits &amp; scripts</h2>
+    <table class="parity">
+      <thead><tr><th>Construct</th><th>Status</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td><code>sum_(i=0)^n</code> (display)</td><td><span class="status ok">ok</span></td><td><code>munderover</code></td></tr>
+        <tr><td><code>sum_(i=0)^n</code> (inline)</td><td><span class="status ok">ok</span></td><td><code>msubsup</code></td></tr>
+        <tr><td><code>integral_0^1</code> (display)</td><td><span class="status ok">ok</span></td><td>Stays <code>msubsup</code> per Typst's rule for integrals</td></tr>
+        <tr><td><code>lim_(x -&gt; oo)</code></td><td><span class="status ok">ok</span></td><td><code>munder</code> in display</td></tr>
+        <tr><td><code>limits(x)</code>, <code>scripts(x)</code></td><td><span class="status ok">ok</span></td><td></td></tr>
+        <tr><td><code>op("text", limits: true)</code></td><td><span class="status ok">ok</span></td><td></td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section class="parity-section">
+    <h2>Delimiters &amp; fences</h2>
+    <table class="parity">
+      <thead><tr><th>Construct</th><th>Status</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td><code>(x)</code>, <code>[x]</code>, <code>{x}</code> (plain)</td><td><span class="status ok">ok</span></td><td>Body height, <code>stretchy="false"</code></td></tr>
+        <tr><td>Auto-sized parens around tall content</td><td><span class="status ok">ok</span></td><td>Bare <code>(a/b)</code> upgrades to stretchy fences; mirrors Typst's <code>lr()</code></td></tr>
+        <tr><td><code>lr((...))</code>, <code>lr([...])</code></td><td><span class="status ok">ok</span></td><td><code>stretchy="true" symmetric="true"</code> for Safari parity</td></tr>
+        <tr><td><code>abs(x)</code>, <code>norm(v)</code></td><td><span class="status ok">ok</span></td><td>Stretchy symmetric bars</td></tr>
+        <tr><td><code>floor(x)</code>, <code>ceil(x)</code></td><td><span class="status ok">ok</span></td><td></td></tr>
+        <tr><td>Conditional bar inside <code>lr()</code> (<code>P(A | B)</code>)</td><td><span class="status ok">ok</span></td><td><code>|</code> becomes a stretchy symmetric fence so Safari sizes it with the parens</td></tr>
+        <tr><td><code>round(x)</code></td><td><span class="status no">no</span></td><td>Renders as a generic call</td></tr>
+        <tr><td><code>mid(x)</code></td><td><span class="status partial">partial</span></td><td>Wrapped as a relation class; doesn't yet stretch to enclosing <code>lr()</code></td></tr>
+        <tr><td>Mismatched fences (<code>lr([x/y))</code>)</td><td><span class="status partial">partial</span></td><td>Use explicit <code>lr()</code>; bare mismatched delimiters error at parse</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section class="parity-section">
+    <h2>Matrices &amp; multi-line</h2>
+    <table class="parity">
+      <thead><tr><th>Construct</th><th>Status</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td><code>vec(a, b, c)</code></td><td><span class="status ok">ok</span></td><td></td></tr>
+        <tr><td><code>mat(a, b; c, d)</code></td><td><span class="status ok">ok</span></td><td>Comma = column, semicolon = row</td></tr>
+        <tr><td><code>cases(...)</code></td><td><span class="status ok">ok</span></td><td>Left brace, left-aligned cells</td></tr>
+        <tr><td><code>mat(..., delim: "[")</code></td><td><span class="status ok">ok</span></td><td>Honored for <code>()</code>, <code>[]</code>, <code>{}</code>, <code>|</code>, <code>||</code></td></tr>
+        <tr><td><code>mat(..., augment: ...)</code></td><td><span class="status no">no</span></td><td>Augmented matrices (vline/hline) not rendered</td></tr>
+        <tr><td><code>mat(..., gap: ...)</code></td><td><span class="status no">no</span></td><td>Spacing knobs ignored</td></tr>
+        <tr><td><code>&amp;</code> alignment across lines</td><td><span class="status partial">partial</span></td><td>Only inside matrix calls; multi-line display equations are the biggest gap</td></tr>
+        <tr><td>Multi-line equations with <code>\</code></td><td><span class="status no">no</span></td><td>Parser doesn't yet recognize <code>\</code> as a row break in display equations. Tracked in <a href="https://github.com/tejasprabhune/kern">the parser TODO</a></td></tr>
+        <tr><td>Equation numbering / supplements</td><td><span class="status skip">skip</span></td><td>Belongs to Typst's figure/layout system</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section class="parity-section">
+    <h2>Accents &amp; under/over</h2>
+    <table class="parity">
+      <thead><tr><th>Construct</th><th>Status</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td><code>hat</code>, <code>tilde</code>, <code>bar</code>, <code>dot</code>, <code>ddot</code></td><td><span class="status ok">ok</span></td><td><code>mover accent="true"</code></td></tr>
+        <tr><td><code>arrow(x)</code>, <code>arrow.l(x)</code>, <code>arrow.l.r(x)</code></td><td><span class="status ok">ok</span></td><td>Vector accent and harpoons</td></tr>
+        <tr><td><code>acute</code>, <code>grave</code>, <code>breve</code>, <code>caron</code>, <code>circle</code>, <code>macron</code></td><td><span class="status ok">ok</span></td><td></td></tr>
+        <tr><td><code>overline</code>, <code>underline</code></td><td><span class="status ok">ok</span></td><td></td></tr>
+        <tr><td><code>overbrace</code>, <code>underbrace</code> (+ annotation)</td><td><span class="status ok">ok</span></td><td></td></tr>
+        <tr><td><code>overparen</code>, <code>underparen</code>, <code>overbracket</code>, <code>underbracket</code></td><td><span class="status ok">ok</span></td><td></td></tr>
+        <tr><td>Bottom-attached accents via combining class</td><td><span class="status no">no</span></td><td>Typst flips combining-Below characters; kern keeps every accent on top</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section class="parity-section">
+    <h2>Spacing, classes, cancellation</h2>
+    <table class="parity">
+      <thead><tr><th>Construct</th><th>Status</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td><code>thin</code>, <code>med</code>, <code>thick</code>, <code>quad</code>, <code>qquad</code></td><td><span class="status ok">ok</span></td><td></td></tr>
+        <tr><td><code>wide</code> (2 em)</td><td><span class="status no">no</span></td><td>Not in the spacing map yet</td></tr>
+        <tr><td><code>class("rel", x)</code> &amp; friends</td><td><span class="status partial">partial</span></td><td>Single-atom bodies only</td></tr>
+        <tr><td><code>display</code>, <code>inline</code>, <code>script</code>, <code>sscript</code></td><td><span class="status ok">ok</span></td><td><code>&lt;mstyle&gt;</code> with <code>displaystyle</code>/<code>scriptlevel</code></td></tr>
+        <tr><td><code>cancel</code>, <code>bcancel</code>, <code>xcancel</code></td><td><span class="status ok">ok</span></td><td><code>menclose</code> notation</td></tr>
+        <tr><td>Text in math: <code>"word"</code></td><td><span class="status ok">ok</span></td><td><code>&lt;mtext&gt;</code> with thin-space padding</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section class="parity-section">
+    <h2>How we measure correctness</h2>
+    <p>
+      Typst's compiler is the spec. Pixel-level parity is not achievable
+      (different fonts, hinting, sub-pixel positioning), so the oracle is
+      <em>structural MathML</em>: tags, nesting, and the attributes that
+      affect layout.
+    </p>
+    <p>
+      The script at <code>scripts/check-parity.ts</code> reads
+      <code>tests/corpus.txt</code>, renders every entry through kern, and
+      (when <code>typst compile --features html</code> exposes equation
+      MathML, currently pending in Typst 0.14.2) renders the same entries
+      through Typst, then runs a structural diff that ignores
+      <code>class</code>, <code>style</code>, and presentation-only
+      attributes.
+    </p>
+    <p>
+      The latest run is at <a href="parity-report.html">parity-report.html</a>.
+      Visual regression tests live under
+      <code>packages/kern/test/visual/</code> and act as a regression
+      gate, never as a correctness oracle: thresholds are constants
+      committed to the repo, and failures dump the Typst baseline, the
+      kern candidate, and a pixelmatch diff to disk for human review.
+    </p>
+  </section>
+
+  <section class="parity-section">
+    <h2>Why kern doesn't bundle Typst's WASM compiler</h2>
+    <p>
+      The MathML emitter we measure against is Rust code in
+      <code>typst/crates/typst-html/src/mathml.rs</code>. It depends on
+      Typst's Engine, layout, font, and IR crates - shipping it to the
+      browser would multiply kern's bundle by an order of magnitude and
+      couple every release to Typst's. Modern browsers already do
+      glyph-level layout from <code>&lt;mfrac&gt;</code> /
+      <code>&lt;msqrt&gt;</code> / etc.; we only need to emit the right
+      MathML tree.
+    </p>
+    <p>
+      Instead, we treat Typst's emitter as the
+      <strong>structural oracle</strong> and keep kern a small,
+      JS-native renderer. The parity gap between the two trees is the
+      north star metric; the
+      <a href="parity-report.html">parity report</a> tracks it expression
+      by expression.
+    </p>
+  </section>
+
+  <footer>
+    <a href="https://github.com/tejasprabhune/kern" target="_blank" rel="noopener">GitHub</a>
+    <a href="https://github.com/tejasprabhune/kern/blob/main/LICENSE" target="_blank" rel="noopener">MIT</a>
+    <a href="https://www.npmjs.com/package/kern-typ" target="_blank" rel="noopener">npm</a>
+  </footer>
+
+</body>
+</html>
