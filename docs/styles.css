@@ -295,7 +295,7 @@ tr:last-child td {
 /* Examples page: editor */
 
 .editor-wrap {
-  margin: 20px 0;
+  margin: 24px 0;
   border: 1px solid rgba(75, 78, 109, 0.2);
   border-radius: 6px;
   overflow: hidden;
@@ -304,6 +304,17 @@ tr:last-child td {
      expand the column to its intrinsic width; the column stays half the
      wrap and the #editor-output's overflow-x: auto can actually scroll. */
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+}
+
+/* On wide viewports, let the editor escape the 680px body column so the
+   side-by-side panes have room to breathe. The negative margins scale
+   smoothly with viewport width and cap so very large screens don't make
+   the panes unwieldy. Narrower screens hit the @media block lower in
+   the file and fall back to the in-column layout. */
+@media (min-width: 880px) {
+  .editor-wrap {
+    margin-inline: calc(-1 * min((100vw - 680px) / 2, 220px));
+  }
 }
 
 .editor-col {
@@ -329,11 +340,11 @@ tr:last-child td {
 
 #editor-textarea {
   flex: 1;
-  min-height: 140px;
-  padding: 12px;
+  min-height: 260px;
+  padding: 16px;
   font-family: "calling-code", "SF Mono", "Menlo", "Consolas", monospace;
-  font-size: 13px;
-  line-height: 1.5;
+  font-size: 14px;
+  line-height: 1.55;
   background: transparent;
   color: var(--dark);
   border: none;
@@ -344,13 +355,20 @@ tr:last-child td {
 #editor-output {
   flex: 1;
   min-width: 0;
-  min-height: 140px;
-  padding: 12px;
+  min-height: 260px;
+  padding: 16px;
   display: flex;
   align-items: center;
-  font-size: 1.2rem;
+  font-size: 1.6rem;
   overflow-x: auto;
   overflow-y: hidden;
+}
+
+/* On narrow screens the textarea typically needs less height; mobile
+   users mostly use the gallery rather than the live editor. */
+@media (max-width: 540px) {
+  #editor-textarea, #editor-output { min-height: 160px; }
+  #editor-output { font-size: 1.35rem; }
 }
 
 /* margin: auto on a flex child centers it when there's room and collapses
