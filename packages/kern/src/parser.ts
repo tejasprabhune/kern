@@ -48,7 +48,7 @@ const SIZE_FUNCS: Record<string, MathSize> = {
 
 const SPACING_MAP: Record<string, SpacingNode['kind']> = {
   thin: 'thin', med: 'med', thick: 'thick',
-  quad: 'quad', qquad: 'qquad', space: 'space', zws: 'zws',
+  quad: 'quad', qquad: 'qquad', wide: 'wide', space: 'space', zws: 'zws',
 };
 
 const LR_MAP: Record<string, { kind: LRKind; open: string; close: string }> = {
@@ -96,16 +96,62 @@ class Parser {
     return this.consume();
   }
 
-  // alignExpr := addExpr ('&' addExpr)*
+  // alignExpr := row (LineBreak row)*  where row := addExpr ('&' addExpr)*
+  //
+  // The single-row case (no `\` line breaks) preserves the old behavior:
+  // `&` becomes an inline AlignNode marker inside a sequence, so the
+  // construct still works inside subexpressions like fraction
+  // numerators or matrix cells.
+  //
+  // When `\` appears at this level, every row collects its `&`-separated
+  // cells into a list and the whole construct becomes an EqArray node,
+  // which the renderer emits as a multi-line `<mtable>`. This matches
+  // Typst's behavior for display-mode aligned equations like
+  // `a &= b + c \ &= d`.
   parseAlign(): AstNode {
-    const first = this.parseAdd();
-    if (this.peek().kind !== TK.Amp) return first;
+    const rows: AstNode[][] = [];
+    let row: AstNode[] = [];
+    let multiRow = false;
 
-    const nodes: AstNode[] = [first];
-    while (this.peek().kind === TK.Amp) {
-      this.consume();
-      nodes.push({ type: 'align' });
-      nodes.push(this.parseAdd());
+    const cellStop = (kind: TK): boolean =>
+      kind === TK.Amp || kind === TK.LineBreak || kind === TK.EOF
+      || kind === TK.RParen || kind === TK.RBracket || kind === TK.RBrace
+      || kind === TK.Semicolon || kind === TK.Comma;
+
+    const parseCell = (): AstNode => {
+      if (cellStop(this.peek().kind)) return { type: 'seq', nodes: [] };
+      return this.parseAdd();
+    };
+
+    row.push(parseCell());
+
+    while (true) {
+      const t = this.peek();
+      if (t.kind === TK.Amp) {
+        this.consume();
+        row.push(parseCell());
+      } else if (t.kind === TK.LineBreak) {
+        this.consume();
+        rows.push(row);
+        row = [];
+        multiRow = true;
+        if (cellStop(this.peek().kind) && this.peek().kind !== TK.Amp) break;
+        row.push(parseCell());
+      } else {
+        break;
+      }
+    }
+    if (row.length > 0) rows.push(row);
+
+    if (multiRow) {
+      return { type: 'eqarray', rows };
+    }
+    const cells = rows[0]!;
+    if (cells.length === 1) return cells[0]!;
+    const nodes: AstNode[] = [];
+    for (let i = 0; i < cells.length; i++) {
+      if (i > 0) nodes.push({ type: 'align' });
+      nodes.push(cells[i]!);
     }
     return { type: 'seq', nodes };
   }
@@ -155,6 +201,7 @@ class Parser {
       if (t.kind === TK.Semicolon) break;
       if (t.kind === TK.Comma) break;
       if (t.kind === TK.Slash) break;
+      if (t.kind === TK.LineBreak) break;
       // Only stop on addOp when there are already atoms to the left.
       // At the start of a seq (nodes empty), addOp chars like '-' are unary.
       if (nodes.length > 0 && (t.kind === TK.Op || t.kind === TK.Shorthand) && isAddOpText(t.text)) break;
@@ -625,8 +672,9 @@ class Parser {
     // For mat/bmat/pmat/vmat/Vmat, commas separate columns within a row.
     const commaIsRowSep = kind === 'vec' || kind === 'cases';
 
-    // Track named args (delim:, align:, gap:, ...). We only honor `delim`.
     let delim: { open: string; close: string } | undefined;
+    let augment: { vline: number[]; hline: number[] } | undefined;
+    let gap: { row?: string; column?: string } | undefined;
 
     while (this.peek().kind !== TK.RParen && this.peek().kind !== TK.EOF) {
       const t = this.peek();
@@ -640,12 +688,37 @@ class Parser {
           rows.push(row);
           row = [];
         }
-      } else if (t.kind === TK.Ident && this.peek(1).kind === TK.Colon) {
-        const key = this.consume().text;
+      } else if (
+        t.kind === TK.Ident
+        && (
+          this.peek(1).kind === TK.Colon
+          || (this.peek(1).kind === TK.Op && this.peek(1).text === '-'
+              && this.peek(2).kind === TK.Ident && this.peek(3).kind === TK.Colon)
+        )
+      ) {
+        // Named arg key. Typst allows hyphens in identifiers (e.g.
+        // `row-gap`, `column-gap`); the lexer tokenizes those as three
+        // tokens, so reassemble before the colon.
+        let key = this.consume().text;
+        if (this.peek().kind === TK.Op && this.peek().text === '-') {
+          this.consume();
+          key += '-' + this.consume().text;
+        }
         this.consume(); // ':'
         const val = this.parseAlign();
         if (key === 'delim') {
           delim = delimFromValue(val);
+        } else if (key === 'augment') {
+          augment = augmentFromValue(val);
+        } else if (key === 'gap') {
+          const em = lengthEm(val);
+          if (em !== undefined) gap = { ...(gap ?? {}), row: em, column: em };
+        } else if (key === 'row-gap') {
+          const em = lengthEm(val);
+          if (em !== undefined) gap = { ...(gap ?? {}), row: em };
+        } else if (key === 'column-gap') {
+          const em = lengthEm(val);
+          if (em !== undefined) gap = { ...(gap ?? {}), column: em };
         }
       } else if (t.kind === TK.DotDot) {
         this.consume();
@@ -659,8 +732,55 @@ class Parser {
     this.expect(TK.RParen);
     const out: MatrixNode = { type: 'matrix', kind, rows };
     if (delim !== undefined) out.delim = delim;
+    if (augment !== undefined) out.augment = augment;
+    if (gap !== undefined) out.gap = gap;
     return out;
   }
+}
+
+// Coerces an AST node carrying a numeric or list-of-numbers argument
+// (Typst's `1`, `(1, 2)`, or a dict shorthand) into the augment shape.
+// Anything we can't make sense of yields an empty augment object, so a
+// bad arg silently falls back to no lines rather than crashing the parse.
+function augmentFromValue(node: AstNode): { vline: number[]; hline: number[] } {
+  const result = { vline: [] as number[], hline: [] as number[] };
+  const pushInt = (target: number[], v: AstNode): void => {
+    if (v.type === 'number') {
+      const n = parseInt(v.value, 10);
+      if (Number.isFinite(n)) target.push(n);
+    } else if (v.type === 'seq') {
+      for (const c of v.nodes) pushInt(target, c);
+    } else if (v.type === 'lr' && v.kind === 'paren') {
+      pushInt(target, v.body);
+    }
+  };
+  if (node.type === 'number') {
+    const n = parseInt(node.value, 10);
+    if (Number.isFinite(n)) result.vline.push(n);
+    return result;
+  }
+  // For named-arg dicts like `(vline: 1, hline: 2)`, the parser will have
+  // consumed them as a paren-wrapped sequence with named-arg-style atoms
+  // we can't recover here. We support the simple integer form and a
+  // paren-wrapped integer list `augment: (1, 2)` (all vlines).
+  if (node.type === 'lr' && node.kind === 'paren') {
+    pushInt(result.vline, node.body);
+  }
+  return result;
+}
+
+// Recovers an em-length string from an arg like `1em`, `0.5em`, or a
+// bare number (interpreted as em). Returns undefined for unsupported
+// shapes; the matrix renderer falls back to default spacing in that case.
+function lengthEm(node: AstNode): string | undefined {
+  if (node.type === 'number') return `${node.value}em`;
+  if (node.type === 'seq' && node.nodes.length === 2) {
+    const [a, b] = node.nodes;
+    if (a!.type === 'number' && b!.type === 'atom' && b!.text === 'em') {
+      return `${a!.value}em`;
+    }
+  }
+  return undefined;
 }
 
 function delimFromValue(node: AstNode): { open: string; close: string } | undefined {

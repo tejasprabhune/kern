@@ -1,4 +1,7 @@
-import type { AstNode, AttachNode, MatrixKind, UnderOverNode, MathClass, MathSize } from '../ast.js';
+import type {
+  AstNode, AttachNode, EqArrayNode, MatrixKind, MatrixAugment, MatrixGap,
+  UnderOverNode, MathClass, MathSize,
+} from '../ast.js';
 import { isBigOperator, isIntegralOperator, isLimitsOperator } from '../symbols.js';
 import { escapeHtml, mathvariantForStyle, mspaceWidth } from './shared.js';
 
@@ -58,7 +61,8 @@ function renderNode(node: AstNode, ctx: RenderCtx): string {
     case 'sqrt': return `<msqrt>${renderNode(node.body, ctx)}</msqrt>`;
     case 'root': return `<mroot>${renderNode(node.body, ctx)}${renderNode(node.index, ctx)}</mroot>`;
     case 'attach': return renderAttach(node, ctx);
-    case 'matrix': return renderMatrix(node.kind, node.rows, node.delim, ctx);
+    case 'matrix': return renderMatrix(node.kind, node.rows, node.delim, node.augment, node.gap, ctx);
+    case 'eqarray': return renderEqArray(node, ctx);
     case 'style': return renderStyle(node.kind, node.body, ctx);
     case 'lr': return renderLR(node.open, node.close, node.body, node.stretchy === true, ctx);
     case 'spacing': return `<mspace width="${mspaceWidth(node.kind)}"/>`;
@@ -254,27 +258,52 @@ function renderMatrix(
   kind: MatrixKind,
   rows: AstNode[][],
   delim: { open: string; close: string } | undefined,
+  augment: MatrixAugment | undefined,
+  gap: MatrixGap | undefined,
   ctx: RenderCtx,
 ): string {
   const { open, close } = delim ?? matrixDelimiters(kind);
-  const tableRows = rows.map(row => {
-    const cells = row.map(cell => `<mtd>${renderNode(cell, ctx)}</mtd>`).join('');
+
+  const vlineSet = new Set((augment?.vline ?? []).filter(n => Number.isFinite(n)));
+  const hlineSet = new Set((augment?.hline ?? []).filter(n => Number.isFinite(n)));
+
+  const tableRows = rows.map((row, rIdx) => {
+    const cells = row.map((cell, cIdx) => {
+      const classes: string[] = [];
+      if (vlineSet.has(cIdx + 1)) classes.push('kern-augment-right');
+      if (hlineSet.has(rIdx + 1)) classes.push('kern-augment-bottom');
+      const cls = classes.length ? ` class="${classes.join(' ')}"` : '';
+      return `<mtd${cls}>${renderNode(cell, ctx)}</mtd>`;
+    }).join('');
     return `<mtr>${cells}</mtr>`;
   }).join('');
 
-  // MathML Core drops columnspacing/rowspacing as attributes; cell padding
-  // lives in CSS now (see kern.css "MathML output styling" block).
+  const styleParts: string[] = [];
+  if (gap?.row) styleParts.push(`--kern-row-gap:${gap.row}`);
+  if (gap?.column) styleParts.push(`--kern-column-gap:${gap.column}`);
+  const styleAttr = styleParts.length ? ` style="${styleParts.join(';')}"` : '';
+  const gapClass = gap ? ' class="kern-gap"' : '';
+
   if (kind === 'cases') {
-    return `<mrow><mo stretchy="true">{</mo><mtable columnalign="left left">${tableRows}</mtable></mrow>`;
+    return `<mrow><mo stretchy="true">{</mo><mtable columnalign="left left"${gapClass}${styleAttr}>${tableRows}</mtable></mrow>`;
   }
 
-  const table = `<mtable>${tableRows}</mtable>`;
+  const table = `<mtable${gapClass}${styleAttr}>${tableRows}</mtable>`;
   if (open || close) {
     const o = open ? `<mo stretchy="true" fence="true">${escapeHtml(open)}</mo>` : '';
     const c = close ? `<mo stretchy="true" fence="true">${escapeHtml(close)}</mo>` : '';
     return `<mrow>${o}${table}${c}</mrow>`;
   }
   return table;
+}
+
+function renderEqArray(node: EqArrayNode, ctx: RenderCtx): string {
+  const childCtx: RenderCtx = { ...ctx, display: true };
+  const tableRows = node.rows.map(row => {
+    const cells = row.map(cell => `<mtd>${renderNode(cell, childCtx)}</mtd>`).join('');
+    return `<mtr>${cells}</mtr>`;
+  }).join('');
+  return `<mtable class="kern-eqarray kern-aligned">${tableRows}</mtable>`;
 }
 
 function matrixDelimiters(kind: MatrixKind): { open: string; close: string } {

@@ -211,6 +211,48 @@ describe('MathML renderer', () => {
     // The outer paren group wrapping the mfrac should stretch.
     expect(out).toMatch(/<mo stretchy="true"[^>]*>\(<\/mo>/);
   });
+
+  it('wide spacing emits a 2em mspace', () => {
+    const out = ml('a wide b');
+    expect(out).toContain('<mspace width="2em"/>');
+  });
+
+  it('multi-line equation with \\ becomes an mtable', () => {
+    const out = ml('a = b \\ c = d', true);
+    expect(out).toContain('<mtable class="kern-eqarray kern-aligned">');
+    expect(out).toMatch(/<mtr>.*<\/mtr>.*<mtr>.*<\/mtr>/);
+  });
+
+  it('& inside a multi-line row splits cells', () => {
+    const out = ml('a &= b \\ &= c', true);
+    expect(out).toContain('<mtable class="kern-eqarray kern-aligned">');
+    // First row should have at least two <mtd>.
+    const firstRow = out.match(/<mtr>(.*?)<\/mtr>/)?.[1] ?? '';
+    const cellCount = (firstRow.match(/<mtd>/g) ?? []).length;
+    expect(cellCount).toBeGreaterThanOrEqual(2);
+  });
+
+  it('single-line & still uses inline align marker', () => {
+    const out = ml('a &= b');
+    expect(out).not.toContain('kern-eqarray');
+  });
+
+  it('mat with augment draws a vertical rule', () => {
+    const out = ml('mat(1, 2; 3, 4, augment: 1)', true);
+    expect(out).toContain('class="kern-augment-right"');
+  });
+
+  it('mat with gap sets row/column gap CSS vars', () => {
+    const out = ml('mat(1, 0; 0, 1, gap: 1em)', true);
+    expect(out).toContain('--kern-row-gap:1em');
+    expect(out).toContain('--kern-column-gap:1em');
+  });
+
+  it('mat with row-gap only sets row gap', () => {
+    const out = ml('mat(1, 0; 0, 1, row-gap: 0.5em)', true);
+    expect(out).toContain('--kern-row-gap:0.5em');
+    expect(out).not.toContain('--kern-column-gap');
+  });
 });
 
 describe('renderToString error handling', () => {

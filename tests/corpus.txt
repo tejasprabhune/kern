@@ -82,8 +82,16 @@ lr((A | B))
 # Matrices / vectors / cases
 mat(1, 0; 0, 1) [display]
 mat(a, b; c, d) [display]
+mat(1, 2, 3; 4, 5, 6, augment: 2) [display]
+mat(1, 0; 0, 1, gap: 0.6em) [display]
+mat(a, b; c, d, row-gap: 1em) [display]
 vec(a, b, c) [display]
 cases(x "if" x > 0, -x "otherwise") [display]
+
+# Multi-line equations
+a = b \ c = d [display]
+a &= b + c \ &= d [display]
+f(x) &= x^2 + 2 x \ &= x (x + 2) [display]
 
 # Binomial
 binom(n, k) [display]
@@ -116,6 +124,7 @@ x "where" x > 0
 # Spacing
 a thin b
 a quad b
+a qquad b
 a wide b
 
 # Set notation

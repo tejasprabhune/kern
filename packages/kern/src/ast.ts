@@ -21,7 +21,8 @@ export type AstNode =
   | OpNode
   | ClassNode
   | SizeNode
-  | LimitsNode;
+  | LimitsNode
+  | EqArrayNode;
 
 export interface SeqNode {
   type: 'seq';
@@ -88,12 +89,30 @@ export interface AttachNode {
 
 export type MatrixKind = 'vec' | 'mat' | 'cases' | 'bmat' | 'pmat' | 'vmat' | 'Vmat';
 
+export interface MatrixAugment {
+  // Column indices (1-based) after which to draw a vertical rule.
+  vline: number[];
+  // Row indices (1-based) after which to draw a horizontal rule.
+  hline: number[];
+}
+
+export interface MatrixGap {
+  // Em values for row gap (between rows) and column gap (between columns).
+  // Either can be omitted; the renderer falls back to the matrix default.
+  row?: string;
+  column?: string;
+}
+
 export interface MatrixNode {
   type: 'matrix';
   kind: MatrixKind;
   rows: AstNode[][];
   // Optional explicit delimiters from `mat(..., delim: "[")` etc.
   delim?: { open: string; close: string };
+  // Augmentation lines from `mat(..., augment: ...)`.
+  augment?: MatrixAugment;
+  // Row/column spacing from `mat(..., gap: ..., row-gap: ..., column-gap: ...)`.
+  gap?: MatrixGap;
 }
 
 export type StyleKind = 'cal' | 'bb' | 'frak' | 'bold' | 'italic' | 'upright' | 'sans' | 'mono';
@@ -118,7 +137,7 @@ export interface LRNode {
   stretchy?: boolean;
 }
 
-export type SpacingKind = 'thin' | 'med' | 'thick' | 'quad' | 'qquad' | 'space' | 'zws';
+export type SpacingKind = 'thin' | 'med' | 'thick' | 'quad' | 'qquad' | 'wide' | 'space' | 'zws';
 
 export interface SpacingNode {
   type: 'spacing';
@@ -194,6 +213,14 @@ export interface LimitsNode {
   type: 'limits-hint';
   mode: 'limits' | 'scripts';
   body: AstNode;
+}
+
+// Multi-row equation array. Each row is an array of cells; cells are
+// rendered as <mtd>, rows as <mtr>. Used for `a \ b` line breaks and
+// `a &= b \ &= c` alignment in display equations.
+export interface EqArrayNode {
+  type: 'eqarray';
+  rows: AstNode[][];
 }
 
 export function seq(nodes: AstNode[]): AstNode {

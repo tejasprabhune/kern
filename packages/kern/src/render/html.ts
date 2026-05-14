@@ -37,6 +37,13 @@ function renderNode(node: AstNode, ctx: RenderCtx): string {
     case 'class': return renderNode(node.body, ctx);
     case 'size': return renderNode(node.body, ctx);
     case 'limits-hint': return renderNode(node.body, ctx);
+    case 'eqarray': {
+      const rowsHtml = node.rows.map(row => {
+        const cells = row.map(cell => `<span class="kern-mtd">${renderNode(cell, ctx)}</span>`).join('');
+        return `<span class="kern-mtr">${cells}</span>`;
+      }).join('');
+      return `<span class="kern-mtable kern-eqarray">${rowsHtml}</span>`;
+    }
   }
 }
 

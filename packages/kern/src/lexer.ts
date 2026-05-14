@@ -24,6 +24,7 @@ export enum TK {
   Bang,
   Escape,
   Shorthand,
+  LineBreak,
   EOF,
 }
 
@@ -132,14 +133,28 @@ export function tokenize(src: string): Token[] {
       continue;
     }
 
-    // Backslash escapes: \alpha, \(, \\, etc. Emit an Escape token whose
-    // text is the *content* (without the leading backslash). The parser
-    // tries the symbol table first, then falls back to atom/operator.
+    // Backslash escapes: \alpha, \(, etc. A bare `\` at end of input or
+    // followed by whitespace, and the `\\` digraph, are math-mode line
+    // breaks (used to split multi-line display equations).
     if (c === 92) { // '\'
-      i++;
-      if (i >= len) {
-        throw new ParseError('Unexpected end after backslash', start, src);
+      const nextIdx = i + 1;
+      if (nextIdx >= len) {
+        i++;
+        tokens.push({ kind: TK.LineBreak, text: '\\', pos: start });
+        continue;
       }
+      const nc0 = src.charCodeAt(nextIdx);
+      if (isWhitespace(nc0)) {
+        i++;
+        tokens.push({ kind: TK.LineBreak, text: '\\', pos: start });
+        continue;
+      }
+      if (nc0 === 92) {
+        i += 2;
+        tokens.push({ kind: TK.LineBreak, text: '\\\\', pos: start });
+        continue;
+      }
+      i++;
       const nc = src.charCodeAt(i);
       if (isLetter(nc)) {
         const idStart = i;

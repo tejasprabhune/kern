@@ -41,6 +41,7 @@ export function mspaceWidth(kind: string): string {
     case 'thick': return '0.2778em';
     case 'quad': return '1em';
     case 'qquad': return '2em';
+    case 'wide': return '2em';
     case 'space': return '0.3333em';
     case 'zws': return '0em';
     default: return '0em';
