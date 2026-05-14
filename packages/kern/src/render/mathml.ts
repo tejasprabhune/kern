@@ -9,6 +9,11 @@ interface RenderCtx {
   // Forced limit placement: 'limits' = under/over, 'scripts' = sub/sup,
   // 'auto' or undefined = decide based on base + display.
   limitsHint?: 'limits' | 'scripts';
+  // True when rendering directly inside the body of a stretchy lr().
+  // A `|` or `‖` in this position becomes a stretchy fence so Safari
+  // sizes the conditional bar (e.g. P(A | B)) symmetrically with the
+  // surrounding parens.
+  inStretchyLR?: boolean;
 }
 
 const BIG_OP_RE = /^[∑∏∐∫∬∭⨌∮∯∰∱∲∳⋃⋂⨆⨅⨀⨁⨂⨃⨄⨊⨋]$/u;
@@ -26,6 +31,14 @@ function normalizeOperator(text: string): string {
   return OPERATOR_GLYPHS[text] ?? text;
 }
 
+function renderOperator(text: string, ctx: RenderCtx): string {
+  const t = normalizeOperator(text);
+  if (ctx.inStretchyLR && (t === '|' || t === '‖')) {
+    return `<mo stretchy="true" symmetric="true">${escapeHtml(t)}</mo>`;
+  }
+  return `<mo>${escapeHtml(t)}</mo>`;
+}
+
 export function renderMathML(node: AstNode, display: boolean): string {
   const ctx: RenderCtx = { display, scriptLevel: 0 };
   const inner = renderNode(node, ctx);
@@ -39,7 +52,7 @@ function renderNode(node: AstNode, ctx: RenderCtx): string {
     case 'atom': return renderAtom(node.text, node.italic, node.operator === true);
     case 'number': return `<mn>${escapeHtml(node.value)}</mn>`;
     case 'symbol': return renderSymbol(node.char);
-    case 'operator': return `<mo>${escapeHtml(normalizeOperator(node.text))}</mo>`;
+    case 'operator': return renderOperator(node.text, ctx);
     case 'text': return `<mtext>${escapeHtml(node.value)}</mtext>`;
     case 'frac': return renderFrac(node.num, node.den, ctx);
     case 'sqrt': return `<msqrt>${renderNode(node.body, ctx)}</msqrt>`;
@@ -290,14 +303,60 @@ function renderLR(open: string, close: string, body: AstNode, stretchy: boolean,
   // dropping the form attribute alone isn't enough since the browser still
   // infers form from position. Stretchy LR (from lr()/abs()/matrix) sets
   // stretchy="true" so the operator can grow to its content.
-  const stretchAttr = ` stretchy="${stretchy ? 'true' : 'false'}"`;
+  //
+  // Bare parens around tall content (fractions, matrices, big radicals,
+  // limits-style attachments) auto-promote to stretchy to match Typst's
+  // lr() output. Typst always wraps fractions in stretchy fences; mirror
+  // that so expressions like `softmax((Q K^T) / sqrt(d_k))` look right.
+  const effectiveStretchy = stretchy || containsTallContent(body);
+  const stretchAttr = ` stretchy="${effectiveStretchy ? 'true' : 'false'}"`;
+  // Add symmetric="true" on stretched fences. This nudges Safari (whose
+  // MathML implementation otherwise sizes the bar/paren asymmetrically
+  // around the math axis) to match Firefox/Chromium.
+  const symAttr = effectiveStretchy ? ' symmetric="true"' : '';
   const openMo = open
-    ? `<mo${stretchAttr} fence="true">${escapeHtml(open)}</mo>`
+    ? `<mo${stretchAttr}${symAttr} fence="true">${escapeHtml(open)}</mo>`
     : '';
   const closeMo = close
-    ? `<mo${stretchAttr} fence="true">${escapeHtml(close)}</mo>`
+    ? `<mo${stretchAttr}${symAttr} fence="true">${escapeHtml(close)}</mo>`
     : '';
-  return `<mrow>${openMo}${renderNode(body, ctx)}${closeMo}</mrow>`;
+  const bodyCtx: RenderCtx = { ...ctx, inStretchyLR: effectiveStretchy };
+  return `<mrow>${openMo}${renderNode(body, bodyCtx)}${closeMo}</mrow>`;
+}
+
+// True if the body should trigger auto-sized fences. Stretchy fences
+// matter most for content whose visual height exceeds the body line:
+// fractions, matrices/cases, multi-row tables, large radicals, and
+// limits-style under/over constructs. Plain attachments (msub/msup)
+// don't push the line height enough to need stretching.
+function containsTallContent(node: AstNode): boolean {
+  switch (node.type) {
+    case 'frac':
+    case 'binom':
+    case 'matrix':
+    case 'underover':
+      return true;
+    case 'sqrt':
+    case 'root':
+      return true;
+    case 'cancel':
+      return containsTallContent(node.body);
+    case 'seq':
+      return node.nodes.some(containsTallContent);
+    case 'lr':
+      return node.stretchy === true || containsTallContent(node.body);
+    case 'style':
+    case 'size':
+    case 'class':
+    case 'accent':
+      return containsTallContent(node.body);
+    case 'attach':
+      return containsTallContent(node.base)
+        || (node.sub !== undefined && containsTallContent(node.sub))
+        || (node.sup !== undefined && containsTallContent(node.sup));
+    default:
+      return false;
+  }
 }
 
 // Accent glyphs. Prefer the modifier-letter / accent-height characters

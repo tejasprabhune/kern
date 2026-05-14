@@ -166,6 +166,51 @@ describe('MathML renderer', () => {
     const out = renderToString('lim_(n -> oo) f', { output: 'mathml', displayMode: true });
     expect(out).toContain('<munder>');
   });
+
+  it('dif emits upright d with a thin leading space', () => {
+    const out = ml('integral f dif x');
+    expect(out).toMatch(/<mspace width="0\.1667em"\/><mi mathvariant="normal">d<\/mi>/);
+    expect(out).not.toMatch(/<mi>d<\/mi>/);
+  });
+
+  it('Dif emits upright D', () => {
+    const out = ml('Dif x');
+    expect(out).toMatch(/<mi mathvariant="normal">D<\/mi>/);
+  });
+
+  it('bare parens around a fraction auto-size to stretchy', () => {
+    const out = ml('(a/b)');
+    // Both open and close get stretchy="true" when wrapping tall content.
+    expect(out).toMatch(/<mo stretchy="true"[^>]*>\(<\/mo>/);
+    expect(out).toMatch(/<mo stretchy="true"[^>]*>\)<\/mo>/);
+  });
+
+  it('bare parens around plain content stay non-stretchy', () => {
+    const out = ml('(x + y)');
+    expect(out).toMatch(/<mo stretchy="false"[^>]*>\(<\/mo>/);
+    expect(out).toMatch(/<mo stretchy="false"[^>]*>\)<\/mo>/);
+  });
+
+  it('stretchy lr fences emit symmetric="true" for Safari', () => {
+    const out = ml('lr((x))');
+    expect(out).toMatch(/<mo stretchy="true"[^>]*symmetric="true"[^>]*>\(<\/mo>/);
+  });
+
+  it('conditional bar inside lr() is a stretchy symmetric fence', () => {
+    const out = ml('lr((A | B))');
+    expect(out).toMatch(/<mo stretchy="true" symmetric="true">\|<\/mo>/);
+  });
+
+  it('conditional bar outside lr() stays plain', () => {
+    const out = ml('a | b');
+    expect(out).toMatch(/<mo>\|<\/mo>/);
+  });
+
+  it('Attention showcase auto-sizes outer fraction parens', () => {
+    const out = ml('"softmax"((Q K^T) / sqrt(d_k)) V');
+    // The outer paren group wrapping the mfrac should stretch.
+    expect(out).toMatch(/<mo stretchy="true"[^>]*>\(<\/mo>/);
+  });
 });
 
 describe('renderToString error handling', () => {

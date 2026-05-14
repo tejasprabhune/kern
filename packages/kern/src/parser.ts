@@ -328,6 +328,17 @@ class Parser {
       return { type: 'spacing', kind };
     }
 
+    // Upright differential `dif x` / `Dif x`. Typst emits a weak thin space
+    // followed by an upright d (or D), classed as Unary so following
+    // expressions group as the differential's operand.
+    if (name === 'dif' || name === 'Dif') {
+      const letter = name === 'dif' ? 'd' : 'D';
+      return seq([
+        { type: 'spacing', kind: 'thin' },
+        { type: 'atom', text: letter, italic: false },
+      ]);
+    }
+
     // Only the *structural* names (frac, sqrt, mat, accents, style funcs,
     // limits/scripts/op/class, etc.) take their parens as call syntax.
     // Generic identifiers like `p`, `f`, `Psi`, or `clip` get resolved as
