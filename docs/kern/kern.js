@@ -4,19 +4,19 @@ class k extends Error {
   }
 }
 var o = /* @__PURE__ */ ((e) => (e[e.Ident = 0] = "Ident", e[e.Number = 1] = "Number", e[e.Op = 2] = "Op", e[e.Slash = 3] = "Slash", e[e.LParen = 4] = "LParen", e[e.RParen = 5] = "RParen", e[e.LBracket = 6] = "LBracket", e[e.RBracket = 7] = "RBracket", e[e.LBrace = 8] = "LBrace", e[e.RBrace = 9] = "RBrace", e[e.Under = 10] = "Under", e[e.Caret = 11] = "Caret", e[e.Amp = 12] = "Amp", e[e.Semicolon = 13] = "Semicolon", e[e.Comma = 14] = "Comma", e[e.Colon = 15] = "Colon", e[e.Dot = 16] = "Dot", e[e.DotDot = 17] = "DotDot", e[e.Str = 18] = "Str", e[e.Prime = 19] = "Prime", e[e.Bang = 20] = "Bang", e[e.Escape = 21] = "Escape", e[e.Shorthand = 22] = "Shorthand", e[e.EOF = 23] = "EOF", e))(o || {});
-function f(e) {
+function g(e) {
   return e >= 65 && e <= 90 || e >= 97 && e <= 122;
 }
 function b(e) {
   return e >= 48 && e <= 57;
 }
 function w(e) {
-  return f(e) || b(e);
+  return g(e) || b(e);
 }
-function H(e) {
+function I(e) {
   return e === 32 || e === 9 || e === 10 || e === 13;
 }
-const I = /* @__PURE__ */ new Set([
+const _ = /* @__PURE__ */ new Set([
   "+",
   "-",
   "=",
@@ -60,10 +60,10 @@ const I = /* @__PURE__ */ new Set([
   "⟺",
   "↦"
 ]);
-function _(e) {
-  return I.has(e);
+function D(e) {
+  return _.has(e);
 }
-const D = [
+const z = [
   ["<==>", "⟺"],
   ["<-->", "⟷"],
   ["-->", "⟶"],
@@ -88,22 +88,22 @@ const D = [
   ["||", "‖"],
   ["...", "…"]
 ];
-function z(e, r) {
-  for (const [t, s] of D)
+function F(e, r) {
+  for (const [t, s] of z)
     if (e.startsWith(t, r)) return [t, s];
   return null;
 }
-function F(e) {
+function U(e) {
   const r = [];
   let t = 0;
   const s = e.length;
   for (; t < s; ) {
     const n = t, a = e.charCodeAt(t);
-    if (H(a)) {
+    if (I(a)) {
       t++;
       continue;
     }
-    if (f(a)) {
+    if (g(a)) {
       for (; t < s && w(e.charCodeAt(t)); ) t++;
       r.push({ kind: 0, text: e.slice(n, t), pos: n });
       continue;
@@ -119,15 +119,15 @@ function F(e) {
       if (t++, t >= s)
         throw new k("Unexpected end after backslash", n, e);
       const c = e.charCodeAt(t);
-      if (f(c)) {
+      if (g(c)) {
         const d = t;
         for (; t < s && w(e.charCodeAt(t)); ) t++;
         let h = e.slice(d, t);
-        for (; t + 1 < s && e.charCodeAt(t) === 46 && f(e.charCodeAt(t + 1)); ) {
+        for (; t + 1 < s && e.charCodeAt(t) === 46 && g(e.charCodeAt(t + 1)); ) {
           t++;
-          const g = t;
+          const f = t;
           for (; t < s && w(e.charCodeAt(t)); ) t++;
-          h = h + "." + e.slice(g, t);
+          h = h + "." + e.slice(f, t);
         }
         r.push({ kind: 21, text: h, pos: n });
       } else {
@@ -136,7 +136,7 @@ function F(e) {
       }
       continue;
     }
-    const l = z(e, t);
+    const l = F(e, t);
     if (l !== null) {
       const [c, d] = l;
       r.push({ kind: 22, text: d, pos: n }), t += c.length;
@@ -211,7 +211,7 @@ function F(e) {
 function m(e) {
   return e.length === 0 ? { type: "seq", nodes: [] } : e.length === 1 ? e[0] : { type: "seq", nodes: e };
 }
-const U = {
+const j = {
   AA: "𝔸",
   acute: "´",
   "acute.double": "˝",
@@ -1369,15 +1369,15 @@ const U = {
   zws: "​",
   ZZ: "ℤ"
 }, P = /* @__PURE__ */ new Set(["thin", "med", "thick", "quad", "qquad", "space", "zws"]);
-function j(e) {
+function G(e) {
   return P.has(e);
 }
-function G(e) {
-  const r = U[e];
+function V(e) {
+  const r = j[e];
   if (r !== void 0)
     return r === "" && P.has(e), r;
 }
-const V = /* @__PURE__ */ new Set([
+const W = /* @__PURE__ */ new Set([
   "sin",
   "cos",
   "tan",
@@ -1417,7 +1417,7 @@ const V = /* @__PURE__ */ new Set([
   "ker",
   "tr",
   "Pr"
-]), W = /* @__PURE__ */ new Set([
+]), Y = /* @__PURE__ */ new Set([
   "lim",
   "liminf",
   "limsup",
@@ -1429,13 +1429,13 @@ const V = /* @__PURE__ */ new Set([
   "gcd",
   "arg"
 ]);
-function Y(e) {
-  return V.has(e);
-}
-function x(e) {
+function Z(e) {
   return W.has(e);
 }
-const Z = /* @__PURE__ */ new Set([
+function x(e) {
+  return Y.has(e);
+}
+const X = /* @__PURE__ */ new Set([
   "∑",
   "∏",
   "∐",
@@ -1460,7 +1460,7 @@ const Z = /* @__PURE__ */ new Set([
   "⨄",
   "⨊",
   "⨋"
-]), X = /* @__PURE__ */ new Set([
+]), J = /* @__PURE__ */ new Set([
   "∫",
   "∬",
   "∭",
@@ -1473,10 +1473,10 @@ const Z = /* @__PURE__ */ new Set([
   "∳"
 ]);
 function O(e) {
-  return Z.has(e);
+  return X.has(e);
 }
 function E(e) {
-  return X.has(e);
+  return J.has(e);
 }
 const L = /* @__PURE__ */ new Set(["cal", "bb", "frak", "bold", "italic", "upright", "sans", "mono"]), N = /* @__PURE__ */ new Set(["vec", "mat", "cases", "bmat", "pmat", "vmat", "Vmat"]), B = /* @__PURE__ */ new Set([
   "hat",
@@ -1504,11 +1504,11 @@ const L = /* @__PURE__ */ new Set(["cal", "bb", "frak", "bold", "italic", "uprig
   underparen: "underparen",
   overbracket: "overbracket",
   underbracket: "underbracket"
-}, J = {
+}, Q = {
   cancel: "cancel",
   bcancel: "bcancel",
   xcancel: "xcancel"
-}, Q = /* @__PURE__ */ new Set(["normal", "op", "bin", "rel", "open", "close", "punct"]), y = {
+}, T = /* @__PURE__ */ new Set(["normal", "op", "bin", "rel", "open", "close", "punct"]), y = {
   display: "display",
   inline: "inline",
   script: "script",
@@ -1527,13 +1527,13 @@ const L = /* @__PURE__ */ new Set(["cal", "bb", "frak", "bold", "italic", "uprig
   floor: { kind: "floor", open: "⌊", close: "⌋" },
   ceil: { kind: "ceil", open: "⌈", close: "⌉" }
 };
-function T(e) {
-  const r = F(e), t = new K(r, e), s = t.parseAlign();
+function K(e) {
+  const r = U(e), t = new ee(r, e), s = t.parseAlign();
   if (t.peek().kind !== o.EOF)
     throw new k(`Unexpected token '${t.peek().text}'`, t.peek().pos, e);
   return s;
 }
-class K {
+class ee {
   constructor(r, t) {
     this.tokens = r, this.src = t, this.pos = 0;
   }
@@ -1671,12 +1671,12 @@ class K {
   resolveName(r) {
     if (r in $)
       return { type: "spacing", kind: $[r] };
-    if (this.peek().kind === o.LParen && se(r))
+    if (this.peek().kind === o.LParen && ne(r))
       return this.parseCall(r);
-    const t = G(r);
+    const t = V(r);
     if (t !== void 0)
-      return j(r) ? { type: "spacing", kind: r } : { type: "symbol", name: r, char: t };
-    if (Y(r))
+      return G(r) ? { type: "spacing", kind: r } : { type: "symbol", name: r, char: t };
+    if (Z(r))
       return { type: "atom", text: r, italic: !1, operator: !0 };
     const s = r.length === 1 && /[a-zA-Z]/.test(r);
     return { type: "atom", text: r, italic: s };
@@ -1706,7 +1706,7 @@ class K {
     if (B.has(r)) return this.parseAccent(r);
     if (L.has(r)) return this.parseStyle(r);
     if (N.has(r)) return this.parseMatrix(r);
-    const t = this.parseArgs(), s = { type: "atom", text: r, italic: !1 }, a = { type: "lr", kind: "paren", open: "(", close: ")", body: re(t) };
+    const t = this.parseArgs(), s = { type: "atom", text: r, italic: !1 }, a = { type: "lr", kind: "paren", open: "(", close: ")", body: te(t) };
     return m([s, a]);
   }
   // Parses a comma-separated argument list, handling named args (k: v) and
@@ -1756,22 +1756,22 @@ class K {
   }
   parseLr() {
     const r = this.parseAlign();
-    if (this.expect(o.RParen), r.type === "lr") return r;
+    if (this.expect(o.RParen), r.type === "lr") return { ...r, stretchy: !0 };
     if (r.type === "seq" && r.nodes.length >= 2) {
       const t = r.nodes[0], s = r.nodes[r.nodes.length - 1];
       if (t.type === "operator" && s.type === "operator") {
         const n = t.text, a = s.text;
-        if (te(n) === a) {
+        if (se(n) === a) {
           const l = r.nodes.slice(1, -1);
-          return { type: "lr", kind: "custom", open: n, close: a, body: m(l) };
+          return { type: "lr", kind: "custom", open: n, close: a, body: m(l), stretchy: !0 };
         }
       }
     }
-    return { type: "lr", kind: "custom", open: "", close: "", body: r };
+    return { type: "lr", kind: "custom", open: "", close: "", body: r, stretchy: !0 };
   }
   parseLrShorthand(r) {
     const t = q[r], s = this.parseAlign();
-    return this.expect(o.RParen), { type: "lr", kind: t.kind, open: t.open, close: t.close, body: s };
+    return this.expect(o.RParen), { type: "lr", kind: t.kind, open: t.open, close: t.close, body: s, stretchy: !0 };
   }
   parseAccent(r) {
     const t = this.parseAlign();
@@ -1790,7 +1790,7 @@ class K {
   }
   parseCancel(r) {
     const t = this.parseAlign();
-    return this.expect(o.RParen), { type: "cancel", kind: J[r], body: t };
+    return this.expect(o.RParen), { type: "cancel", kind: Q[r], body: t };
   }
   parseOp() {
     let r = "", t = !1;
@@ -1813,7 +1813,7 @@ class K {
     this.expect(o.RParen);
     let s = "normal";
     const n = r.type === "text" ? r.value : r.type === "atom" ? r.text : "";
-    return Q.has(n) && (s = n), { type: "class", cls: s, body: t };
+    return T.has(n) && (s = n), { type: "class", cls: s, body: t };
   }
   parseSize(r) {
     const t = this.parseAlign();
@@ -1842,7 +1842,7 @@ class K {
         const d = this.consume().text;
         this.consume();
         const h = this.parseAlign();
-        d === "delim" && (a = ee(h));
+        d === "delim" && (a = re(h));
       } else c.kind === o.DotDot ? (this.consume(), s.push(this.parseAlign())) : s.push(this.parseAlign());
     }
     s.length > 0 && t.push(s), this.expect(o.RParen);
@@ -1850,7 +1850,7 @@ class K {
     return a !== void 0 && (l.delim = a), l;
   }
 }
-function ee(e) {
+function re(e) {
   switch (e.type === "text" ? e.value : e.type === "atom" ? e.text : e.type === "symbol" ? e.char : e.type === "operator" ? e.text : "") {
     case "(":
       return { open: "(", close: ")" };
@@ -1866,7 +1866,7 @@ function ee(e) {
       return;
   }
 }
-function re(e) {
+function te(e) {
   if (e.positional.length === 0) return { type: "seq", nodes: [] };
   if (e.positional.length === 1) return e.positional[0];
   const r = [];
@@ -1874,7 +1874,7 @@ function re(e) {
     t > 0 && r.push({ type: "operator", text: "," }), r.push(e.positional[t]);
   return m(r);
 }
-function te(e) {
+function se(e) {
   return {
     "(": ")",
     "[": "]",
@@ -1887,9 +1887,9 @@ function te(e) {
   }[e] ?? e;
 }
 function A(e) {
-  return _(e);
+  return D(e);
 }
-function se(e) {
+function ne(e) {
   return !!(e === "frac" || e === "sqrt" || e === "root" || e === "binom" || e === "lr" || e === "mid" || e === "op" || e === "class" || e === "limits" || e === "scripts" || e === "cancel" || e === "bcancel" || e === "xcancel" || e in y || e in v || e in q || B.has(e) || L.has(e) || N.has(e));
 }
 function i(e) {
@@ -1900,7 +1900,7 @@ function i(e) {
   }
   return r;
 }
-function ne(e) {
+function oe(e) {
   switch (e) {
     case "cal":
       return "script";
@@ -1942,7 +1942,7 @@ function M(e) {
       return "0em";
   }
 }
-const oe = /^[∑∏∐∫∬∭⨌∮∯∰∱∲∳⋃⋂⨆⨅⨀⨁⨂⨃⨄⨊⨋]$/u;
+const ae = /^[∑∏∐∫∬∭⨌∮∯∰∱∲∳⋃⋂⨆⨅⨀⨁⨂⨃⨄⨊⨋]$/u;
 function S(e, r) {
   const s = p(e, { display: r, scriptLevel: 0 });
   return `<math xmlns="http://www.w3.org/1998/Math/MathML"${r ? ' display="block"' : ""}>${s}</math>`;
@@ -1950,54 +1950,54 @@ function S(e, r) {
 function p(e, r) {
   switch (e.type) {
     case "seq":
-      return ae(e.nodes, r);
+      return ie(e.nodes, r);
     case "atom":
-      return ie(e.text, e.italic, e.operator === !0);
+      return le(e.text, e.italic, e.operator === !0);
     case "number":
       return `<mn>${i(e.value)}</mn>`;
     case "symbol":
-      return le(e.char);
+      return ce(e.char);
     case "operator":
       return `<mo>${i(e.text)}</mo>`;
     case "text":
       return `<mtext>${i(e.value)}</mtext>`;
     case "frac":
-      return pe(e.num, e.den, r);
+      return de(e.num, e.den, r);
     case "sqrt":
       return `<msqrt>${p(e.body, r)}</msqrt>`;
     case "root":
       return `<mroot>${p(e.body, r)}${p(e.index, r)}</mroot>`;
     case "attach":
-      return me(e, r);
+      return ke(e, r);
     case "matrix":
-      return be(e.kind, e.rows, e.delim, r);
+      return fe(e.kind, e.rows, e.delim, r);
     case "style":
-      return ge(e.kind, e.body, r);
+      return we(e.kind, e.body, r);
     case "lr":
-      return we(e.open, e.close, e.body, r);
+      return ve(e.open, e.close, e.body, e.stretchy === !0, r);
     case "spacing":
       return `<mspace width="${M(e.kind)}"/>`;
     case "align":
       return "<mo>&#x200B;</mo>";
     case "binom":
-      return de(e.top, e.bot, r);
+      return he(e.top, e.bot, r);
     case "accent":
-      return ye(e.kind, e.body, r);
+      return qe(e.kind, e.body, r);
     case "underover":
-      return xe(e, r);
+      return $e(e, r);
     case "cancel":
-      return $e(e.kind, p(e.body, r));
+      return Ae(e.kind, p(e.body, r));
     case "op":
-      return Ae(e.text, e.limits);
+      return Se(e.text, e.limits);
     case "class":
-      return Se(e.cls, e.body, r);
+      return Ce(e.cls, e.body, r);
     case "size":
-      return Ce(e.size, e.body, r);
+      return Re(e.size, e.body, r);
     case "limits-hint":
       return p(e.body, { ...r, limitsHint: e.mode });
   }
 }
-function ae(e, r) {
+function ie(e, r) {
   if (e.length === 0) return "<mrow></mrow>";
   const t = '<mspace width="0.1667em"/>', s = [];
   for (let n = 0; n < e.length; n++) {
@@ -2006,48 +2006,48 @@ function ae(e, r) {
   }
   return `<mrow>${s.join("")}</mrow>`;
 }
-function ie(e, r, t) {
+function le(e, r, t) {
   return t ? `<mi mathvariant="normal">${i(e)}</mi><mspace width="0.1667em"/>` : `<mi${r ? "" : ' mathvariant="normal"'}>${i(e)}</mi>`;
 }
-function le(e) {
+function ce(e) {
   if (e === "") return '<mspace width="0em"/>';
   const r = e.codePointAt(0) ?? 0;
-  return O(e) || oe.test(e) ? `<mo largeop="true" movablelimits="${E(e) ? "false" : "true"}">${i(e)}</mo>` : ce(r) ? `<mo>${i(e)}</mo>` : ue(r) ? `<mi>${i(e)}</mi>` : `<mo>${i(e)}</mo>`;
-}
-function ce(e) {
-  return e >= 8592 && e <= 10239 || e === 177 || e === 215 || e === 247 || e >= 10752 && e <= 11007;
+  return O(e) || ae.test(e) ? `<mo largeop="true" movablelimits="${E(e) ? "false" : "true"}">${i(e)}</mo>` : ue(r) ? `<mo>${i(e)}</mo>` : pe(r) ? `<mi>${i(e)}</mi>` : `<mo>${i(e)}</mo>`;
 }
 function ue(e) {
+  return e >= 8592 && e <= 10239 || e === 177 || e === 215 || e === 247 || e >= 10752 && e <= 11007;
+}
+function pe(e) {
   return e >= 913 && e <= 1023 || e >= 8448 && e <= 8527 || e >= 119808 && e <= 120831;
 }
-function pe(e, r, t) {
+function de(e, r, t) {
   return `<mfrac>${p(e, t)}${p(r, t)}</mfrac>`;
 }
-function de(e, r, t) {
+function he(e, r, t) {
   return `<mrow><mo form="prefix" stretchy="true">(</mo><mfrac linethickness="0">${p(e, t)}${p(r, t)}</mfrac><mo form="postfix" stretchy="true">)</mo></mrow>`;
 }
-function he(e, r) {
+function me(e, r) {
   return r.limitsHint === "limits" ? !0 : r.limitsHint === "scripts" || !r.display ? !1 : !!(e.type === "symbol" && O(e.char) && !E(e.char) || e.type === "atom" && e.operator === !0 && x(e.text) || e.type === "op" && e.limits || e.type === "op" && x(e.text));
 }
-function me(e, r) {
-  const t = ke(e.base, r), s = e.sub !== void 0 ? p(e.sub, r) : void 0, n = e.sup !== void 0 ? p(e.sup, r) : void 0, a = he(e.base, r);
+function ke(e, r) {
+  const t = be(e.base, r), s = e.sub !== void 0 ? p(e.sub, r) : void 0, n = e.sup !== void 0 ? p(e.sup, r) : void 0, a = me(e.base, r);
   return s !== void 0 && n !== void 0 ? a ? `<munderover>${t}${s}${n}</munderover>` : `<msubsup>${t}${s}${n}</msubsup>` : s !== void 0 ? a ? `<munder>${t}${s}</munder>` : `<msub>${t}${s}</msub>` : n !== void 0 ? a ? `<mover>${t}${n}</mover>` : `<msup>${t}${n}</msup>` : t;
 }
-function ke(e, r) {
+function be(e, r) {
   return e.type === "atom" && e.operator === !0 ? `<mi mathvariant="normal">${i(e.text)}</mi>` : e.type === "op" ? `<mi mathvariant="normal">${i(e.text)}</mi>` : p(e, r);
 }
-function be(e, r, t, s) {
-  const { open: n, close: a } = t ?? fe(e), l = r.map((d) => `<mtr>${d.map((g) => `<mtd>${p(g, s)}</mtd>`).join("")}</mtr>`).join("");
+function fe(e, r, t, s) {
+  const { open: n, close: a } = t ?? ge(e), l = r.map((h) => `<mtr>${h.map((H) => `<mtd>${p(H, s)}</mtd>`).join("")}</mtr>`).join(""), c = ' columnspacing="0.8em" rowspacing="0.4em"';
   if (e === "cases")
-    return `<mrow><mo form="prefix" stretchy="true">{</mo><mtable columnalign="left left">${l}</mtable></mrow>`;
-  const c = `<mtable>${l}</mtable>`;
+    return `<mrow><mo form="prefix" stretchy="true">{</mo><mtable columnalign="left left"${c}>${l}</mtable></mrow>`;
+  const d = `<mtable${c}>${l}</mtable>`;
   if (n || a) {
-    const d = n ? `<mo form="prefix" stretchy="true">${i(n)}</mo>` : "", h = a ? `<mo form="postfix" stretchy="true">${i(a)}</mo>` : "";
-    return `<mrow>${d}${c}${h}</mrow>`;
+    const h = n ? `<mo form="prefix" stretchy="true">${i(n)}</mo>` : "", f = a ? `<mo form="postfix" stretchy="true">${i(a)}</mo>` : "";
+    return `<mrow>${h}${d}${f}</mrow>`;
   }
-  return c;
+  return d;
 }
-function fe(e) {
+function ge(e) {
   switch (e) {
     case "vec":
       return { open: "(", close: ")" };
@@ -2067,15 +2067,15 @@ function fe(e) {
       return { open: "(", close: ")" };
   }
 }
-function ge(e, r, t) {
-  const s = ne(e), n = p(r, t);
+function we(e, r, t) {
+  const s = oe(e), n = p(r, t);
   return `<mstyle mathvariant="${s}">${n}</mstyle>`;
 }
-function we(e, r, t, s) {
-  const n = e ? `<mo form="prefix" stretchy="true" fence="true">${i(e)}</mo>` : "", a = r ? `<mo form="postfix" stretchy="true" fence="true">${i(r)}</mo>` : "";
-  return `<mrow>${n}${p(t, s)}${a}</mrow>`;
+function ve(e, r, t, s, n) {
+  const a = s ? ' stretchy="true"' : "", l = e ? `<mo form="prefix"${a} fence="true">${i(e)}</mo>` : "", c = r ? `<mo form="postfix"${a} fence="true">${i(r)}</mo>` : "";
+  return `<mrow>${l}${p(t, n)}${c}</mrow>`;
 }
-const ve = {
+const ye = {
   hat: "^",
   tilde: "~",
   dot: "˙",
@@ -2093,11 +2093,11 @@ const ve = {
   caron: "ˇ",
   circle: "˚"
 };
-function ye(e, r, t) {
-  const s = ve[e] ?? "^";
+function qe(e, r, t) {
+  const s = ye[e] ?? "^";
   return `<mover accent="true">${p(r, t)}<mo>${i(s)}</mo></mover>`;
 }
-const qe = {
+const xe = {
   overbrace: { ch: "⏞", over: !0 },
   underbrace: { ch: "⏟", over: !1 },
   "overline.stretch": { ch: "‾", over: !0 },
@@ -2107,19 +2107,19 @@ const qe = {
   overbracket: { ch: "⎴", over: !0 },
   underbracket: { ch: "⎵", over: !1 }
 };
-function xe(e, r) {
-  const t = qe[e.kind], s = t.over ? "mover" : "munder", n = p(e.body, r), a = `<mo stretchy="true">${i(t.ch)}</mo>`, l = `<${s} accent="true">${n}${a}</${s}>`;
+function $e(e, r) {
+  const t = xe[e.kind], s = t.over ? "mover" : "munder", n = p(e.body, r), a = `<mo stretchy="true">${i(t.ch)}</mo>`, l = `<${s} accent="true">${n}${a}</${s}>`;
   if (e.annotation === void 0) return l;
   const c = p(e.annotation, r);
   return t.over ? `<mover>${l}${c}</mover>` : `<munder>${l}${c}</munder>`;
 }
-function $e(e, r) {
+function Ae(e, r) {
   return `<menclose notation="${e === "bcancel" ? "downdiagonalstrike" : e === "xcancel" ? "updiagonalstrike downdiagonalstrike" : "updiagonalstrike"}">${r}</menclose>`;
 }
-function Ae(e, r) {
+function Se(e, r) {
   return `<mi mathvariant="normal">${i(e)}</mi><mspace width="0.1667em"/>`;
 }
-function Se(e, r, t) {
+function Ce(e, r, t) {
   if (r.type === "atom" || r.type === "symbol" || r.type === "operator") {
     const s = r.type === "atom" ? r.text : r.type === "symbol" ? r.char : r.text;
     if (e === "op")
@@ -2135,7 +2135,7 @@ function Se(e, r, t) {
   }
   return p(r, t);
 }
-function Ce(e, r, t) {
+function Re(e, r, t) {
   const s = e === "display" ? "true" : e === "inline" ? "false" : void 0, n = e === "display" || e === "inline" ? "0" : e === "script" ? "1" : e === "sscript" ? "2" : void 0, a = [
     s !== void 0 ? `displaystyle="${s}"` : "",
     n !== void 0 ? `scriptlevel="${n}"` : ""
@@ -2152,45 +2152,45 @@ function C(e, r) {
 function u(e, r) {
   switch (e.type) {
     case "seq":
-      return Re(e.nodes);
+      return Pe(e.nodes);
     case "atom":
-      return Pe(e.text, e.italic, e.operator === !0);
+      return Oe(e.text, e.italic, e.operator === !0);
     case "number":
       return `<span class="kern-mn">${i(e.value)}</span>`;
     case "symbol":
-      return Oe(e.char);
+      return Ee(e.char);
     case "operator":
       return `<span class="kern-mo">${i(e.text)}</span>`;
     case "text":
       return `<span class="kern-mtext">${i(e.value)}</span>`;
     case "frac":
-      return Ee(e.num, e.den);
+      return Le(e.num, e.den);
     case "sqrt":
-      return Ne(e.body);
+      return Be(e.body);
     case "root":
-      return Be(e.index, e.body);
+      return Me(e.index, e.body);
     case "attach":
-      return Me(e);
+      return He(e);
     case "matrix":
-      return He(e.kind, e.rows);
+      return Ie(e.kind, e.rows);
     case "style":
-      return De(e.kind, e.body);
+      return ze(e.kind, e.body);
     case "lr":
-      return ze(e.open, e.close, e.body);
+      return Fe(e.open, e.close, e.body);
     case "spacing":
-      return je(e.kind);
+      return Ge(e.kind);
     case "align":
       return '<span class="kern-align"></span>';
     case "binom":
-      return Le(e.top, e.bot);
+      return Ne(e.top, e.bot);
     case "accent":
-      return Ue(e.kind, e.body);
+      return je(e.kind, e.body);
     case "underover":
-      return Ge(e.kind, e.body, e.annotation);
+      return Ve(e.kind, e.body, e.annotation);
     case "cancel":
-      return Ve(e.kind, e.body);
+      return We(e.kind, e.body);
     case "op":
-      return We(e.text);
+      return Ye(e.text);
     case "class":
       return u(e.body);
     case "size":
@@ -2199,38 +2199,38 @@ function u(e, r) {
       return u(e.body);
   }
 }
-function Re(e, r) {
+function Pe(e, r) {
   return `<span class="kern-mrow">${e.map((t) => u(t)).join("")}</span>`;
 }
-function Pe(e, r, t) {
+function Oe(e, r, t) {
   return t ? `<span class="kern-mi kern-mathrm kern-op">${i(e)}</span><span class="kern-mspace" style="display:inline-block;width:0.1667em"></span>` : `<span class="${r ? "kern-mi kern-mathnormal" : "kern-mi kern-mathrm"}">${i(e)}</span>`;
 }
-function Oe(e) {
+function Ee(e) {
   return e === "" ? "" : `<span class="kern-mo">${i(e)}</span>`;
 }
-function Ee(e, r, t) {
+function Le(e, r, t) {
   return `<span class="kern-mfrac"><span class="kern-mfrac-num">${u(e)}</span><span class="kern-mfrac-den">${u(r)}</span></span>`;
 }
-function Le(e, r, t) {
+function Ne(e, r, t) {
   return `<span class="kern-mrow"><span class="kern-mo">(</span><span class="kern-mfrac kern-mfrac-binom"><span class="kern-mfrac-num">${u(e)}</span><span class="kern-mfrac-den">${u(r)}</span></span><span class="kern-mo">)</span></span>`;
 }
-function Ne(e, r) {
+function Be(e, r) {
   return `<span class="kern-sqrt"><span class="kern-sqrt-sign">√</span><span class="kern-sqrt-body">${u(e)}</span></span>`;
 }
-function Be(e, r, t) {
+function Me(e, r, t) {
   return `<span class="kern-sqrt kern-nroot"><span class="kern-nroot-index">${u(e)}</span><span class="kern-sqrt-sign">√</span><span class="kern-sqrt-body">${u(r)}</span></span>`;
 }
-function Me(e, r) {
+function He(e, r) {
   const t = u(e.base);
   return e.sub !== void 0 && e.sup !== void 0 ? `<span class="kern-msubsup"><span class="kern-msubsup-base">${t}</span><span class="kern-msubsup-scripts"><span class="kern-msup">${u(e.sup)}</span><span class="kern-msub">${u(e.sub)}</span></span></span>` : e.sub !== void 0 ? `<span class="kern-msub">${t}<span class="kern-msub-script">${u(e.sub)}</span></span>` : e.sup !== void 0 ? `<span class="kern-msup">${t}<span class="kern-msup-script">${u(e.sup)}</span></span>` : t;
 }
-function He(e, r, t) {
-  const { open: s, close: n } = Ie(e), l = `<span class="kern-mtable">${r.map((c) => `<span class="kern-mtr">${c.map(
+function Ie(e, r, t) {
+  const { open: s, close: n } = _e(e), l = `<span class="kern-mtable">${r.map((c) => `<span class="kern-mtr">${c.map(
     (h) => `<span class="kern-mtd">${u(h)}</span>`
   ).join("")}</span>`).join("")}</span>`;
   return s || n ? '<span class="kern-mrow">' + (s ? `<span class="kern-mo kern-delimiter">${i(s)}</span>` : "") + l + (n ? `<span class="kern-mo kern-delimiter">${i(n)}</span>` : "") + "</span>" : l;
 }
-function Ie(e) {
+function _e(e) {
   switch (e) {
     case "vec":
       return { open: "(", close: ")" };
@@ -2250,7 +2250,7 @@ function Ie(e) {
       return { open: "(", close: ")" };
   }
 }
-const _e = {
+const De = {
   cal: "kern-cal",
   bb: "kern-bb",
   frak: "kern-frak",
@@ -2260,13 +2260,13 @@ const _e = {
   sans: "kern-sans",
   mono: "kern-mono"
 };
-function De(e, r, t) {
-  return `<span class="${_e[e] ?? "kern-upright"}">${u(r)}</span>`;
+function ze(e, r, t) {
+  return `<span class="${De[e] ?? "kern-upright"}">${u(r)}</span>`;
 }
-function ze(e, r, t, s) {
+function Fe(e, r, t, s) {
   return '<span class="kern-mrow">' + (e ? `<span class="kern-mo kern-delimiter">${i(e)}</span>` : "") + u(t) + (r ? `<span class="kern-mo kern-delimiter">${i(r)}</span>` : "") + "</span>";
 }
-const Fe = {
+const Ue = {
   hat: "^",
   tilde: "~",
   dot: "˙",
@@ -2274,11 +2274,11 @@ const Fe = {
   bar: "‾",
   arrow: "→"
 };
-function Ue(e, r, t) {
-  const s = Fe[e] ?? "^";
+function je(e, r, t) {
+  const s = Ue[e] ?? "^";
   return `<span class="kern-mover"><span class="kern-mover-body">${u(r)}</span><span class="kern-mo kern-accent">${i(s)}</span></span>`;
 }
-function je(e) {
+function Ge(e) {
   return `<span class="kern-mspace" style="display:inline-block;width:${M(e)}"></span>`;
 }
 const R = {
@@ -2291,17 +2291,17 @@ const R = {
   overbracket: { ch: "⎴", over: !0 },
   underbracket: { ch: "⎵", over: !1 }
 };
-function Ge(e, r, t, s) {
+function Ve(e, r, t, s) {
   const n = R[e] ?? R.overbrace, a = n.over ? "kern-mover" : "kern-munder", l = n.over ? "kern-mover-mark" : "kern-munder-mark", c = n.over ? "kern-mover-body" : "kern-munder-body", d = t !== void 0 ? `<span class="${l} kern-ann">${u(t)}</span>` : "";
   return `<span class="${a}"><span class="${c}">${u(r)}</span><span class="${l}">${i(n.ch)}</span>` + d + "</span>";
 }
-function Ve(e, r, t) {
+function We(e, r, t) {
   return `<span class="${e === "bcancel" ? "kern-cancel kern-bcancel" : e === "xcancel" ? "kern-cancel kern-xcancel" : "kern-cancel"}">${u(r)}</span>`;
 }
-function We(e) {
+function Ye(e) {
   return `<span class="kern-mi kern-mathrm kern-op">${i(e)}</span><span class="kern-mspace" style="display:inline-block;width:0.1667em"></span>`;
 }
-function Ye(e) {
+function Ze(e) {
   return {
     displayMode: e?.displayMode ?? !1,
     throwOnError: e?.throwOnError ?? !0,
@@ -2316,13 +2316,13 @@ function Ye(e) {
     ]
   };
 }
-function Je(e, r, t) {
-  r.innerHTML = Ze(e, t);
+function Qe(e, r, t) {
+  r.innerHTML = Xe(e, t);
 }
-function Ze(e, r) {
-  const t = Ye(r);
+function Xe(e, r) {
+  const t = Ze(r);
   try {
-    const s = T(e), n = t.displayMode, a = t.output;
+    const s = K(e), n = t.displayMode, a = t.output;
     if (a === "mathml")
       return S(s, n);
     if (a === "html")
@@ -2332,17 +2332,17 @@ function Ze(e, r) {
   } catch (s) {
     if (s instanceof k) {
       if (t.throwOnError) throw s;
-      const n = Xe(s.message);
+      const n = Je(s.message);
       return `<span class="kern-error" style="color:${t.errorColor}">${n}</span>`;
     }
     throw s;
   }
 }
-function Xe(e) {
+function Je(e) {
   return e.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
 export {
   k as ParseError,
-  Je as render,
-  Ze as renderToString
+  Qe as render,
+  Xe as renderToString
 };

@@ -34,7 +34,7 @@ function renderNode(node: AstNode, ctx: RenderCtx): string {
     case 'attach': return renderAttach(node, ctx);
     case 'matrix': return renderMatrix(node.kind, node.rows, node.delim, ctx);
     case 'style': return renderStyle(node.kind, node.body, ctx);
-    case 'lr': return renderLR(node.open, node.close, node.body, ctx);
+    case 'lr': return renderLR(node.open, node.close, node.body, node.stretchy === true, ctx);
     case 'spacing': return `<mspace width="${mspaceWidth(node.kind)}"/>`;
     case 'align': return `<mo>&#x200B;</mo>`;
     case 'binom': return renderBinom(node.top, node.bot, ctx);
@@ -189,11 +189,16 @@ function renderMatrix(
     return `<mtr>${cells}</mtr>`;
   }).join('');
 
+  // Chromium's <mtable> defaults to zero column/row spacing, so cells
+  // collide visually (the identity matrix renders as `100/010/001`).
+  // Set explicit values that roughly match Typst's matrix defaults.
+  const tableAttrs = ' columnspacing="0.8em" rowspacing="0.4em"';
+
   if (kind === 'cases') {
-    return `<mrow><mo form="prefix" stretchy="true">{</mo><mtable columnalign="left left">${tableRows}</mtable></mrow>`;
+    return `<mrow><mo form="prefix" stretchy="true">{</mo><mtable columnalign="left left"${tableAttrs}>${tableRows}</mtable></mrow>`;
   }
 
-  const table = `<mtable>${tableRows}</mtable>`;
+  const table = `<mtable${tableAttrs}>${tableRows}</mtable>`;
   if (open || close) {
     const o = open ? `<mo form="prefix" stretchy="true">${escapeHtml(open)}</mo>` : '';
     const c = close ? `<mo form="postfix" stretchy="true">${escapeHtml(close)}</mo>` : '';
@@ -221,12 +226,15 @@ function renderStyle(kind: string, body: AstNode, ctx: RenderCtx): string {
   return `<mstyle mathvariant="${variant}">${inner}</mstyle>`;
 }
 
-function renderLR(open: string, close: string, body: AstNode, ctx: RenderCtx): string {
+function renderLR(open: string, close: string, body: AstNode, stretchy: boolean, ctx: RenderCtx): string {
+  // Only explicit lr()/abs()/norm()/matrix delimiters get stretchy="true".
+  // Bare math parens stay natural-size; Chromium otherwise inflates them.
+  const stretch = stretchy ? ' stretchy="true"' : '';
   const openMo = open
-    ? `<mo form="prefix" stretchy="true" fence="true">${escapeHtml(open)}</mo>`
+    ? `<mo form="prefix"${stretch} fence="true">${escapeHtml(open)}</mo>`
     : '';
   const closeMo = close
-    ? `<mo form="postfix" stretchy="true" fence="true">${escapeHtml(close)}</mo>`
+    ? `<mo form="postfix"${stretch} fence="true">${escapeHtml(close)}</mo>`
     : '';
   return `<mrow>${openMo}${renderNode(body, ctx)}${closeMo}</mrow>`;
 }

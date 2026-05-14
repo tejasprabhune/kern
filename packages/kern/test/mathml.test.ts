@@ -80,7 +80,7 @@ describe('MathML renderer', () => {
 
   it('renders matrix', () => {
     const out = ml('mat(1, 2; 3, 4)');
-    expect(out).toContain('<mtable>');
+    expect(out).toMatch(/<mtable[^>]*>/);
     expect(out).toContain('<mtr>');
     expect(out).toContain('<mtd>');
   });

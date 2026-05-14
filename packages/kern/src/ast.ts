@@ -112,6 +112,10 @@ export interface LRNode {
   open: string;
   close: string;
   body: AstNode;
+  // True for explicit lr()/abs()/norm()/floor()/ceil() and matrix
+  // delimiters. False for bare math paren groups like `(x + y)`. Mirrors
+  // Typst's distinction between math parens and lr() calls.
+  stretchy?: boolean;
 }
 
 export type SpacingKind = 'thin' | 'med' | 'thick' | 'quad' | 'qquad' | 'space' | 'zws';

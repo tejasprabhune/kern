@@ -478,7 +478,7 @@ class Parser {
     const body = this.parseAlign();
     this.expect(TK.RParen);
 
-    if (body.type === 'lr') return body;
+    if (body.type === 'lr') return { ...body, stretchy: true };
 
     if (body.type === 'seq' && body.nodes.length >= 2) {
       const first = body.nodes[0]!;
@@ -488,19 +488,19 @@ class Parser {
         const close = last.text;
         if (mirrorDelimiter(open) === close) {
           const inner = body.nodes.slice(1, -1);
-          return { type: 'lr', kind: 'custom', open, close, body: seq(inner) };
+          return { type: 'lr', kind: 'custom', open, close, body: seq(inner), stretchy: true };
         }
       }
     }
 
-    return { type: 'lr', kind: 'custom', open: '', close: '', body };
+    return { type: 'lr', kind: 'custom', open: '', close: '', body, stretchy: true };
   }
 
   private parseLrShorthand(name: string): LRNode {
     const info = LR_MAP[name]!;
     const body = this.parseAlign();
     this.expect(TK.RParen);
-    return { type: 'lr', kind: info.kind, open: info.open, close: info.close, body };
+    return { type: 'lr', kind: info.kind, open: info.open, close: info.close, body, stretchy: true };
   }
 
   private parseAccent(kind: string): AccentNode {
