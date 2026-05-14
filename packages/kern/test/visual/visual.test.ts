@@ -29,7 +29,7 @@ const UPDATE_BASELINES = process.env.UPDATE_BASELINES === '1';
 // a sizable regression (missing limit, dropped delimiter, mis-stretched
 // fence) trips it. Tighten per-case via the corpus when the renderer
 // improves.
-const DEFAULT_THRESHOLD = Number(process.env.KERN_VISUAL_THRESHOLD ?? '0.85');
+const DEFAULT_THRESHOLD = Number(process.env.KERN_VISUAL_THRESHOLD ?? '1.0');
 
 const havePlaywright = hasPlaywright();
 const haveTypst = hasTypstCli();

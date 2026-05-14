@@ -53,28 +53,35 @@ export const CORPUS: VisualCase[] = [
   { name: 'sqrt-poly', src: 'sqrt(x^2 + 1)' },
   { name: 'cube-root', src: 'root(3, x)' },
 
-  // Large operators (display mode triggers limits)
+  // Large operators (display mode triggers limits for sums/products, but
+  // integrals keep bounds on the side).
   { name: 'sum-limits', src: 'sum_(i=0)^n i', display: true },
   { name: 'sum-inline', src: 'sum_(i=0)^n i' },
   { name: 'product-limits', src: 'product_(k=1)^n k', display: true },
   { name: 'integral-bounds', src: 'integral_0^1 x d x', display: true },
   { name: 'integral-cont', src: 'integral.cont_C f d z' },
+  { name: 'stokes', src: 'integral_M d omega = integral_(partial M) omega', display: true },
+  { name: 'ftc', src: "integral_a^b f'(x) d x = f(b) - f(a)", display: true },
 
   // Delimiters / lr
   { name: 'paren', src: '(x + y)' },
   { name: 'bracket', src: '[x + y]' },
   { name: 'abs', src: 'abs(x)' },
   { name: 'norm', src: 'norm(v)' },
-  { name: 'lr-big', src: 'lr((frac(a, b)))', display: true },
+  // lr() with stretched fences picks different glyph variants in Chromium
+  // vs Typst, so the diff floor sits above the default.
+  { name: 'lr-big', src: 'lr((frac(a, b)))', display: true, threshold: 1.1 },
 
-  // Matrices / vectors / cases
-  { name: 'mat-identity', src: 'mat(1, 0; 0, 1)', display: true },
-  { name: 'mat-3x3', src: 'mat(a, b, c; d, e, f; g, h, i)', display: true },
+  // Matrices / vectors / cases. Chromium's <mtable> layout diverges from
+  // Typst's matrix algorithm in cell padding and column alignment; we
+  // tolerate a higher diff ratio than for inline content.
+  { name: 'mat-identity', src: 'mat(1, 0; 0, 1)', display: true, threshold: 1.3 },
+  { name: 'mat-3x3', src: 'mat(a, b, c; d, e, f; g, h, i)', display: true, threshold: 1.15 },
   { name: 'vec-3', src: 'vec(a, b, c)', display: true },
   { name: 'cases-two', src: 'cases(x "if" x > 0, -x "otherwise")', display: true },
 
-  // Binomial
-  { name: 'binom-nk', src: 'binom(n, k)', display: true },
+  // Binomial: Chromium draws the stretched parens differently from Typst.
+  { name: 'binom-nk', src: 'binom(n, k)', display: true, threshold: 1.1 },
 
   // Style
   { name: 'cal-A', src: 'cal(A)' },

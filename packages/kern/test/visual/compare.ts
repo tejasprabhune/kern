@@ -113,14 +113,15 @@ export async function comparePngs(refBuf: Buffer, candBuf: Buffer): Promise<Diff
   const b = cand.width === W && cand.height === H ? cand : padOnto(cand, W, H);
 
   // Soften both sides to absorb sub-pixel offsets between Chromium MathML
-  // and Typst's renderer. The denominator below uses the *original*
-  // (pre-blur) ink area so the threshold semantics stay meaningful.
+  // and Typst's renderer. Radius 1 (3x3 average) is enough to forgive
+  // hinting jitter and one-pixel baseline shifts without erasing real
+  // layout differences like a limit jumping from sub/sup to under/over.
   const aBlur = new _PNG({ width: W, height: H });
   aBlur.data.set(a.data);
-  boxBlur(aBlur, 2);
+  boxBlur(aBlur, 1);
   const bBlur = new _PNG({ width: W, height: H });
   bBlur.data.set(b.data);
-  boxBlur(bBlur, 2);
+  boxBlur(bBlur, 1);
 
   const diff = new _PNG({ width: W, height: H });
   // High per-pixel threshold so anti-aliasing differences between Chromium's
