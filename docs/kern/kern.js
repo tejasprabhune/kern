@@ -2072,7 +2072,7 @@ function we(e, r, t) {
   return `<mstyle mathvariant="${s}">${n}</mstyle>`;
 }
 function ve(e, r, t, s, n) {
-  const a = s ? ' stretchy="true"' : "", l = e ? `<mo form="prefix"${a} fence="true">${i(e)}</mo>` : "", c = r ? `<mo form="postfix"${a} fence="true">${i(r)}</mo>` : "";
+  const a = ` stretchy="${s ? "true" : "false"}"`, l = e ? `<mo${a} fence="true">${i(e)}</mo>` : "", c = r ? `<mo${a} fence="true">${i(r)}</mo>` : "";
   return `<mrow>${l}${p(t, n)}${c}</mrow>`;
 }
 const ye = {

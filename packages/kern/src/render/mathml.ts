@@ -227,14 +227,18 @@ function renderStyle(kind: string, body: AstNode, ctx: RenderCtx): string {
 }
 
 function renderLR(open: string, close: string, body: AstNode, stretchy: boolean, ctx: RenderCtx): string {
-  // Only explicit lr()/abs()/norm()/matrix delimiters get stretchy="true".
-  // Bare math parens stay natural-size; Chromium otherwise inflates them.
-  const stretch = stretchy ? ' stretchy="true"' : '';
+  // The MathML Core operator dictionary auto-applies stretchy="true" to (,
+  // ), [, ], etc. when form="prefix"/"postfix" is set. To keep bare math
+  // parens at body height we have to *explicitly* set stretchy="false";
+  // dropping the form attribute alone isn't enough since the browser still
+  // infers form from position. Stretchy LR (from lr()/abs()/matrix) sets
+  // stretchy="true" so the operator can grow to its content.
+  const stretchAttr = ` stretchy="${stretchy ? 'true' : 'false'}"`;
   const openMo = open
-    ? `<mo form="prefix"${stretch} fence="true">${escapeHtml(open)}</mo>`
+    ? `<mo${stretchAttr} fence="true">${escapeHtml(open)}</mo>`
     : '';
   const closeMo = close
-    ? `<mo form="postfix"${stretch} fence="true">${escapeHtml(close)}</mo>`
+    ? `<mo${stretchAttr} fence="true">${escapeHtml(close)}</mo>`
     : '';
   return `<mrow>${openMo}${renderNode(body, ctx)}${closeMo}</mrow>`;
 }
