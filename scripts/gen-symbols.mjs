@@ -164,8 +164,14 @@ export function isBigOperator(ch: string): boolean {
 // want to display differently (the spacing tokens kept as empty strings so
 // the parser routes them through <mspace>).
 const OVERRIDES = {
+  // Aliases users expect even though Typst's codex uses different names.
+  // hbar is the reduced Planck constant (U+210F); codex's `planck` is the
+  // bare Latin h-stroke (U+0127), which is shorter and looks different.
+  hbar: 'ℏ',
   infty: '∞',
   emptyset: '∅',
+  // Spacing tokens stored as empty strings; the parser turns them into
+  // <mspace> nodes.
   thin: '',
   med: '',
   thick: '',

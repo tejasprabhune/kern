@@ -1,22 +1,22 @@
-class m extends Error {
-  constructor(t, r, s) {
-    super(t), this.name = "ParseError", this.position = r, this.source = s;
+class k extends Error {
+  constructor(r, t, s) {
+    super(r), this.name = "ParseError", this.position = t, this.source = s;
   }
 }
-var a = /* @__PURE__ */ ((e) => (e[e.Ident = 0] = "Ident", e[e.Number = 1] = "Number", e[e.Op = 2] = "Op", e[e.Slash = 3] = "Slash", e[e.LParen = 4] = "LParen", e[e.RParen = 5] = "RParen", e[e.LBracket = 6] = "LBracket", e[e.RBracket = 7] = "RBracket", e[e.Under = 8] = "Under", e[e.Caret = 9] = "Caret", e[e.Amp = 10] = "Amp", e[e.Semicolon = 11] = "Semicolon", e[e.Comma = 12] = "Comma", e[e.Dot = 13] = "Dot", e[e.Str = 14] = "Str", e[e.Prime = 15] = "Prime", e[e.EOF = 16] = "EOF", e))(a || {});
-function $(e) {
+var o = /* @__PURE__ */ ((e) => (e[e.Ident = 0] = "Ident", e[e.Number = 1] = "Number", e[e.Op = 2] = "Op", e[e.Slash = 3] = "Slash", e[e.LParen = 4] = "LParen", e[e.RParen = 5] = "RParen", e[e.LBracket = 6] = "LBracket", e[e.RBracket = 7] = "RBracket", e[e.LBrace = 8] = "LBrace", e[e.RBrace = 9] = "RBrace", e[e.Under = 10] = "Under", e[e.Caret = 11] = "Caret", e[e.Amp = 12] = "Amp", e[e.Semicolon = 13] = "Semicolon", e[e.Comma = 14] = "Comma", e[e.Colon = 15] = "Colon", e[e.Dot = 16] = "Dot", e[e.DotDot = 17] = "DotDot", e[e.Str = 18] = "Str", e[e.Prime = 19] = "Prime", e[e.Bang = 20] = "Bang", e[e.Escape = 21] = "Escape", e[e.Shorthand = 22] = "Shorthand", e[e.EOF = 23] = "EOF", e))(o || {});
+function f(e) {
   return e >= 65 && e <= 90 || e >= 97 && e <= 122;
 }
-function d(e) {
+function b(e) {
   return e >= 48 && e <= 57;
 }
-function v(e) {
-  return $(e) || d(e);
+function w(e) {
+  return f(e) || b(e);
 }
-function A(e) {
+function M(e) {
   return e === 32 || e === 9 || e === 10 || e === 13;
 }
-const S = /* @__PURE__ */ new Set([
+const H = /* @__PURE__ */ new Set([
   "+",
   "-",
   "=",
@@ -57,453 +57,1449 @@ const S = /* @__PURE__ */ new Set([
   "⟷",
   "⟸",
   "⟹",
-  "⟺"
+  "⟺",
+  "↦"
 ]);
-function f(e) {
-  return S.has(e);
+function _(e) {
+  return H.has(e);
 }
-function C(e) {
-  const t = [];
-  let r = 0;
+const D = [
+  ["<==>", "⟺"],
+  ["<-->", "⟷"],
+  ["-->", "⟶"],
+  ["==>", "⟹"],
+  ["<==", "⟸"],
+  ["<->", "↔"],
+  ["<=>", "⇔"],
+  ["->>", "↠"],
+  ["|->", "↦"],
+  ["::=", "⩴"],
+  ["->", "→"],
+  ["=>", "⇒"],
+  ["<-", "←"],
+  ["<=", "≤"],
+  [">=", "≥"],
+  ["!=", "≠"],
+  [":=", "≔"],
+  ["~~", "≈"],
+  ["~=", "≅"],
+  [">>", "≫"],
+  ["<<", "≪"],
+  ["||", "‖"],
+  ["...", "…"]
+];
+function I(e, r) {
+  for (const [t, s] of D)
+    if (e.startsWith(t, r)) return [t, s];
+  return null;
+}
+function z(e) {
+  const r = [];
+  let t = 0;
   const s = e.length;
-  for (; r < s; ) {
-    const n = r, o = e.charCodeAt(r);
-    if (A(o)) {
-      r++;
+  for (; t < s; ) {
+    const n = t, a = e.charCodeAt(t);
+    if (M(a)) {
+      t++;
       continue;
     }
-    if ($(o)) {
-      for (; r < s && v(e.charCodeAt(r)); ) r++;
-      t.push({ kind: 0, text: e.slice(n, r), pos: n });
+    if (f(a)) {
+      for (; t < s && w(e.charCodeAt(t)); ) t++;
+      r.push({ kind: 0, text: e.slice(n, t), pos: n });
       continue;
     }
-    if (d(o)) {
-      for (; r < s && d(e.charCodeAt(r)); ) r++;
-      if (r < s && e.charCodeAt(r) === 46 && r + 1 < s && d(e.charCodeAt(r + 1)))
-        for (r++; r < s && d(e.charCodeAt(r)); ) r++;
-      t.push({ kind: 1, text: e.slice(n, r), pos: n });
+    if (b(a)) {
+      for (; t < s && b(e.charCodeAt(t)); ) t++;
+      if (t < s && e.charCodeAt(t) === 46 && t + 1 < s && b(e.charCodeAt(t + 1)))
+        for (t++; t < s && b(e.charCodeAt(t)); ) t++;
+      r.push({ kind: 1, text: e.slice(n, t), pos: n });
       continue;
     }
-    switch (o) {
+    if (a === 92) {
+      if (t++, t >= s)
+        throw new k("Unexpected end after backslash", n, e);
+      const c = e.charCodeAt(t);
+      if (f(c)) {
+        const d = t;
+        for (; t < s && w(e.charCodeAt(t)); ) t++;
+        let h = e.slice(d, t);
+        for (; t + 1 < s && e.charCodeAt(t) === 46 && f(e.charCodeAt(t + 1)); ) {
+          t++;
+          const g = t;
+          for (; t < s && w(e.charCodeAt(t)); ) t++;
+          h = h + "." + e.slice(g, t);
+        }
+        r.push({ kind: 21, text: h, pos: n });
+      } else {
+        const d = e[t];
+        t++, r.push({ kind: 21, text: d, pos: n });
+      }
+      continue;
+    }
+    const l = I(e, t);
+    if (l !== null) {
+      const [c, d] = l;
+      r.push({ kind: 22, text: d, pos: n }), t += c.length;
+      continue;
+    }
+    switch (a) {
       case 34: {
-        for (r++; r < s && e.charCodeAt(r) !== 34; )
-          e.charCodeAt(r) === 92 && r++, r++;
-        if (r >= s) throw new m("Unterminated string literal", n, e);
-        r++, t.push({ kind: 14, text: e.slice(n + 1, r - 1), pos: n });
+        for (t++; t < s && e.charCodeAt(t) !== 34; )
+          e.charCodeAt(t) === 92 && t++, t++;
+        if (t >= s) throw new k("Unterminated string literal", n, e);
+        t++, r.push({ kind: 18, text: e.slice(n + 1, t - 1), pos: n });
         break;
       }
       case 40:
-        t.push({ kind: 4, text: "(", pos: n }), r++;
+        r.push({ kind: 4, text: "(", pos: n }), t++;
         break;
       case 41:
-        t.push({ kind: 5, text: ")", pos: n }), r++;
+        r.push({ kind: 5, text: ")", pos: n }), t++;
         break;
       case 91:
-        t.push({ kind: 6, text: "[", pos: n }), r++;
+        r.push({ kind: 6, text: "[", pos: n }), t++;
         break;
       case 93:
-        t.push({ kind: 7, text: "]", pos: n }), r++;
+        r.push({ kind: 7, text: "]", pos: n }), t++;
+        break;
+      case 123:
+        r.push({ kind: 8, text: "{", pos: n }), t++;
+        break;
+      case 125:
+        r.push({ kind: 9, text: "}", pos: n }), t++;
         break;
       case 95:
-        t.push({ kind: 8, text: "_", pos: n }), r++;
+        r.push({ kind: 10, text: "_", pos: n }), t++;
         break;
       case 94:
-        t.push({ kind: 9, text: "^", pos: n }), r++;
+        r.push({ kind: 11, text: "^", pos: n }), t++;
         break;
       case 38:
-        t.push({ kind: 10, text: "&", pos: n }), r++;
+        r.push({ kind: 12, text: "&", pos: n }), t++;
         break;
       case 59:
-        t.push({ kind: 11, text: ";", pos: n }), r++;
+        r.push({ kind: 13, text: ";", pos: n }), t++;
         break;
       case 44:
-        t.push({ kind: 12, text: ",", pos: n }), r++;
+        r.push({ kind: 14, text: ",", pos: n }), t++;
         break;
-      case 46:
-        t.push({ kind: 13, text: ".", pos: n }), r++;
+      case 58:
+        r.push({ kind: 15, text: ":", pos: n }), t++;
         break;
+      case 46: {
+        t + 1 < s && e.charCodeAt(t + 1) === 46 ? (r.push({ kind: 17, text: "..", pos: n }), t += 2) : (r.push({ kind: 16, text: ".", pos: n }), t++);
+        break;
+      }
       case 39:
-        t.push({ kind: 15, text: "'", pos: n }), r++;
+        r.push({ kind: 19, text: "'", pos: n }), t++;
+        break;
+      case 33:
+        r.push({ kind: 20, text: "!", pos: n }), t++;
         break;
       case 47:
-        t.push({ kind: 3, text: "/", pos: n }), r++;
+        r.push({ kind: 3, text: "/", pos: n }), t++;
         break;
       default: {
-        const l = e[r];
-        r++, t.push({ kind: 2, text: l, pos: n });
+        const c = e[t];
+        t++, r.push({ kind: 2, text: c, pos: n });
         break;
       }
     }
   }
-  return t.push({ kind: 16, text: "", pos: s }), t;
+  return r.push({ kind: 23, text: "", pos: s }), r;
 }
-function h(e) {
+function m(e) {
   return e.length === 0 ? { type: "seq", nodes: [] } : e.length === 1 ? e[0] : { type: "seq", nodes: e };
 }
-const P = {
-  // Greek lowercase
+const F = {
+  AA: "𝔸",
+  acute: "´",
+  "acute.double": "˝",
+  afghani: "؋",
+  aleph: "א",
   alpha: "α",
-  beta: "β",
-  gamma: "γ",
-  delta: "δ",
-  epsilon: "ε",
-  zeta: "ζ",
-  eta: "η",
-  theta: "θ",
-  iota: "ι",
-  kappa: "κ",
-  lambda: "λ",
-  mu: "μ",
-  nu: "ν",
-  xi: "ξ",
-  pi: "π",
-  rho: "ρ",
-  sigma: "σ",
-  tau: "τ",
-  upsilon: "υ",
-  phi: "φ",
-  chi: "χ",
-  psi: "ψ",
-  omega: "ω",
-  // Greek uppercase
   Alpha: "Α",
+  amp: "&",
+  "amp.inv": "⅋",
+  and: "∧",
+  "and.big": "⋀",
+  "and.curly": "⋏",
+  "and.dot": "⟑",
+  "and.double": "⩓",
+  angle: "∠",
+  "angle.acute": "⦟",
+  "angle.arc": "∡",
+  "angle.arc.rev": "⦛",
+  "angle.azimuth": "⍼",
+  "angle.obtuse": "⦦",
+  "angle.rev": "⦣",
+  "angle.right": "∟",
+  "angle.right.arc": "⊾",
+  "angle.right.dot": "⦝",
+  "angle.right.rev": "⯾",
+  "angle.right.square": "⦜",
+  "angle.s": "⦞",
+  "angle.spatial": "⟀",
+  "angle.spheric": "∢",
+  "angle.spheric.rev": "⦠",
+  "angle.spheric.t": "⦡",
+  angstrom: "Å",
+  angzarr: "⍼",
+  approx: "≈",
+  "approx.eq": "≊",
+  "approx.not": "≉",
+  "arrow.b": "↓",
+  "arrow.b.bar": "↧",
+  "arrow.b.curve": "⤵",
+  "arrow.b.dashed": "⇣",
+  "arrow.b.double": "⇓",
+  "arrow.b.dstruck": "⇟",
+  "arrow.b.filled": "⬇",
+  "arrow.b.quad": "⟱",
+  "arrow.b.stop": "⤓",
+  "arrow.b.stroked": "⇩",
+  "arrow.b.struck": "⤈",
+  "arrow.b.triple": "⤋",
+  "arrow.b.turn": "⮏",
+  "arrow.b.twohead": "↡",
+  "arrow.bl": "↙",
+  "arrow.bl.double": "⇙",
+  "arrow.bl.filled": "⬋",
+  "arrow.bl.hook": "⤦",
+  "arrow.bl.stroked": "⬃",
+  "arrow.br": "↘",
+  "arrow.br.double": "⇘",
+  "arrow.br.filled": "⬊",
+  "arrow.br.hook": "⤥",
+  "arrow.br.stroked": "⬂",
+  "arrow.ccw": "↺",
+  "arrow.ccw.half": "↶",
+  "arrow.cw": "↻",
+  "arrow.cw.half": "↷",
+  "arrow.l": "←",
+  "arrow.l.bar": "↤",
+  "arrow.l.curve": "⤶",
+  "arrow.l.dashed": "⇠",
+  "arrow.l.dotted": "⬸",
+  "arrow.l.double": "⇐",
+  "arrow.l.double.bar": "⤆",
+  "arrow.l.double.long": "⟸",
+  "arrow.l.double.long.bar": "⟽",
+  "arrow.l.double.not": "⇍",
+  "arrow.l.double.struck": "⤂",
+  "arrow.l.dstruck": "⇺",
+  "arrow.l.filled": "⬅",
+  "arrow.l.hook": "↩",
+  "arrow.l.long": "⟵",
+  "arrow.l.long.bar": "⟻",
+  "arrow.l.long.squiggly": "⬳",
+  "arrow.l.loop": "↫",
+  "arrow.l.not": "↚",
+  "arrow.l.open": "⇽",
+  "arrow.l.quad": "⭅",
+  "arrow.l.r": "↔",
+  "arrow.l.r.double": "⇔",
+  "arrow.l.r.double.long": "⟺",
+  "arrow.l.r.double.not": "⇎",
+  "arrow.l.r.double.struck": "⤄",
+  "arrow.l.r.dstruck": "⇼",
+  "arrow.l.r.filled": "⬌",
+  "arrow.l.r.long": "⟷",
+  "arrow.l.r.not": "↮",
+  "arrow.l.r.open": "⇿",
+  "arrow.l.r.stroked": "⬄",
+  "arrow.l.r.struck": "⇹",
+  "arrow.l.r.wave": "↭",
+  "arrow.l.squiggly": "⇜",
+  "arrow.l.stop": "⇤",
+  "arrow.l.stroked": "⇦",
+  "arrow.l.struck": "⇷",
+  "arrow.l.tail": "↢",
+  "arrow.l.tail.dstruck": "⬺",
+  "arrow.l.tail.struck": "⬹",
+  "arrow.l.tilde": "⭉",
+  "arrow.l.triple": "⇚",
+  "arrow.l.turn": "⮌",
+  "arrow.l.twohead": "↞",
+  "arrow.l.twohead.bar": "⬶",
+  "arrow.l.twohead.dstruck": "⬵",
+  "arrow.l.twohead.struck": "⬴",
+  "arrow.l.twohead.tail": "⬻",
+  "arrow.l.twohead.tail.dstruck": "⬽",
+  "arrow.l.twohead.tail.struck": "⬼",
+  "arrow.l.wave": "↜",
+  "arrow.r": "→",
+  "arrow.r.bar": "↦",
+  "arrow.r.curve": "⤷",
+  "arrow.r.dashed": "⇢",
+  "arrow.r.dotted": "⤑",
+  "arrow.r.double": "⇒",
+  "arrow.r.double.bar": "⤇",
+  "arrow.r.double.long": "⟹",
+  "arrow.r.double.long.bar": "⟾",
+  "arrow.r.double.not": "⇏",
+  "arrow.r.double.struck": "⤃",
+  "arrow.r.dstruck": "⇻",
+  "arrow.r.filled": "➡",
+  "arrow.r.hook": "↪",
+  "arrow.r.long": "⟶",
+  "arrow.r.long.bar": "⟼",
+  "arrow.r.long.squiggly": "⟿",
+  "arrow.r.loop": "↬",
+  "arrow.r.not": "↛",
+  "arrow.r.open": "⇾",
+  "arrow.r.quad": "⭆",
+  "arrow.r.squiggly": "⇝",
+  "arrow.r.stop": "⇥",
+  "arrow.r.stroked": "⇨",
+  "arrow.r.struck": "⇸",
+  "arrow.r.tail": "↣",
+  "arrow.r.tail.dstruck": "⤕",
+  "arrow.r.tail.struck": "⤔",
+  "arrow.r.tilde": "⥲",
+  "arrow.r.triple": "⇛",
+  "arrow.r.turn": "⮎",
+  "arrow.r.twohead": "↠",
+  "arrow.r.twohead.bar": "⤅",
+  "arrow.r.twohead.dstruck": "⤁",
+  "arrow.r.twohead.struck": "⤀",
+  "arrow.r.twohead.tail": "⤖",
+  "arrow.r.twohead.tail.dstruck": "⤘",
+  "arrow.r.twohead.tail.struck": "⤗",
+  "arrow.r.wave": "↝",
+  "arrow.t": "↑",
+  "arrow.t.b": "↕",
+  "arrow.t.b.double": "⇕",
+  "arrow.t.b.filled": "⬍",
+  "arrow.t.b.stroked": "⇳",
+  "arrow.t.bar": "↥",
+  "arrow.t.curve": "⤴",
+  "arrow.t.dashed": "⇡",
+  "arrow.t.double": "⇑",
+  "arrow.t.dstruck": "⇞",
+  "arrow.t.filled": "⬆",
+  "arrow.t.quad": "⟰",
+  "arrow.t.stop": "⤒",
+  "arrow.t.stroked": "⇧",
+  "arrow.t.struck": "⤉",
+  "arrow.t.triple": "⤊",
+  "arrow.t.turn": "⮍",
+  "arrow.t.twohead": "↟",
+  "arrow.tl": "↖",
+  "arrow.tl.br": "⤡",
+  "arrow.tl.double": "⇖",
+  "arrow.tl.filled": "⬉",
+  "arrow.tl.hook": "⤣",
+  "arrow.tl.stroked": "⬁",
+  "arrow.tr": "↗",
+  "arrow.tr.bl": "⤢",
+  "arrow.tr.double": "⇗",
+  "arrow.tr.filled": "⬈",
+  "arrow.tr.hook": "⤤",
+  "arrow.tr.stroked": "⬀",
+  "arrow.zigzag": "↯",
+  "arrowhead.b": "⌄",
+  "arrowhead.t": "⌃",
+  "arrows.bb": "⇊",
+  "arrows.bt": "⇵",
+  "arrows.ll": "⇇",
+  "arrows.lll": "⬱",
+  "arrows.lr": "⇆",
+  "arrows.lr.stop": "↹",
+  "arrows.rl": "⇄",
+  "arrows.rr": "⇉",
+  "arrows.rrr": "⇶",
+  "arrows.tb": "⇅",
+  "arrows.tt": "⇈",
+  "ast.basic": "*",
+  "ast.double": "⁑",
+  "ast.low": "⁎",
+  "ast.op": "∗",
+  "ast.op.o": "⊛",
+  "ast.square": "⧆",
+  "ast.triple": "⁂",
+  asymp: "≍",
+  "asymp.not": "≭",
+  at: "@",
+  backslash: "\\",
+  "backslash.not": "⧷",
+  "backslash.o": "⦸",
+  "bag.l": "⟅",
+  "bag.r": "⟆",
+  baht: "฿",
+  ballot: "☐",
+  "ballot.check": "☑",
+  "ballot.check.heavy": "🗹",
+  "ballot.cross": "☒",
+  "bar.h": "―",
+  "bar.v": "|",
+  "bar.v.broken": "¦",
+  "bar.v.double": "‖",
+  "bar.v.o": "⦶",
+  "bar.v.triple": "⦀",
+  BB: "𝔹",
+  because: "∵",
+  beta: "β",
   Beta: "Β",
-  Gamma: "Γ",
-  Delta: "Δ",
-  Epsilon: "Ε",
-  Zeta: "Ζ",
-  Eta: "Η",
-  Theta: "Θ",
-  Iota: "Ι",
-  Kappa: "Κ",
-  Lambda: "Λ",
-  Mu: "Μ",
-  Nu: "Ν",
-  Xi: "Ξ",
-  Pi: "Π",
-  Rho: "Ρ",
-  Sigma: "Σ",
-  Tau: "Τ",
-  Upsilon: "Υ",
-  Phi: "Φ",
+  "beta.alt": "ϐ",
+  beth: "ב",
+  bitcoin: "₿",
+  bot: "⊥",
+  "bowtie.filled": "⧓",
+  "bowtie.filled.l": "⧑",
+  "bowtie.filled.r": "⧒",
+  "bowtie.stroked": "⋈",
+  "bowtie.stroked.big": "⨝",
+  "bowtie.stroked.big.l": "⟕",
+  "bowtie.stroked.big.l.r": "⟗",
+  "bowtie.stroked.big.r": "⟖",
+  "brace.b": "⏟",
+  "brace.l": "{",
+  "brace.l.stroked": "⦃",
+  "brace.r": "}",
+  "brace.r.stroked": "⦄",
+  "brace.t": "⏞",
+  "bracket.b": "⎵",
+  "bracket.l": "[",
+  "bracket.l.stroked": "⟦",
+  "bracket.l.tick.b": "⦏",
+  "bracket.l.tick.t": "⦍",
+  "bracket.r": "]",
+  "bracket.r.stroked": "⟧",
+  "bracket.r.tick.b": "⦎",
+  "bracket.r.tick.t": "⦐",
+  "bracket.t": "⎴",
+  breve: "˘",
+  bullet: "•",
+  "bullet.hole": "◘",
+  "bullet.hyph": "⁃",
+  "bullet.l": "⁌",
+  "bullet.o": "⦿",
+  "bullet.op": "∙",
+  "bullet.r": "⁍",
+  "bullet.stroked": "◦",
+  "bullet.stroked.o": "⦾",
+  "bullet.tri": "‣",
+  caret: "‸",
+  caron: "ˇ",
+  cc: "🅭",
+  CC: "ℂ",
+  "cc.by": "🅯",
+  "cc.nc": "🄏",
+  "cc.nd": "⊜",
+  "cc.public": "🅮",
+  "cc.sa": "🄎",
+  "cc.zero": "🄍",
+  cedi: "₵",
+  "ceil.l": "⌈",
+  "ceil.r": "⌉",
+  cent: "¢",
+  checkmark: "✓",
+  "checkmark.heavy": "✔",
+  "checkmark.light": "🗸",
+  "chevron.l": "⟨",
+  "chevron.l.closed": "⦉",
+  "chevron.l.curly": "⧼",
+  "chevron.l.dot": "⦑",
+  "chevron.l.double": "⟪",
+  "chevron.r": "⟩",
+  "chevron.r.closed": "⦊",
+  "chevron.r.curly": "⧽",
+  "chevron.r.dot": "⦒",
+  "chevron.r.double": "⟫",
+  chi: "χ",
   Chi: "Χ",
-  Psi: "Ψ",
-  Omega: "Ω",
-  // Greek variants
+  "circle.dotted": "◌",
+  "circle.filled": "●",
+  "circle.filled.big": "⬤",
+  "circle.filled.small": "∙",
+  "circle.filled.tiny": "⦁",
+  "circle.stroked": "○",
+  "circle.stroked.big": "◯",
+  "circle.stroked.small": "⚬",
+  "circle.stroked.tiny": "∘",
+  co: "℅",
+  colon: ":",
+  "colon.currency": "₡",
+  "colon.double": "∷",
+  "colon.double.eq": "⩴",
+  "colon.eq": "≔",
+  "colon.tri": "⁝",
+  "colon.tri.op": "⫶",
+  comma: ",",
+  "comma.inv": "⸲",
+  "comma.rev": "⹁",
+  complement: "∁",
+  compose: "∘",
+  "compose.o": "⊚",
+  convolve: "∗",
+  "convolve.o": "⊛",
+  copyleft: "🄯",
+  copyright: "©",
+  "copyright.sound": "℗",
+  "corner.l.b": "⌞",
+  "corner.l.t": "⌜",
+  "corner.r.b": "⌟",
+  "corner.r.t": "⌝",
+  crossmark: "✗",
+  "crossmark.heavy": "✘",
+  currency: "¤",
+  dagger: "†",
+  "dagger.double": "‡",
+  "dagger.inv": "⸸",
+  "dagger.l": "⸶",
+  "dagger.r": "⸷",
+  "dagger.triple": "⹋",
+  daleth: "ד",
+  "dash.colon": "∹",
+  "dash.em": "—",
+  "dash.em.three": "⸻",
+  "dash.em.two": "⸺",
+  "dash.en": "–",
+  "dash.fig": "‒",
+  "dash.o": "⊝",
+  "dash.wave": "〜",
+  "dash.wave.double": "〰",
+  DD: "𝔻",
+  degree: "°",
+  delta: "δ",
+  Delta: "Δ",
+  diaer: "¨",
+  diameter: "⌀",
+  "diamond.filled": "◆",
+  "diamond.filled.medium": "⬥",
+  "diamond.filled.small": "⬩",
+  "diamond.stroked": "◇",
+  "diamond.stroked.dot": "⟐",
+  "diamond.stroked.medium": "⬦",
+  "diamond.stroked.small": "⋄",
+  "die.five": "⚄",
+  "die.four": "⚃",
+  "die.one": "⚀",
+  "die.six": "⚅",
+  "die.three": "⚂",
+  "die.two": "⚁",
+  digamma: "ϝ",
+  Digamma: "Ϝ",
+  div: "÷",
+  "div.o": "⨸",
+  "div.slanted.o": "⦼",
+  divides: "∣",
+  "divides.not": "∤",
+  "divides.not.rev": "⫮",
+  "divides.struck": "⟊",
+  dollar: "$",
+  dong: "₫",
+  dorome: "߾",
+  "dot.basic": ".",
+  "dot.c": "·",
+  "dot.double": "¨",
+  "dot.o": "⊙",
+  "dot.o.big": "⨀",
+  "dot.op": "⋅",
+  "dot.quad": "⃜",
+  "dot.square": "⊡",
+  "dot.triple": "⃛",
+  "dotless.i": "ı",
+  "dotless.j": "ȷ",
+  "dots.down": "⋱",
+  "dots.h": "…",
+  "dots.h.c": "⋯",
+  "dots.up": "⋰",
+  "dots.v": "⋮",
+  dram: "֏",
+  earth: "🜨",
+  "earth.alt": "♁",
+  EE: "𝔼",
+  ell: "ℓ",
+  "ellipse.filled.h": "⬬",
+  "ellipse.filled.v": "⬮",
+  "ellipse.stroked.h": "⬭",
+  "ellipse.stroked.v": "⬯",
+  emptyset: "∅",
+  "emptyset.arrow.l": "⦴",
+  "emptyset.arrow.r": "⦳",
+  "emptyset.bar": "⦱",
+  "emptyset.circle": "⦲",
+  "emptyset.rev": "⦰",
+  "emptyset.zero": "∅",
+  epsilon: "ε",
+  Epsilon: "Ε",
   "epsilon.alt": "ϵ",
-  "phi.alt": "ϕ",
-  "theta.alt": "ϑ",
-  "rho.alt": "ϱ",
-  "kappa.alt": "ϰ",
-  "pi.alt": "ϖ",
-  "sigma.alt": "ς",
-  // Basic math
-  infinity: "∞",
-  infty: "∞",
-  partial: "∂",
-  nabla: "∇",
-  forall: "∀",
+  "epsilon.alt.rev": "϶",
+  eq: "=",
+  "eq.colon": "≕",
+  "eq.def": "≝",
+  "eq.delta": "≜",
+  "eq.dots": "≑",
+  "eq.dots.down": "≒",
+  "eq.dots.up": "≓",
+  "eq.equi": "≚",
+  "eq.est": "≙",
+  "eq.gt": "⋝",
+  "eq.lt": "⋜",
+  "eq.m": "≞",
+  "eq.not": "≠",
+  "eq.o": "⊜",
+  "eq.prec": "⋞",
+  "eq.quad": "≣",
+  "eq.quest": "≟",
+  "eq.star": "≛",
+  "eq.succ": "⋟",
+  "eq.triple": "≡",
+  "eq.triple.not": "≢",
+  equiv: "≡",
+  "equiv.not": "≢",
+  "errorbar.circle.filled": "⧳",
+  "errorbar.circle.stroked": "⧲",
+  "errorbar.diamond.filled": "⧱",
+  "errorbar.diamond.stroked": "⧰",
+  "errorbar.square.filled": "⧯",
+  "errorbar.square.stroked": "⧮",
+  eta: "η",
+  Eta: "Η",
+  euro: "€",
+  excl: "!",
+  "excl.double": "‼",
+  "excl.inv": "¡",
+  "excl.quest": "⁉",
   exists: "∃",
   "exists.not": "∄",
-  nothing: "∅",
-  emptyset: "∅",
-  // Number sets (double-struck)
-  NN: "ℕ",
-  ZZ: "ℤ",
-  QQ: "ℚ",
-  RR: "ℝ",
-  CC: "ℂ",
+  "fence.dotted": "⦙",
+  "fence.l": "⧘",
+  "fence.l.double": "⧚",
+  "fence.r": "⧙",
+  "fence.r.double": "⧛",
   FF: "𝔽",
+  flat: "♭",
+  "flat.b": "𝄭",
+  "flat.double": "𝄫",
+  "flat.quarter": "𝄳",
+  "flat.t": "𝄬",
+  "floor.l": "⌊",
+  "floor.r": "⌋",
+  floral: "❦",
+  "floral.l": "☙",
+  "floral.r": "❧",
+  forall: "∀",
+  forces: "⊩",
+  "forces.not": "⊮",
+  frown: "⌢",
+  gamma: "γ",
+  Gamma: "Γ",
+  gender: "{",
+  "gender.double": "⚣",
+  "gender.female": "⚤",
+  "gender.male": "⚤",
+  "gender.stroke": "⚦",
+  "gender.stroke.r": "⚩",
+  "gender.stroke.t": "⚨",
+  genderfemale: "♀",
+  genderintersex: "⚥",
+  gendermale: "♂",
+  genderneuter: "⚲",
+  gendertrans: "⚧",
+  GG: "𝔾",
+  gimel: "ג",
+  gradient: "∇",
+  grave: "`",
+  gt: ">",
+  "gt.approx": "⪆",
+  "gt.arc": "⪧",
+  "gt.arc.eq": "⪩",
+  "gt.closed": "⊳",
+  "gt.closed.eq": "⊵",
+  "gt.closed.eq.not": "⋭",
+  "gt.closed.not": "⋫",
+  "gt.dot": "⋗",
+  "gt.double": "≫",
+  "gt.double.nested": "⪢",
+  "gt.eq": "≥",
+  "gt.eq.lt": "⋛",
+  "gt.eq.not": "≱",
+  "gt.eq.slant": "⩾",
+  "gt.equiv": "≧",
+  "gt.lt": "≷",
+  "gt.lt.not": "≹",
+  "gt.napprox": "⪊",
+  "gt.neq": "⪈",
+  "gt.nequiv": "≩",
+  "gt.not": "≯",
+  "gt.ntilde": "⋧",
+  "gt.o": "⧁",
+  "gt.tilde": "≳",
+  "gt.tilde.not": "≵",
+  "gt.tri": "⊳",
+  "gt.tri.eq": "⊵",
+  "gt.tri.eq.not": "⋭",
+  "gt.tri.not": "⋫",
+  "gt.triple": "⋙",
+  "gt.triple.nested": "⫸",
+  guarani: "₲",
+  "harpoon.bl": "⇃",
+  "harpoon.bl.bar": "⥡",
+  "harpoon.bl.stop": "⥙",
+  "harpoon.br": "⇂",
+  "harpoon.br.bar": "⥝",
+  "harpoon.br.stop": "⥕",
+  "harpoon.lb": "↽",
+  "harpoon.lb.bar": "⥞",
+  "harpoon.lb.rb": "⥐",
+  "harpoon.lb.rt": "⥋",
+  "harpoon.lb.stop": "⥖",
+  "harpoon.lt": "↼",
+  "harpoon.lt.bar": "⥚",
+  "harpoon.lt.rb": "⥊",
+  "harpoon.lt.rt": "⥎",
+  "harpoon.lt.stop": "⥒",
+  "harpoon.rb": "⇁",
+  "harpoon.rb.bar": "⥟",
+  "harpoon.rb.stop": "⥗",
+  "harpoon.rt": "⇀",
+  "harpoon.rt.bar": "⥛",
+  "harpoon.rt.stop": "⥓",
+  "harpoon.tl": "↿",
+  "harpoon.tl.bar": "⥠",
+  "harpoon.tl.bl": "⥑",
+  "harpoon.tl.br": "⥍",
+  "harpoon.tl.stop": "⥘",
+  "harpoon.tr": "↾",
+  "harpoon.tr.bar": "⥜",
+  "harpoon.tr.bl": "⥌",
+  "harpoon.tr.br": "⥏",
+  "harpoon.tr.stop": "⥔",
+  "harpoons.blbr": "⥥",
+  "harpoons.bltr": "⥯",
+  "harpoons.lbrb": "⥧",
+  "harpoons.ltlb": "⥢",
+  "harpoons.ltrb": "⇋",
+  "harpoons.ltrt": "⥦",
+  "harpoons.rblb": "⥩",
+  "harpoons.rtlb": "⇌",
+  "harpoons.rtlt": "⥨",
+  "harpoons.rtrb": "⥤",
+  "harpoons.tlbr": "⥮",
+  "harpoons.tltr": "⥣",
+  hash: "#",
+  hat: "^",
+  hbar: "ℏ",
+  "hexa.filled": "⬢",
+  "hexa.stroked": "⬡",
   HH: "ℍ",
-  // Logic
-  not: "¬",
-  and: "∧",
-  or: "∨",
-  xor: "⊻",
-  top: "⊤",
-  bot: "⊥",
-  models: "⊨",
-  "models.not": "⊭",
-  tack: "⊢",
-  "tack.r": "⊢",
-  "tack.l": "⊣",
-  "tack.r.double": "⊨",
-  // Set operations
+  "hourglass.filled": "⧗",
+  "hourglass.stroked": "⧖",
+  hryvnia: "₴",
+  hyph: "‐",
+  "hyph.minus": "-",
+  "hyph.nobreak": "‑",
+  "hyph.point": "‧",
+  "hyph.soft": "­",
+  II: "𝕀",
+  Im: "ℑ",
+  image: "⊷",
   in: "∈",
   "in.not": "∉",
   "in.rev": "∋",
   "in.rev.not": "∌",
-  subset: "⊂",
-  supset: "⊃",
-  "subset.eq": "⊆",
-  "supset.eq": "⊇",
-  "subset.eq.not": "⊈",
-  "supset.eq.not": "⊉",
-  "subset.neq": "⊊",
-  "supset.neq": "⊋",
-  union: "∪",
-  "union.big": "⋃",
-  "union.sq": "⊎",
-  "union.sq.big": "⨆",
-  sect: "∩",
-  "sect.big": "⋂",
-  "sect.sq": "⊓",
-  "sect.sq.big": "⨅",
-  complement: "∁",
-  // Arithmetic
-  plus: "+",
-  minus: "−",
-  times: "×",
-  div: "÷",
-  "dot.op": "⋅",
-  "dot.c": "∙",
-  "dot.basic": ".",
-  ast: "∗",
-  star: "⋆",
-  compose: "∘",
-  "circle.plus": "⊕",
-  "circle.minus": "⊖",
-  "circle.times": "⊗",
-  "circle.dot": "⊙",
-  "circle.small": "◦",
-  dagger: "†",
-  ddagger: "‡",
-  prime: "′",
-  dprime: "″",
-  tprime: "‴",
-  backprime: "‵",
-  // Relations - equality
-  "eq.not": "≠",
-  "eq.equiv": "≡",
-  "eq.nequiv": "≢",
-  "eq.prec": "⋞",
-  "eq.succ": "⋟",
-  "eq.def": "≝",
-  "eq.quest": "≟",
-  "eq.colon": "≔",
-  approx: "≈",
-  "approx.not": "≉",
-  "approx.eq": "≊",
-  sim: "∼",
-  "sim.eq": "≃",
-  "sim.equiv": "≅",
-  "sim.not": "≁",
-  tilde: "∼",
-  "tilde.eq": "≃",
-  "tilde.equiv": "≅",
-  "tilde.not": "≁",
-  "tilde.nequiv": "≇",
-  propto: "∝",
-  "propto.var": "∝",
-  perp: "⊥",
-  parallel: "∥",
-  "parallel.not": "∦",
-  mid: "∣",
-  "mid.not": "∤",
-  // Relations - order
-  "lt.eq": "≤",
-  "gt.eq": "≥",
-  "lt.eq.not": "≰",
-  "gt.eq.not": "≱",
-  "lt.not": "≮",
-  "gt.not": "≯",
-  "lt.tri": "⊲",
-  "gt.tri": "⊳",
-  "lt.tri.eq": "⊴",
-  "gt.tri.eq": "⊵",
-  prec: "≺",
-  succ: "≻",
-  "prec.eq": "≼",
-  "succ.eq": "≽",
-  "prec.not": "⊀",
-  "succ.not": "⊁",
-  "prec.equiv": "≾",
-  "succ.equiv": "≿",
-  ll: "≪",
-  gg: "≫",
-  "lt.double": "≪",
-  "gt.double": "≫",
-  // Arrows - rightward
-  "arrow.r": "→",
-  "arrow.r.long": "⟶",
-  "arrow.r.double": "⇒",
-  "arrow.r.long.double": "⟹",
-  "arrow.r.triple": "⇛",
-  "arrow.r.squiggly": "⟿",
-  "arrow.r.hook": "↪",
-  "arrow.r.bar": "↦",
-  "arrow.r.tilde": "⇝",
-  "arrow.r.not": "↛",
-  "arrow.r.double.not": "⇏",
-  "arrow.r.dashed": "⇢",
-  "arrow.r.dotted": "⇠",
-  "arrow.r.wave": "↜",
-  "arrow.r.two": "⇉",
-  "arrow.r.stop": "↣",
-  "arrow.r.curve": "⤳",
-  "arrow.r.loop": "↺",
-  // Arrows - leftward
-  "arrow.l": "←",
-  "arrow.l.long": "⟵",
-  "arrow.l.double": "⇐",
-  "arrow.l.long.double": "⟸",
-  "arrow.l.hook": "↩",
-  "arrow.l.bar": "↤",
-  "arrow.l.not": "↚",
-  "arrow.l.double.not": "⇍",
-  "arrow.l.dashed": "⇠",
-  "arrow.l.two": "⇇",
-  "arrow.l.stop": "↢",
-  "arrow.l.curve": "⤶",
-  // Arrows - bidirectional
-  "arrow.l.r": "↔",
-  "arrow.l.r.long": "⟷",
-  "arrow.l.r.double": "⇔",
-  "arrow.l.r.long.double": "⟺",
-  "arrow.l.r.not": "↮",
-  "arrow.l.r.double.not": "⇎",
-  // Arrows - vertical
-  "arrow.t": "↑",
-  "arrow.b": "↓",
-  "arrow.t.double": "⇑",
-  "arrow.b.double": "⇓",
-  "arrow.t.b": "↕",
-  "arrow.t.b.double": "⇕",
-  "arrow.t.l": "↖",
-  "arrow.t.r": "↗",
-  "arrow.b.l": "↙",
-  "arrow.b.r": "↘",
-  // Arrows - harpoons
-  "harpoon.rt": "⇀",
-  "harpoon.rb": "⇁",
-  "harpoon.lt": "↼",
-  "harpoon.lb": "↽",
-  "harpoon.tl": "↿",
-  "harpoon.tr": "↾",
-  "harpoon.bl": "⇃",
-  "harpoon.br": "⇂",
-  // Big operators
-  sum: "∑",
-  product: "∏",
-  coproduct: "∐",
+  "in.rev.small": "∍",
+  "in.small": "∊",
+  infinity: "∞",
+  "infinity.bar": "⧞",
+  "infinity.incomplete": "⧜",
+  "infinity.tie": "⧝",
+  infty: "∞",
   integral: "∫",
-  "integral.double": "∬",
-  "integral.triple": "∭",
+  "integral.arrow.hook": "⨗",
+  "integral.ccw": "⨑",
   "integral.cont": "∮",
-  "integral.cont.double": "∯",
-  "integral.cont.triple": "∰",
-  "integral.arrow.r": "∷",
-  // Geometry / misc math
-  degree: "°",
-  angle: "∠",
-  "angle.l": "⟨",
-  "angle.r": "⟩",
-  "angle.spheric": "∢",
-  "angle.arc": "∡",
-  // Dots
-  "dots.h": "⋯",
-  "dots.v": "⋮",
-  "dots.d": "⋱",
-  "dots.l": "⋰",
-  "dots.c": "⋅",
-  dots: "…",
-  // Brackets / fences
-  "floor.l": "⌊",
-  "floor.r": "⌋",
-  "ceil.l": "⌈",
-  "ceil.r": "⌉",
-  "bracket.l": "[",
-  "bracket.r": "]",
-  "bracket.double.l": "⟦",
-  "bracket.double.r": "⟧",
-  "brace.l": "{",
-  "brace.r": "}",
-  "paren.l": "(",
-  "paren.r": ")",
-  "bar.v": "|",
-  "bar.v.double": "‖",
-  // Miscellaneous
-  aleph: "ℵ",
-  beth: "ℶ",
-  gimel: "ℷ",
-  daleth: "ℸ",
-  hbar: "ℏ",
-  planck: "ℎ",
-  ell: "ℓ",
-  Re: "ℜ",
-  Im: "ℑ",
-  wp: "℘",
-  mho: "℧",
-  weierp: "℘",
+  "integral.cont.ccw": "∳",
+  "integral.cont.cw": "∲",
+  "integral.cw": "∱",
+  "integral.dash": "⨍",
+  "integral.dash.double": "⨎",
+  "integral.double": "∬",
+  "integral.inter": "⨙",
+  "integral.quad": "⨌",
+  "integral.slash": "⨏",
+  "integral.square": "⨖",
+  "integral.surf": "∯",
+  "integral.times": "⨘",
+  "integral.triple": "∭",
+  "integral.union": "⨚",
+  "integral.vol": "∰",
+  inter: "∩",
+  "inter.and": "⩄",
+  "inter.big": "⋂",
+  "inter.dot": "⩀",
+  "inter.double": "⋒",
+  "inter.serif": "∩",
+  "inter.sq": "⊓",
+  "inter.sq.big": "⨅",
+  "inter.sq.double": "⩎",
+  "inter.sq.serif": "⊓",
+  interleave: "⫴",
+  "interleave.big": "⫼",
+  "interleave.struck": "⫵",
+  interrobang: "‽",
+  "interrobang.inv": "⸘",
+  iota: "ι",
+  Iota: "Ι",
+  "iota.inv": "℩",
+  JJ: "𝕁",
+  join: "⨝",
+  "join.l": "⟕",
+  "join.l.r": "⟗",
+  "join.r": "⟖",
+  jupiter: "♃",
+  kappa: "κ",
+  Kappa: "Κ",
+  "kappa.alt": "ϰ",
+  kip: "₭",
+  KK: "𝕂",
+  lambda: "λ",
+  Lambda: "Λ",
   laplace: "∆",
-  gradient: "∇",
-  sterling: "£",
-  euro: "€",
-  yen: "¥",
-  cent: "¢",
-  copyright: "©",
-  trademark: "™",
-  registered: "®",
-  bullet: "•",
-  section: "§",
-  paragraph: "¶",
-  lozenge: "◊",
-  checkmark: "✓",
-  "checkmark.light": "✔",
-  cross: "✗",
-  "cross.circle": "⊗",
-  // Accents (returned as standalone characters for use with hat(), tilde() etc.)
-  hat: "̂",
-  bar: "̅",
-  "tilde.accent": "̃",
-  vec: "⃗",
-  dot: "̇",
-  "dot.double": "̈",
-  acute: "́",
-  grave: "̀",
-  breve: "̆",
-  macron: "̅",
-  caron: "̌",
-  circle: "̊",
-  // Spacing (resolved to MathML/CSS spacing, not characters)
-  thin: "",
-  med: "",
-  thick: "",
-  quad: "",
-  qquad: "",
-  space: " ",
-  zws: "​",
-  // Misc operators
-  "plus.minus": "±",
-  "minus.plus": "∓",
+  lari: "₾",
+  lat: "⪫",
+  "lat.eq": "⪭",
+  lira: "₺",
+  LL: "𝕃",
+  "lozenge.filled": "⧫",
+  "lozenge.filled.medium": "⬧",
+  "lozenge.filled.small": "⬪",
+  "lozenge.stroked": "◊",
+  "lozenge.stroked.medium": "⬨",
+  "lozenge.stroked.small": "⬫",
+  lrm: "‎",
+  lt: "<",
+  "lt.approx": "⪅",
+  "lt.arc": "⪦",
+  "lt.arc.eq": "⪨",
+  "lt.closed": "⊲",
+  "lt.closed.eq": "⊴",
+  "lt.closed.eq.not": "⋬",
+  "lt.closed.not": "⋪",
+  "lt.dot": "⋖",
+  "lt.double": "≪",
+  "lt.double.nested": "⪡",
+  "lt.eq": "≤",
+  "lt.eq.gt": "⋚",
+  "lt.eq.not": "≰",
   "lt.eq.slant": "⩽",
-  "gt.eq.slant": "⩾",
-  wreath: "≀",
+  "lt.equiv": "≦",
+  "lt.gt": "≶",
+  "lt.gt.not": "≸",
+  "lt.napprox": "⪉",
+  "lt.neq": "⪇",
+  "lt.nequiv": "≨",
+  "lt.not": "≮",
+  "lt.ntilde": "⋦",
+  "lt.o": "⧀",
+  "lt.tilde": "≲",
+  "lt.tilde.not": "≴",
+  "lt.tri": "⊲",
+  "lt.tri.eq": "⊴",
+  "lt.tri.eq.not": "⋬",
+  "lt.tri.not": "⋪",
+  "lt.triple": "⋘",
+  "lt.triple.nested": "⫷",
+  macron: "¯",
+  maltese: "✠",
+  manat: "₼",
+  mapsto: "↦",
+  "mapsto.long": "⟼",
+  mars: "♂",
+  med: "",
+  mercury: "☿",
+  minus: "−",
+  "minus.dot": "∸",
+  "minus.o": "⊖",
+  "minus.plus": "∓",
+  "minus.square": "⊟",
+  "minus.tilde": "≂",
+  "minus.triangle": "⨺",
+  miny: "⧿",
+  MM: "𝕄",
+  models: "⊧",
+  mu: "μ",
+  Mu: "Μ",
   multimap: "⊸",
-  intercal: "⊺",
-  bowtie: "⋈",
-  ltimes: "⋉",
-  rtimes: "⋊",
-  divides: "∣",
-  "divides.not": "∤",
+  "multimap.double": "⧟",
+  "mustache.l": "⎰",
+  "mustache.r": "⎱",
+  nabla: "∇",
+  naira: "₦",
+  natural: "♮",
+  "natural.b": "𝄯",
+  "natural.t": "𝄮",
+  neptune: "♆",
+  "neptune.alt": "⯉",
+  NN: "ℕ",
+  not: "¬",
+  "note.down": "🎝",
+  "note.eighth": "𝅘𝅥𝅮",
+  "note.eighth.alt": "♪",
+  "note.eighth.beamed": "♫",
+  "note.grace": "𝆕",
+  "note.grace.slash": "𝆔",
+  "note.half": "𝅗𝅥",
+  "note.quarter": "𝅘𝅥",
+  "note.quarter.alt": "♩",
+  "note.sixteenth": "𝅘𝅥𝅯",
+  "note.sixteenth.beamed": "♬",
+  "note.up": "🎜",
+  "note.whole": "𝅝",
+  nothing: "∅",
+  "nothing.arrow.l": "⦴",
+  "nothing.arrow.r": "⦳",
+  "nothing.bar": "⦱",
+  "nothing.circle": "⦲",
+  "nothing.rev": "⦰",
+  "nothing.zero": "∅",
+  nu: "ν",
+  Nu: "Ν",
+  numero: "№",
+  omega: "ω",
+  Omega: "Ω",
+  "Omega.inv": "℧",
+  omicron: "ο",
+  Omicron: "Ο",
+  oo: "∞",
+  OO: "𝕆",
+  or: "∨",
+  "or.big": "⋁",
+  "or.curly": "⋎",
+  "or.dot": "⟇",
+  "or.double": "⩔",
+  original: "⊶",
+  parallel: "∥",
+  "parallel.eq": "⋕",
+  "parallel.equiv": "⩨",
+  "parallel.not": "∦",
+  "parallel.o": "⦷",
+  "parallel.slanted.eq": "⧣",
+  "parallel.slanted.eq.tilde": "⧤",
+  "parallel.slanted.equiv": "⧥",
+  "parallel.struck": "⫲",
+  "parallel.tilde": "⫳",
+  "parallelogram.filled": "▰",
+  "parallelogram.stroked": "▱",
+  "paren.b": "⏝",
+  "paren.l": "(",
+  "paren.l.closed": "⦇",
+  "paren.l.flat": "⟮",
+  "paren.l.stroked": "⦅",
+  "paren.r": ")",
+  "paren.r.closed": "⦈",
+  "paren.r.flat": "⟯",
+  "paren.r.stroked": "⦆",
+  "paren.t": "⏜",
+  partial: "∂",
+  pataca: "$",
+  pee: "℘",
+  "penta.filled": "⬟",
+  "penta.stroked": "⬠",
+  percent: "%",
+  permille: "‰",
+  permyriad: "‱",
+  perp: "⟂",
+  "perp.o": "⦹",
+  peso: "$",
+  "peso.philippine": "₱",
+  phi: "φ",
+  Phi: "Φ",
+  "phi.alt": "ϕ",
+  pi: "π",
+  Pi: "Π",
+  "pi.alt": "ϖ",
+  pilcrow: "¶",
+  "pilcrow.rev": "⁋",
+  planck: "ħ",
+  plus: "+",
+  "plus.dot": "∔",
+  "plus.double": "⧺",
+  "plus.minus": "±",
+  "plus.o": "⊕",
+  "plus.o.arrow": "⟴",
+  "plus.o.big": "⨁",
+  "plus.o.l": "⨭",
+  "plus.o.r": "⨮",
+  "plus.square": "⊞",
+  "plus.triangle": "⨹",
+  "plus.triple": "⧻",
+  pound: "£",
+  "power.off": "⭘",
+  "power.on": "⏽",
+  "power.on.off": "⏼",
+  "power.sleep": "⏾",
+  "power.standby": "⏻",
+  PP: "ℙ",
+  prec: "≺",
+  "prec.approx": "⪷",
+  "prec.curly.eq": "≼",
+  "prec.curly.eq.not": "⋠",
+  "prec.double": "⪻",
+  "prec.eq": "⪯",
+  "prec.equiv": "⪳",
+  "prec.napprox": "⪹",
+  "prec.neq": "⪱",
+  "prec.nequiv": "⪵",
+  "prec.not": "⊀",
+  "prec.ntilde": "⋨",
+  "prec.tilde": "≾",
+  prime: "′",
+  "prime.double": "″",
+  "prime.double.rev": "‶",
+  "prime.quad": "⁗",
+  "prime.rev": "‵",
+  "prime.triple": "‴",
+  "prime.triple.rev": "‷",
+  product: "∏",
+  "product.co": "∐",
+  prop: "∝",
+  psi: "ψ",
+  Psi: "Ψ",
+  qed: "∎",
+  QQ: "ℚ",
+  qquad: "",
+  quad: "",
+  quest: "?",
+  "quest.double": "⁇",
+  "quest.excl": "⁈",
+  "quest.inv": "¿",
+  "quote.chevron.l.double": "«",
+  "quote.chevron.l.single": "‹",
+  "quote.chevron.r.double": "»",
+  "quote.chevron.r.single": "›",
+  "quote.double": '"',
+  "quote.high.double": "‟",
+  "quote.high.single": "‛",
+  "quote.l.double": "“",
+  "quote.l.single": "‘",
+  "quote.low.double": "„",
+  "quote.low.single": "‚",
+  "quote.r.double": "”",
+  "quote.r.single": "’",
+  "quote.single": "'",
+  ratio: "∶",
+  Re: "ℜ",
+  "rect.filled.h": "▬",
+  "rect.filled.v": "▮",
+  "rect.stroked.h": "▭",
+  "rect.stroked.v": "▯",
+  refmark: "※",
+  "rest.eighth": "𝄾",
+  "rest.half": "𝄼",
+  "rest.multiple": "𝄺",
+  "rest.multiple.measure": "𝄩",
+  "rest.quarter": "𝄽",
+  "rest.sixteenth": "𝄿",
+  "rest.whole": "𝄻",
+  rho: "ρ",
+  Rho: "Ρ",
+  "rho.alt": "ϱ",
+  riel: "៛",
+  riyal: "⃁",
+  rlm: "‏",
+  RR: "ℝ",
+  ruble: "₽",
+  "rupee.generic": "₨",
+  "rupee.indian": "₹",
+  "rupee.tamil": "௹",
+  "rupee.wancho": "𞋿",
+  saturn: "♄",
+  section: "§",
+  semi: ";",
+  "semi.inv": "⸵",
+  "semi.rev": "⁏",
+  sha: "ш",
+  Sha: "Ш",
+  sharp: "♯",
+  "sharp.b": "𝄱",
+  "sharp.double": "𝄪",
+  "sharp.quarter": "𝄲",
+  "sharp.t": "𝄰",
+  shekel: "₪",
+  "shell.b": "⏡",
+  "shell.l": "❲",
+  "shell.l.filled": "⦗",
+  "shell.l.stroked": "⟬",
+  "shell.r": "❳",
+  "shell.r.filled": "⦘",
+  "shell.r.stroked": "⟭",
+  "shell.t": "⏠",
+  sigma: "σ",
+  Sigma: "Σ",
+  "sigma.alt": "ς",
+  slash: "/",
+  "slash.big": "⧸",
+  "slash.double": "⫽",
+  "slash.o": "⊘",
+  "slash.triple": "⫻",
   smash: "⨳",
-  curlyeq: "≟",
-  "sqrt.symbol": "√"
-}, R = /* @__PURE__ */ new Set(["thin", "med", "thick", "quad", "qquad", "space", "zws"]);
-function L(e) {
-  return R.has(e);
+  smile: "⌣",
+  smt: "⪪",
+  "smt.eq": "⪬",
+  som: "⃀",
+  space: " ",
+  "space.en": " ",
+  "space.fig": " ",
+  "space.hair": " ",
+  "space.med": " ",
+  "space.nobreak": " ",
+  "space.nobreak.narrow": " ",
+  "space.punct": " ",
+  "space.quad": " ",
+  "space.quarter": " ",
+  "space.sixth": " ",
+  "space.thin": " ",
+  "space.third": " ",
+  "square.filled": "■",
+  "square.filled.big": "⬛",
+  "square.filled.medium": "◼",
+  "square.filled.small": "◾",
+  "square.filled.tiny": "▪",
+  "square.stroked": "□",
+  "square.stroked.big": "⬜",
+  "square.stroked.dotted": "⬚",
+  "square.stroked.medium": "◻",
+  "square.stroked.rounded": "▢",
+  "square.stroked.small": "◽",
+  "square.stroked.tiny": "▫",
+  SS: "𝕊",
+  "star.filled": "★",
+  "star.op": "⋆",
+  "star.stroked": "☆",
+  subset: "⊂",
+  "subset.approx": "⫉",
+  "subset.closed": "⫏",
+  "subset.closed.eq": "⫑",
+  "subset.dot": "⪽",
+  "subset.double": "⋐",
+  "subset.eq": "⊆",
+  "subset.eq.dot": "⫃",
+  "subset.eq.not": "⊈",
+  "subset.eq.sq": "⊑",
+  "subset.eq.sq.not": "⋢",
+  "subset.equiv": "⫅",
+  "subset.neq": "⊊",
+  "subset.nequiv": "⫋",
+  "subset.not": "⊄",
+  "subset.plus": "⪿",
+  "subset.sq": "⊏",
+  "subset.sq.neq": "⋤",
+  "subset.tilde": "⫇",
+  "subset.times": "⫁",
+  succ: "≻",
+  "succ.approx": "⪸",
+  "succ.curly.eq": "≽",
+  "succ.curly.eq.not": "⋡",
+  "succ.double": "⪼",
+  "succ.eq": "⪰",
+  "succ.equiv": "⪴",
+  "succ.napprox": "⪺",
+  "succ.neq": "⪲",
+  "succ.nequiv": "⪶",
+  "succ.not": "⊁",
+  "succ.ntilde": "⋩",
+  "succ.tilde": "≿",
+  "suit.club.filled": "♣",
+  "suit.club.stroked": "♧",
+  "suit.diamond.filled": "♦",
+  "suit.diamond.stroked": "♢",
+  "suit.heart.filled": "♥",
+  "suit.heart.stroked": "♡",
+  "suit.spade.filled": "♠",
+  "suit.spade.stroked": "♤",
+  sum: "∑",
+  "sum.integral": "⨋",
+  sun: "☉",
+  supset: "⊃",
+  "supset.approx": "⫊",
+  "supset.closed": "⫐",
+  "supset.closed.eq": "⫒",
+  "supset.dot": "⪾",
+  "supset.double": "⋑",
+  "supset.eq": "⊇",
+  "supset.eq.dot": "⫄",
+  "supset.eq.not": "⊉",
+  "supset.eq.sq": "⊒",
+  "supset.eq.sq.not": "⋣",
+  "supset.equiv": "⫆",
+  "supset.neq": "⊋",
+  "supset.nequiv": "⫌",
+  "supset.not": "⊅",
+  "supset.plus": "⫀",
+  "supset.sq": "⊐",
+  "supset.sq.neq": "⋥",
+  "supset.tilde": "⫈",
+  "supset.times": "⫂",
+  "tack.b": "⊤",
+  "tack.b.big": "⟙",
+  "tack.b.double": "⫪",
+  "tack.b.short": "⫟",
+  "tack.l": "⊣",
+  "tack.l.double": "⫤",
+  "tack.l.long": "⟞",
+  "tack.l.r": "⟛",
+  "tack.l.short": "⫞",
+  "tack.r": "⊢",
+  "tack.r.double": "⊨",
+  "tack.r.double.not": "⊭",
+  "tack.r.long": "⟝",
+  "tack.r.not": "⊬",
+  "tack.r.short": "⊦",
+  "tack.t": "⊥",
+  "tack.t.big": "⟘",
+  "tack.t.double": "⫫",
+  "tack.t.short": "⫠",
+  taka: "৳",
+  taman: "߿",
+  tau: "τ",
+  Tau: "Τ",
+  tenge: "₸",
+  therefore: "∴",
+  theta: "θ",
+  Theta: "Θ",
+  "theta.alt": "ϑ",
+  "Theta.alt": "ϴ",
+  thick: "",
+  thin: "",
+  "tilde.basic": "~",
+  "tilde.dot": "⩪",
+  "tilde.eq": "≃",
+  "tilde.eq.not": "≄",
+  "tilde.eq.rev": "⋍",
+  "tilde.equiv": "≅",
+  "tilde.equiv.not": "≇",
+  "tilde.nequiv": "≆",
+  "tilde.not": "≁",
+  "tilde.op": "∼",
+  "tilde.rev": "∽",
+  "tilde.rev.equiv": "≌",
+  "tilde.triple": "≋",
+  times: "×",
+  "times.big": "⨉",
+  "times.div": "⋇",
+  "times.l": "⋉",
+  "times.o": "⊗",
+  "times.o.big": "⨂",
+  "times.o.hat": "⨶",
+  "times.o.l": "⨴",
+  "times.o.r": "⨵",
+  "times.r": "⋊",
+  "times.square": "⊠",
+  "times.three.l": "⋋",
+  "times.three.r": "⋌",
+  "times.triangle": "⨻",
+  tiny: "⧾",
+  togrog: "₮",
+  top: "⊤",
+  trademark: "™",
+  "trademark.registered": "®",
+  "trademark.service": "℠",
+  "triangle.filled.b": "▼",
+  "triangle.filled.bl": "◣",
+  "triangle.filled.br": "◢",
+  "triangle.filled.l": "◀",
+  "triangle.filled.r": "▶",
+  "triangle.filled.small.b": "▾",
+  "triangle.filled.small.l": "◂",
+  "triangle.filled.small.r": "▸",
+  "triangle.filled.small.t": "▴",
+  "triangle.filled.t": "▲",
+  "triangle.filled.tl": "◤",
+  "triangle.filled.tr": "◥",
+  "triangle.stroked.b": "▽",
+  "triangle.stroked.bl": "◺",
+  "triangle.stroked.br": "◿",
+  "triangle.stroked.dot": "◬",
+  "triangle.stroked.l": "◁",
+  "triangle.stroked.nested": "⟁",
+  "triangle.stroked.r": "▷",
+  "triangle.stroked.rounded": "🛆",
+  "triangle.stroked.small.b": "▿",
+  "triangle.stroked.small.l": "◃",
+  "triangle.stroked.small.r": "▹",
+  "triangle.stroked.small.t": "▵",
+  "triangle.stroked.t": "△",
+  "triangle.stroked.tl": "◸",
+  "triangle.stroked.tr": "◹",
+  TT: "𝕋",
+  underscore: "_",
+  union: "∪",
+  "union.arrow": "⊌",
+  "union.big": "⋃",
+  "union.dot": "⊍",
+  "union.dot.big": "⨃",
+  "union.double": "⋓",
+  "union.minus": "⩁",
+  "union.or": "⩅",
+  "union.plus": "⊎",
+  "union.plus.big": "⨄",
+  "union.serif": "∪",
+  "union.sq": "⊔",
+  "union.sq.big": "⨆",
+  "union.sq.double": "⩏",
+  "union.sq.serif": "⊔",
+  upsilon: "υ",
+  Upsilon: "Υ",
+  uranus: "⛢",
+  "uranus.alt": "♅",
+  UU: "𝕌",
+  venus: "♀",
+  VV: "𝕍",
+  without: "∖",
+  wj: "⁠",
+  won: "₩",
+  wreath: "≀",
+  WW: "𝕎",
+  xi: "ξ",
+  Xi: "Ξ",
+  xor: "⊕",
+  "xor.big": "⨁",
+  XX: "𝕏",
+  yen: "¥",
+  yuan: "¥",
+  YY: "𝕐",
+  zeta: "ζ",
+  Zeta: "Ζ",
+  zwj: "‍",
+  zwnj: "‌",
+  zws: "​",
+  ZZ: "ℤ"
+}, P = /* @__PURE__ */ new Set(["thin", "med", "thick", "quad", "qquad", "space", "zws"]);
+function U(e) {
+  return P.has(e);
 }
-function E(e) {
-  return P[e];
+function j(e) {
+  const r = F[e];
+  if (r !== void 0)
+    return r === "" && P.has(e), r;
 }
-const M = /* @__PURE__ */ new Set(["cal", "bb", "frak", "bold", "italic", "upright", "sans", "mono"]), N = /* @__PURE__ */ new Set(["vec", "mat", "cases", "bmat", "pmat", "vmat", "Vmat"]), O = {
-  hat: "^",
-  tilde: "~",
-  dot: "˙",
-  overline: "‾",
-  bar: "‾",
-  arrow: "→"
-}, w = {
+const G = /* @__PURE__ */ new Set([
+  "sin",
+  "cos",
+  "tan",
+  "cot",
+  "sec",
+  "csc",
+  "sinh",
+  "cosh",
+  "tanh",
+  "coth",
+  "sech",
+  "csch",
+  "arcsin",
+  "arccos",
+  "arctan",
+  "log",
+  "ln",
+  "lg",
+  "exp",
+  "lim",
+  "liminf",
+  "limsup",
+  "inf",
+  "sup",
+  "max",
+  "min",
+  "det",
+  "gcd",
+  "lcm",
+  "mod",
+  "arg",
+  "deg",
+  "dim",
+  "hom",
+  "id",
+  "im",
+  "ker",
+  "tr",
+  "Pr"
+]), V = /* @__PURE__ */ new Set([
+  "lim",
+  "liminf",
+  "limsup",
+  "inf",
+  "sup",
+  "max",
+  "min",
+  "det",
+  "gcd",
+  "arg"
+]);
+function W(e) {
+  return G.has(e);
+}
+function x(e) {
+  return V.has(e);
+}
+const Y = /* @__PURE__ */ new Set([
+  "∑",
+  "∏",
+  "∐",
+  "∫",
+  "∬",
+  "∭",
+  "⨌",
+  "∮",
+  "∯",
+  "∰",
+  "∱",
+  "∲",
+  "∳",
+  "⋃",
+  "⋂",
+  "⨆",
+  "⨅",
+  "⨀",
+  "⨁",
+  "⨂",
+  "⨃",
+  "⨄",
+  "⨊",
+  "⨋"
+]);
+function O(e) {
+  return Y.has(e);
+}
+const E = /* @__PURE__ */ new Set(["cal", "bb", "frak", "bold", "italic", "upright", "sans", "mono"]), L = /* @__PURE__ */ new Set(["vec", "mat", "cases", "bmat", "pmat", "vmat", "Vmat"]), N = /* @__PURE__ */ new Set([
+  "hat",
+  "tilde",
+  "dot",
+  "overline",
+  "bar",
+  "arrow",
+  "breve",
+  "grave",
+  "acute",
+  "macron",
+  "caron",
+  "circle",
+  "dot.double",
+  "dot.triple",
+  "arrow.l",
+  "arrow.l.r"
+]), v = {
+  overbrace: "overbrace",
+  underbrace: "underbrace",
+  overline: "overline.stretch",
+  underline: "underline.stretch",
+  overparen: "overparen",
+  underparen: "underparen",
+  overbracket: "overbracket",
+  underbracket: "underbracket"
+}, Z = {
+  cancel: "cancel",
+  bcancel: "bcancel",
+  xcancel: "xcancel"
+}, X = /* @__PURE__ */ new Set(["normal", "op", "bin", "rel", "open", "close", "punct"]), y = {
+  display: "display",
+  inline: "inline",
+  script: "script",
+  sscript: "sscript"
+}, $ = {
   thin: "thin",
   med: "med",
   thick: "thick",
@@ -511,226 +1507,360 @@ const M = /* @__PURE__ */ new Set(["cal", "bb", "frak", "bold", "italic", "uprig
   qquad: "qquad",
   space: "space",
   zws: "zws"
-}, g = {
+}, q = {
   abs: { kind: "abs", open: "|", close: "|" },
   norm: { kind: "norm", open: "‖", close: "‖" },
   floor: { kind: "floor", open: "⌊", close: "⌋" },
   ceil: { kind: "ceil", open: "⌈", close: "⌉" }
 };
-function F(e) {
-  const t = C(e), r = new I(t, e), s = r.parseAlign();
-  if (r.peek().kind !== a.EOF)
-    throw new m(`Unexpected token '${r.peek().text}'`, r.peek().pos, e);
+function J(e) {
+  const r = z(e), t = new Q(r, e), s = t.parseAlign();
+  if (t.peek().kind !== o.EOF)
+    throw new k(`Unexpected token '${t.peek().text}'`, t.peek().pos, e);
   return s;
 }
-class I {
-  constructor(t, r) {
-    this.tokens = t, this.src = r, this.pos = 0;
+class Q {
+  constructor(r, t) {
+    this.tokens = r, this.src = t, this.pos = 0;
   }
-  peek(t = 0) {
-    const r = this.pos + t;
-    return r < this.tokens.length ? this.tokens[r] : this.tokens[this.tokens.length - 1];
+  peek(r = 0) {
+    const t = this.pos + r;
+    return t < this.tokens.length ? this.tokens[t] : this.tokens[this.tokens.length - 1];
   }
   consume() {
-    const t = this.tokens[this.pos];
-    return t.kind !== a.EOF && this.pos++, t;
+    const r = this.tokens[this.pos];
+    return r.kind !== o.EOF && this.pos++, r;
   }
-  expect(t) {
-    const r = this.peek();
-    if (r.kind !== t)
-      throw new m(
-        `Expected ${a[t] ?? t} but got '${r.text}'`,
-        r.pos,
+  expect(r) {
+    const t = this.peek();
+    if (t.kind !== r)
+      throw new k(
+        `Expected ${o[r] ?? r} but got '${t.text}'`,
+        t.pos,
         this.src
       );
     return this.consume();
   }
   // alignExpr := addExpr ('&' addExpr)*
   parseAlign() {
-    const t = this.parseAdd();
-    if (this.peek().kind !== a.Amp) return t;
-    const r = [t];
-    for (; this.peek().kind === a.Amp; )
-      this.consume(), r.push({ type: "align" }), r.push(this.parseAdd());
-    return { type: "seq", nodes: r };
+    const r = this.parseAdd();
+    if (this.peek().kind !== o.Amp) return r;
+    const t = [r];
+    for (; this.peek().kind === o.Amp; )
+      this.consume(), t.push({ type: "align" }), t.push(this.parseAdd());
+    return { type: "seq", nodes: t };
   }
   // addExpr := fracExpr (ADDOP fracExpr)*
   parseAdd() {
-    const t = [];
-    for (t.push(...this.collectFrac()); this.peek().kind === a.Op && f(this.peek().text); ) {
-      const r = this.consume();
-      t.push({ type: "operator", text: r.text }), t.push(...this.collectFrac());
+    const r = [];
+    for (r.push(...this.collectFrac()); (this.peek().kind === o.Op || this.peek().kind === o.Shorthand) && A(this.peek().text); ) {
+      const t = this.consume();
+      r.push({ type: "operator", text: t.text }), r.push(...this.collectFrac());
     }
-    return h(t);
+    return m(r);
   }
   // Returns the flat nodes produced by one fracExpr (may be multiple from seq)
   collectFrac() {
-    const t = this.parseSeq();
-    if (this.peek().kind !== a.Slash)
-      return t.type === "seq" ? t.nodes : [t];
-    this.consume();
     const r = this.parseSeq();
-    return [{ type: "frac", num: t, den: r }];
+    if (this.peek().kind !== o.Slash)
+      return r.type === "seq" ? r.nodes : [r];
+    this.consume();
+    const t = this.parseSeq();
+    return [{ type: "frac", num: r, den: t }];
   }
   // seqExpr := attachExpr+ (atoms, not separated by addOps)
   parseSeq() {
-    const t = [];
+    const r = [];
     for (; ; ) {
-      const r = this.peek();
-      if (r.kind === a.EOF || r.kind === a.RParen || r.kind === a.RBracket || r.kind === a.Amp || r.kind === a.Semicolon || r.kind === a.Comma || r.kind === a.Slash || t.length > 0 && r.kind === a.Op && f(r.text)) break;
+      const t = this.peek();
+      if (t.kind === o.EOF || t.kind === o.RParen || t.kind === o.RBracket || t.kind === o.RBrace || t.kind === o.Amp || t.kind === o.Semicolon || t.kind === o.Comma || t.kind === o.Slash || r.length > 0 && (t.kind === o.Op || t.kind === o.Shorthand) && A(t.text)) break;
       const s = this.parseAttach();
-      t.push(s);
+      r.push(s);
     }
-    if (t.length === 0)
-      throw new m("Expected expression", this.peek().pos, this.src);
-    return h(t);
+    if (r.length === 0)
+      throw new k("Expected expression", this.peek().pos, this.src);
+    return m(r);
   }
   // attachExpr := primeExpr (('_' | '^') primeExpr)*
   parseAttach() {
-    let t = this.parsePrime(), r, s;
-    for (; this.peek().kind === a.Under || this.peek().kind === a.Caret; ) {
+    let r = this.parsePrime(), t, s;
+    for (; this.peek().kind === o.Under || this.peek().kind === o.Caret; ) {
       const n = this.consume();
-      let o = this.parsePrime();
-      o.type === "lr" && o.kind === "paren" && (o = o.body), n.kind === a.Under ? r = r ? h([r, o]) : o : s = s ? h([s, o]) : o;
+      let a = this.parsePrime();
+      a.type === "lr" && a.kind === "paren" && (a = a.body), n.kind === o.Under ? t = t ? m([t, a]) : a : s = s ? m([s, a]) : a;
     }
-    return r !== void 0 && s !== void 0 ? { type: "attach", base: t, sub: r, sup: s } : r !== void 0 ? { type: "attach", base: t, sub: r } : s !== void 0 ? { type: "attach", base: t, sup: s } : t;
+    return t !== void 0 && s !== void 0 ? { type: "attach", base: r, sub: t, sup: s } : t !== void 0 ? { type: "attach", base: r, sub: t } : s !== void 0 ? { type: "attach", base: r, sup: s } : r;
   }
   // primeExpr := primary ("'")*
   parsePrime() {
-    let t = this.parsePrimary(), r = 0;
-    for (; this.peek().kind === a.Prime; )
-      this.consume(), r++;
-    return r > 0 ? {
+    let r = this.parsePrimary(), t = 0;
+    for (; this.peek().kind === o.Prime; )
+      this.consume(), t++;
+    return t > 0 ? {
       type: "attach",
-      base: t,
-      sup: { type: "symbol", name: "prime", char: r === 1 ? "′" : r === 2 ? "″" : "‴" }
-    } : t;
+      base: r,
+      sup: { type: "symbol", name: "prime", char: t === 1 ? "′" : t === 2 ? "″" : "‴" }
+    } : r;
   }
   parsePrimary() {
-    const t = this.peek();
-    if (t.kind === a.Number)
-      return this.consume(), { type: "number", value: t.text };
-    if (t.kind === a.Str)
-      return this.consume(), { type: "text", value: t.text };
-    if (t.kind === a.Op)
-      return this.consume(), { type: "operator", text: t.text };
-    if (t.kind === a.LParen)
+    const r = this.peek();
+    if (r.kind === o.Number)
+      return this.consume(), { type: "number", value: r.text };
+    if (r.kind === o.Str)
+      return this.consume(), { type: "text", value: r.text };
+    if (r.kind === o.Op)
+      return this.consume(), { type: "operator", text: r.text };
+    if (r.kind === o.Shorthand)
+      return this.consume(), { type: "operator", text: r.text };
+    if (r.kind === o.Bang)
+      return this.consume(), { type: "operator", text: "!" };
+    if (r.kind === o.Escape)
+      return this.consume(), this.resolveName(r.text);
+    if (r.kind === o.LParen)
       return this.parseGroup("(", ")");
-    if (t.kind === a.LBracket)
+    if (r.kind === o.LBracket)
       return this.parseGroup("[", "]");
-    if (t.kind === a.Ident)
+    if (r.kind === o.LBrace)
+      return this.parseGroup("{", "}");
+    if (r.kind === o.Ident)
       return this.parseIdent();
-    throw new m(`Unexpected token '${t.text}'`, t.pos, this.src);
+    throw new k(`Unexpected token '${r.text}'`, r.pos, this.src);
   }
-  parseGroup(t, r) {
+  parseGroup(r, t) {
     this.consume();
-    const s = r === ")" ? a.RParen : a.RBracket, n = this.parseAlign();
+    const s = t === ")" ? o.RParen : t === "]" ? o.RBracket : o.RBrace, n = [];
     if (this.peek().kind !== s)
-      throw new m(
-        `Expected '${r}' but got '${this.peek().text}'`,
+      for (n.push(this.parseAlign()); this.peek().kind === o.Comma || this.peek().kind === o.Semicolon; ) {
+        const l = this.consume();
+        if (n.push({ type: "operator", text: l.text }), this.peek().kind === s) break;
+        n.push(this.parseAlign());
+      }
+    if (this.peek().kind !== s)
+      throw new k(
+        `Expected '${t}' but got '${this.peek().text}'`,
         this.peek().pos,
         this.src
       );
     return this.consume(), {
       type: "lr",
-      kind: t === "(" ? "paren" : "bracket",
-      open: t,
-      close: r,
-      body: n
+      kind: r === "(" ? "paren" : r === "[" ? "bracket" : "brace",
+      open: r,
+      close: t,
+      body: m(n)
     };
   }
   parseIdent() {
-    const t = this.assembleDottedIdent();
-    if (t in w)
-      return { type: "spacing", kind: w[t] };
-    if (this.peek().kind === a.LParen)
-      return this.parseCall(t);
-    const r = E(t);
-    if (r !== void 0)
-      return L(t) ? { type: "spacing", kind: t } : { type: "symbol", name: t, char: r };
-    const s = t.length === 1 && /[a-zA-Z]/.test(t);
-    return { type: "atom", text: t, italic: s };
+    const r = this.assembleDottedIdent();
+    return this.resolveName(r);
+  }
+  // Resolves a (possibly dotted) identifier or escape name to a node.
+  resolveName(r) {
+    if (r in $)
+      return { type: "spacing", kind: $[r] };
+    if (this.peek().kind === o.LParen && re(r))
+      return this.parseCall(r);
+    const t = j(r);
+    if (t !== void 0)
+      return U(r) ? { type: "spacing", kind: r } : { type: "symbol", name: r, char: t };
+    if (W(r))
+      return { type: "atom", text: r, italic: !1, operator: !0 };
+    const s = r.length === 1 && /[a-zA-Z]/.test(r);
+    return { type: "atom", text: r, italic: s };
   }
   assembleDottedIdent() {
-    let t = this.consume().text;
-    for (; this.peek().kind === a.Dot && this.peek(1).kind === a.Ident; )
-      this.consume(), t += "." + this.consume().text;
-    return t;
+    let r = this.consume().text;
+    for (; this.peek().kind === o.Dot && this.peek(1).kind === o.Ident; )
+      this.consume(), r += "." + this.consume().text;
+    return r;
   }
-  parseCall(t) {
-    if (this.consume(), t === "frac") return this.parseFrac();
-    if (t === "sqrt") return this.parseSqrt();
-    if (t === "root") return this.parseRoot();
-    if (t === "binom") return this.parseBinom();
-    if (t === "lr") return this.parseLr();
-    if (t in g) return this.parseLrShorthand(t);
-    if (t in O) return this.parseAccent(t);
-    if (M.has(t)) return this.parseStyle(t);
-    if (N.has(t)) return this.parseMatrix(t);
-    const r = this.parseAlign();
-    return this.expect(a.RParen), h([{ type: "atom", text: t, italic: !1 }, { type: "lr", kind: "paren", open: "(", close: ")", body: r }]);
+  parseCall(r) {
+    if (this.consume(), r === "frac") return this.parseFrac();
+    if (r === "sqrt") return this.parseSqrt();
+    if (r === "root") return this.parseRoot();
+    if (r === "binom") return this.parseBinom();
+    if (r === "lr") return this.parseLr();
+    if (r === "op") return this.parseOp();
+    if (r === "class") return this.parseClass();
+    if (r === "limits") return this.parseLimitsHint("limits");
+    if (r === "scripts") return this.parseLimitsHint("scripts");
+    if (r === "mid") return this.parseMid();
+    if (r === "cancel" || r === "bcancel" || r === "xcancel")
+      return this.parseCancel(r);
+    if (r in y) return this.parseSize(y[r]);
+    if (r in v) return this.parseUnderOver(v[r]);
+    if (r in q) return this.parseLrShorthand(r);
+    if (N.has(r)) return this.parseAccent(r);
+    if (E.has(r)) return this.parseStyle(r);
+    if (L.has(r)) return this.parseMatrix(r);
+    const t = this.parseArgs(), s = { type: "atom", text: r, italic: !1 }, a = { type: "lr", kind: "paren", open: "(", close: ")", body: K(t) };
+    return m([s, a]);
+  }
+  // Parses a comma-separated argument list, handling named args (k: v) and
+  // spread args (..expr). Returns the positional and named pieces; the
+  // closing ')' is consumed.
+  parseArgs() {
+    const r = [], t = {};
+    for (; this.peek().kind !== o.RParen && this.peek().kind !== o.EOF; ) {
+      if (this.peek().kind === o.Comma) {
+        this.consume();
+        continue;
+      }
+      if (this.peek().kind === o.DotDot) {
+        this.consume(), r.push(this.parseAlign()), this.peek().kind === o.Comma && this.consume();
+        continue;
+      }
+      if (this.peek().kind === o.Ident && this.peek(1).kind === o.Colon) {
+        const s = this.consume().text;
+        this.consume(), t[s] = this.parseAlign(), this.peek().kind === o.Comma && this.consume();
+        continue;
+      }
+      r.push(this.parseAlign()), this.peek().kind === o.Comma && this.consume();
+    }
+    return this.expect(o.RParen), { positional: r, named: t };
   }
   parseFrac() {
-    const t = this.parseAlign();
-    this.expect(a.Comma);
     const r = this.parseAlign();
-    return this.expect(a.RParen), { type: "frac", num: t, den: r };
+    this.expect(o.Comma);
+    const t = this.parseAlign();
+    return this.expect(o.RParen), { type: "frac", num: r, den: t };
   }
   parseSqrt() {
-    const t = this.parseAlign();
-    return this.expect(a.RParen), { type: "sqrt", body: t };
+    const r = this.parseAlign();
+    return this.expect(o.RParen), { type: "sqrt", body: r };
   }
   parseRoot() {
-    const t = this.parseAlign();
-    this.expect(a.Comma);
     const r = this.parseAlign();
-    return this.expect(a.RParen), { type: "root", index: t, body: r };
+    this.expect(o.Comma);
+    const t = this.parseAlign();
+    return this.expect(o.RParen), { type: "root", index: r, body: t };
   }
   parseBinom() {
-    const t = this.parseAlign();
-    this.expect(a.Comma);
     const r = this.parseAlign();
-    return this.expect(a.RParen), { type: "binom", top: t, bot: r };
+    this.expect(o.Comma);
+    const t = this.parseAlign();
+    return this.expect(o.RParen), { type: "binom", top: r, bot: t };
   }
   parseLr() {
-    const t = this.parseAlign();
-    if (this.expect(a.RParen), t.type === "lr") return t;
-    if (t.type === "seq" && t.nodes.length >= 2) {
-      const r = t.nodes[0], s = t.nodes[t.nodes.length - 1];
-      if (r.type === "operator" && s.type === "operator") {
-        const n = r.text, o = s.text;
-        if (B(n) === o) {
-          const l = t.nodes.slice(1, -1);
-          return { type: "lr", kind: "custom", open: n, close: o, body: h(l) };
+    const r = this.parseAlign();
+    if (this.expect(o.RParen), r.type === "lr") return r;
+    if (r.type === "seq" && r.nodes.length >= 2) {
+      const t = r.nodes[0], s = r.nodes[r.nodes.length - 1];
+      if (t.type === "operator" && s.type === "operator") {
+        const n = t.text, a = s.text;
+        if (ee(n) === a) {
+          const l = r.nodes.slice(1, -1);
+          return { type: "lr", kind: "custom", open: n, close: a, body: m(l) };
         }
       }
     }
-    return { type: "lr", kind: "custom", open: "", close: "", body: t };
+    return { type: "lr", kind: "custom", open: "", close: "", body: r };
   }
-  parseLrShorthand(t) {
-    const r = g[t], s = this.parseAlign();
-    return this.expect(a.RParen), { type: "lr", kind: r.kind, open: r.open, close: r.close, body: s };
+  parseLrShorthand(r) {
+    const t = q[r], s = this.parseAlign();
+    return this.expect(o.RParen), { type: "lr", kind: t.kind, open: t.open, close: t.close, body: s };
   }
-  parseAccent(t) {
+  parseAccent(r) {
+    const t = this.parseAlign();
+    return this.expect(o.RParen), { type: "accent", kind: r, body: t };
+  }
+  parseStyle(r) {
+    const t = this.parseAlign();
+    return this.expect(o.RParen), { type: "style", kind: r, body: t };
+  }
+  parseUnderOver(r) {
+    const t = this.parseAlign();
+    let s;
+    this.peek().kind === o.Comma && (this.consume(), s = this.parseAlign()), this.expect(o.RParen);
+    const n = { type: "underover", kind: r, body: t };
+    return s !== void 0 && (n.annotation = s), n;
+  }
+  parseCancel(r) {
+    const t = this.parseAlign();
+    return this.expect(o.RParen), { type: "cancel", kind: Z[r], body: t };
+  }
+  parseOp() {
+    let r = "", t = !1;
+    if (this.peek().kind === o.RParen)
+      return this.consume(), { type: "op", text: "", limits: !1 };
+    const s = this.parseAlign();
+    for (s.type === "text" ? r = s.value : s.type === "atom" && (r = s.text); this.peek().kind === o.Comma; )
+      if (this.consume(), this.peek().kind === o.Ident && this.peek().text === "limits" && this.peek(1).kind === o.Colon) {
+        this.consume(), this.consume();
+        const n = this.parseAlign();
+        n.type === "atom" && (t = n.text === "true");
+      } else
+        this.parseAlign();
+    return this.expect(o.RParen), { type: "op", text: r, limits: t };
+  }
+  parseClass() {
     const r = this.parseAlign();
-    return this.expect(a.RParen), { type: "accent", kind: t, body: r };
+    this.expect(o.Comma);
+    const t = this.parseAlign();
+    this.expect(o.RParen);
+    let s = "normal";
+    const n = r.type === "text" ? r.value : r.type === "atom" ? r.text : "";
+    return X.has(n) && (s = n), { type: "class", cls: s, body: t };
   }
-  parseStyle(t) {
+  parseSize(r) {
+    const t = this.parseAlign();
+    return this.expect(o.RParen), { type: "size", size: r, body: t };
+  }
+  parseLimitsHint(r) {
+    const t = this.parseAlign();
+    return this.expect(o.RParen), { type: "limits-hint", mode: r, body: t };
+  }
+  parseMid() {
     const r = this.parseAlign();
-    return this.expect(a.RParen), { type: "style", kind: t, body: r };
+    return this.expect(o.RParen), { type: "class", cls: "rel", body: r };
   }
-  parseMatrix(t) {
-    const r = [];
+  parseMatrix(r) {
+    const t = [];
     let s = [];
-    const n = t === "vec" || t === "cases";
-    for (; this.peek().kind !== a.RParen && this.peek().kind !== a.EOF; ) {
-      const o = this.peek();
-      o.kind === a.Semicolon ? (this.consume(), r.push(s), s = []) : o.kind === a.Comma ? (this.consume(), n && (r.push(s), s = [])) : s.push(this.parseAlign());
+    const n = r === "vec" || r === "cases";
+    let a;
+    for (; this.peek().kind !== o.RParen && this.peek().kind !== o.EOF; ) {
+      const c = this.peek();
+      if (c.kind === o.Semicolon)
+        this.consume(), t.push(s), s = [];
+      else if (c.kind === o.Comma)
+        this.consume(), n && (t.push(s), s = []);
+      else if (c.kind === o.Ident && this.peek(1).kind === o.Colon) {
+        const d = this.consume().text;
+        this.consume();
+        const h = this.parseAlign();
+        d === "delim" && (a = T(h));
+      } else c.kind === o.DotDot ? (this.consume(), s.push(this.parseAlign())) : s.push(this.parseAlign());
     }
-    return s.length > 0 && r.push(s), this.expect(a.RParen), { type: "matrix", kind: t, rows: r };
+    s.length > 0 && t.push(s), this.expect(o.RParen);
+    const l = { type: "matrix", kind: r, rows: t };
+    return a !== void 0 && (l.delim = a), l;
   }
 }
-function B(e) {
+function T(e) {
+  switch (e.type === "text" ? e.value : e.type === "atom" ? e.text : e.type === "symbol" ? e.char : e.type === "operator" ? e.text : "") {
+    case "(":
+      return { open: "(", close: ")" };
+    case "[":
+      return { open: "[", close: "]" };
+    case "{":
+      return { open: "{", close: "}" };
+    case "|":
+      return { open: "|", close: "|" };
+    case "||":
+      return { open: "‖", close: "‖" };
+    default:
+      return;
+  }
+}
+function K(e) {
+  if (e.positional.length === 0) return { type: "seq", nodes: [] };
+  if (e.positional.length === 1) return e.positional[0];
+  const r = [];
+  for (let t = 0; t < e.positional.length; t++)
+    t > 0 && r.push({ type: "operator", text: "," }), r.push(e.positional[t]);
+  return m(r);
+}
+function ee(e) {
   return {
     "(": ")",
     "[": "]",
@@ -742,15 +1872,21 @@ function B(e) {
     "⌈": "⌉"
   }[e] ?? e;
 }
-function i(e) {
-  let t = "";
-  for (let r = 0; r < e.length; r++) {
-    const s = e.charCodeAt(r);
-    s === 38 ? t += "&amp;" : s === 60 ? t += "&lt;" : s === 62 ? t += "&gt;" : s === 34 ? t += "&quot;" : t += e[r];
-  }
-  return t;
+function A(e) {
+  return _(e);
 }
-function H(e) {
+function re(e) {
+  return !!(e === "frac" || e === "sqrt" || e === "root" || e === "binom" || e === "lr" || e === "mid" || e === "op" || e === "class" || e === "limits" || e === "scripts" || e === "cancel" || e === "bcancel" || e === "xcancel" || e in y || e in v || e in q || N.has(e) || E.has(e) || L.has(e));
+}
+function i(e) {
+  let r = "";
+  for (let t = 0; t < e.length; t++) {
+    const s = e.charCodeAt(t);
+    s === 38 ? r += "&amp;" : s === 60 ? r += "&lt;" : s === 62 ? r += "&gt;" : s === 34 ? r += "&quot;" : r += e[t];
+  }
+  return r;
+}
+function te(e) {
   switch (e) {
     case "cal":
       return "script";
@@ -759,7 +1895,7 @@ function H(e) {
     case "frak":
       return "fraktur";
     case "bold":
-      return "bold";
+      return "bold-italic";
     case "italic":
       return "italic";
     case "upright":
@@ -772,7 +1908,7 @@ function H(e) {
       return "normal";
   }
 }
-function q(e) {
+function B(e) {
   switch (e) {
     case "thin":
       return "0.1667em";
@@ -792,201 +1928,112 @@ function q(e) {
       return "0em";
   }
 }
-function x(e, t) {
-  const r = c(e);
-  return `<math xmlns="http://www.w3.org/1998/Math/MathML"${t ? ' display="block"' : ""}>${r}</math>`;
+const se = /^[∑∏∐∫∬∭⨌∮∯∰∱∲∳⋃⋂⨆⨅⨀⨁⨂⨃⨄⨊⨋]$/u;
+function S(e, r) {
+  const s = p(e, { display: r, scriptLevel: 0 });
+  return `<math xmlns="http://www.w3.org/1998/Math/MathML"${r ? ' display="block"' : ""}>${s}</math>`;
 }
-function c(e, t) {
+function p(e, r) {
   switch (e.type) {
     case "seq":
-      return D(e.nodes);
+      return ne(e.nodes, r);
     case "atom":
-      return _(e.text, e.italic);
+      return oe(e.text, e.italic, e.operator === !0);
     case "number":
       return `<mn>${i(e.value)}</mn>`;
     case "symbol":
-      return U(e.char);
+      return ae(e.char);
     case "operator":
       return `<mo>${i(e.text)}</mo>`;
     case "text":
       return `<mtext>${i(e.value)}</mtext>`;
     case "frac":
-      return G(e.num, e.den);
+      return ce(e.num, e.den, r);
     case "sqrt":
-      return `<msqrt>${c(e.body)}</msqrt>`;
+      return `<msqrt>${p(e.body, r)}</msqrt>`;
     case "root":
-      return `<mroot>${c(e.body)}${c(e.index)}</mroot>`;
+      return `<mroot>${p(e.body, r)}${p(e.index, r)}</mroot>`;
     case "attach":
-      return V(e);
+      return de(e, r);
     case "matrix":
-      return Y(e.kind, e.rows);
+      return me(e.kind, e.rows, e.delim, r);
     case "style":
-      return W(e.kind, e.body);
+      return be(e.kind, e.body, r);
     case "lr":
-      return X(e.open, e.close, e.body);
+      return fe(e.open, e.close, e.body, r);
     case "spacing":
-      return `<mspace width="${q(e.kind)}"/>`;
+      return `<mspace width="${B(e.kind)}"/>`;
     case "align":
       return "<mo>&#x200B;</mo>";
     case "binom":
-      return Z(e.top, e.bot);
+      return ue(e.top, e.bot, r);
     case "accent":
-      return T(e.kind, e.body);
+      return we(e.kind, e.body, r);
+    case "underover":
+      return ye(e, r);
+    case "cancel":
+      return qe(e.kind, p(e.body, r));
+    case "op":
+      return xe(e.text, e.limits);
+    case "class":
+      return $e(e.cls, e.body, r);
+    case "size":
+      return Ae(e.size, e.body, r);
+    case "limits-hint":
+      return p(e.body, { ...r, limitsHint: e.mode });
   }
 }
-function D(e, t) {
+function ne(e, r) {
   if (e.length === 0) return "<mrow></mrow>";
-  const r = '<mspace width="0.1667em"/>', s = [];
+  const t = '<mspace width="0.1667em"/>', s = [];
   for (let n = 0; n < e.length; n++) {
-    const o = e[n], l = e[n - 1], u = e[n + 1];
-    o.type === "text" && l !== void 0 && l.type !== "spacing" && s.push(r), s.push(c(o)), o.type === "text" && u !== void 0 && u.type !== "spacing" && s.push(r);
+    const a = e[n], l = e[n - 1], c = e[n + 1];
+    a.type === "text" && l !== void 0 && l.type !== "spacing" && s.push(t), s.push(p(a, r)), a.type === "text" && c !== void 0 && c.type !== "spacing" && s.push(t);
   }
   return `<mrow>${s.join("")}</mrow>`;
 }
-function _(e, t) {
-  return `<mi${t ? "" : ' mathvariant="normal"'}>${i(e)}</mi>`;
+function oe(e, r, t) {
+  return t ? `<mi mathvariant="normal">${i(e)}</mi><mspace width="0.1667em"/>` : `<mi${r ? "" : ' mathvariant="normal"'}>${i(e)}</mi>`;
 }
-function U(e) {
+function ae(e) {
   if (e === "") return '<mspace width="0em"/>';
-  const t = e.codePointAt(0) ?? 0;
-  return z(t) ? `<mo>${i(e)}</mo>` : j(t) ? `<mi>${i(e)}</mi>` : `<mo>${i(e)}</mo>`;
+  const r = e.codePointAt(0) ?? 0;
+  return O(e) || se.test(e) ? `<mo largeop="true" movablelimits="true">${i(e)}</mo>` : ie(r) ? `<mo>${i(e)}</mo>` : le(r) ? `<mi>${i(e)}</mi>` : `<mo>${i(e)}</mo>`;
 }
-function z(e) {
-  return e >= 8592 && e <= 10239 || e === 177 || e === 215 || e === 247 || // ±×÷
-  e >= 10752 && e <= 11007;
+function ie(e) {
+  return e >= 8592 && e <= 10239 || e === 177 || e === 215 || e === 247 || e >= 10752 && e <= 11007;
 }
-function j(e) {
+function le(e) {
   return e >= 913 && e <= 1023 || e >= 8448 && e <= 8527 || e >= 119808 && e <= 120831;
 }
-function G(e, t, r) {
-  return `<mfrac>${c(e)}${c(t)}</mfrac>`;
+function ce(e, r, t) {
+  return `<mfrac>${p(e, t)}${p(r, t)}</mfrac>`;
 }
-function Z(e, t, r) {
-  return `<mrow><mo>(</mo><mfrac linethickness="0">${c(e)}${c(t)}</mfrac><mo>)</mo></mrow>`;
+function ue(e, r, t) {
+  return `<mrow><mo form="prefix" stretchy="true">(</mo><mfrac linethickness="0">${p(e, t)}${p(r, t)}</mfrac><mo form="postfix" stretchy="true">)</mo></mrow>`;
 }
-function V(e, t) {
-  const r = c(e.base);
-  return e.sub !== void 0 && e.sup !== void 0 ? `<msubsup>${r}${c(e.sub)}${c(e.sup)}</msubsup>` : e.sub !== void 0 ? `<msub>${r}${c(e.sub)}</msub>` : e.sup !== void 0 ? `<msup>${r}${c(e.sup)}</msup>` : r;
+function pe(e, r) {
+  return r.limitsHint === "limits" ? !0 : r.limitsHint === "scripts" || !r.display ? !1 : !!(e.type === "symbol" && O(e.char) || e.type === "atom" && e.operator === !0 && x(e.text) || e.type === "op" && e.limits || e.type === "op" && x(e.text));
 }
-function Y(e, t, r) {
-  const { open: s, close: n } = Q(e), o = t.map((u) => `<mtr>${u.map((k) => `<mtd>${c(k)}</mtd>`).join("")}</mtr>`).join("");
-  let l = `<mtable>${o}</mtable>`;
-  return e === "cases" ? `<mrow><mo>{</mo><mtable columnalign="left">${o}</mtable></mrow>` : s || n ? `<mrow><mo>${i(s)}</mo>${l}<mo>${i(n)}</mo></mrow>` : l;
+function de(e, r) {
+  const t = he(e.base, r), s = e.sub !== void 0 ? p(e.sub, r) : void 0, n = e.sup !== void 0 ? p(e.sup, r) : void 0, a = pe(e.base, r);
+  return s !== void 0 && n !== void 0 ? a ? `<munderover>${t}${s}${n}</munderover>` : `<msubsup>${t}${s}${n}</msubsup>` : s !== void 0 ? a ? `<munder>${t}${s}</munder>` : `<msub>${t}${s}</msub>` : n !== void 0 ? a ? `<mover>${t}${n}</mover>` : `<msup>${t}${n}</msup>` : t;
 }
-function Q(e) {
-  switch (e) {
-    case "vec":
-      return { open: "(", close: ")" };
-    case "mat":
-      return { open: "(", close: ")" };
-    case "pmat":
-      return { open: "(", close: ")" };
-    case "bmat":
-      return { open: "[", close: "]" };
-    case "vmat":
-      return { open: "|", close: "|" };
-    case "Vmat":
-      return { open: "‖", close: "‖" };
-    case "cases":
-      return { open: "", close: "" };
-    default:
-      return { open: "(", close: ")" };
+function he(e, r) {
+  return e.type === "atom" && e.operator === !0 ? `<mi mathvariant="normal">${i(e.text)}</mi>` : e.type === "op" ? `<mi mathvariant="normal">${i(e.text)}</mi>` : p(e, r);
+}
+function me(e, r, t, s) {
+  const { open: n, close: a } = t ?? ke(e), l = r.map((d) => `<mtr>${d.map((g) => `<mtd>${p(g, s)}</mtd>`).join("")}</mtr>`).join("");
+  if (e === "cases")
+    return `<mrow><mo form="prefix" stretchy="true">{</mo><mtable columnalign="left left">${l}</mtable></mrow>`;
+  const c = `<mtable>${l}</mtable>`;
+  if (n || a) {
+    const d = n ? `<mo form="prefix" stretchy="true">${i(n)}</mo>` : "", h = a ? `<mo form="postfix" stretchy="true">${i(a)}</mo>` : "";
+    return `<mrow>${d}${c}${h}</mrow>`;
   }
+  return c;
 }
-function W(e, t, r) {
-  const s = H(e), n = c(t);
-  return `<mstyle mathvariant="${s}">${n}</mstyle>`;
-}
-function X(e, t, r, s) {
-  const n = e ? `<mo>${i(e)}</mo>` : "", o = t ? `<mo>${i(t)}</mo>` : "";
-  return `<mrow>${n}${c(r)}${o}</mrow>`;
-}
-const J = {
-  hat: "^",
-  tilde: "~",
-  dot: "˙",
-  overline: "‾",
-  bar: "‾",
-  arrow: "⃗"
-};
-function T(e, t, r) {
-  const s = J[e] ?? "^";
-  return `<mover accent="true">${c(t)}<mo>${i(s)}</mo></mover>`;
-}
-function y(e, t) {
-  const r = p(e);
-  return `<span class="${t ? "kern kern-display" : "kern kern-inline"}">${r}</span>`;
-}
-function p(e, t) {
-  switch (e.type) {
-    case "seq":
-      return K(e.nodes);
-    case "atom":
-      return ee(e.text, e.italic);
-    case "number":
-      return `<span class="kern-mn">${i(e.value)}</span>`;
-    case "symbol":
-      return te(e.char);
-    case "operator":
-      return `<span class="kern-mo">${i(e.text)}</span>`;
-    case "text":
-      return `<span class="kern-mtext">${i(e.value)}</span>`;
-    case "frac":
-      return re(e.num, e.den);
-    case "sqrt":
-      return ne(e.body);
-    case "root":
-      return ae(e.index, e.body);
-    case "attach":
-      return oe(e);
-    case "matrix":
-      return ie(e.kind, e.rows);
-    case "style":
-      return le(e.kind, e.body);
-    case "lr":
-      return ue(e.open, e.close, e.body);
-    case "spacing":
-      return de(e.kind);
-    case "align":
-      return '<span class="kern-align"></span>';
-    case "binom":
-      return se(e.top, e.bot);
-    case "accent":
-      return he(e.kind, e.body);
-  }
-}
-function K(e, t) {
-  return `<span class="kern-mrow">${e.map((r) => p(r)).join("")}</span>`;
-}
-function ee(e, t) {
-  return `<span class="${t ? "kern-mi kern-mathnormal" : "kern-mi kern-mathrm"}">${i(e)}</span>`;
-}
-function te(e) {
-  return e === "" ? "" : `<span class="kern-mo">${i(e)}</span>`;
-}
-function re(e, t, r) {
-  return `<span class="kern-mfrac"><span class="kern-mfrac-num">${p(e)}</span><span class="kern-mfrac-den">${p(t)}</span></span>`;
-}
-function se(e, t, r) {
-  return `<span class="kern-mrow"><span class="kern-mo">(</span><span class="kern-mfrac kern-mfrac-binom"><span class="kern-mfrac-num">${p(e)}</span><span class="kern-mfrac-den">${p(t)}</span></span><span class="kern-mo">)</span></span>`;
-}
-function ne(e, t) {
-  return `<span class="kern-sqrt"><span class="kern-sqrt-sign">√</span><span class="kern-sqrt-body">${p(e)}</span></span>`;
-}
-function ae(e, t, r) {
-  return `<span class="kern-sqrt kern-nroot"><span class="kern-nroot-index">${p(e)}</span><span class="kern-sqrt-sign">√</span><span class="kern-sqrt-body">${p(t)}</span></span>`;
-}
-function oe(e, t) {
-  const r = p(e.base);
-  return e.sub !== void 0 && e.sup !== void 0 ? `<span class="kern-msubsup"><span class="kern-msubsup-base">${r}</span><span class="kern-msubsup-scripts"><span class="kern-msup">${p(e.sup)}</span><span class="kern-msub">${p(e.sub)}</span></span></span>` : e.sub !== void 0 ? `<span class="kern-msub">${r}<span class="kern-msub-script">${p(e.sub)}</span></span>` : e.sup !== void 0 ? `<span class="kern-msup">${r}<span class="kern-msup-script">${p(e.sup)}</span></span>` : r;
-}
-function ie(e, t, r) {
-  const { open: s, close: n } = ce(e), l = `<span class="kern-mtable">${t.map((u) => `<span class="kern-mtr">${u.map(
-    (k) => `<span class="kern-mtd">${p(k)}</span>`
-  ).join("")}</span>`).join("")}</span>`;
-  return s || n ? '<span class="kern-mrow">' + (s ? `<span class="kern-mo kern-delimiter">${i(s)}</span>` : "") + l + (n ? `<span class="kern-mo kern-delimiter">${i(n)}</span>` : "") + "</span>" : l;
-}
-function ce(e) {
+function ke(e) {
   switch (e) {
     case "vec":
       return { open: "(", close: ")" };
@@ -1006,7 +2053,190 @@ function ce(e) {
       return { open: "(", close: ")" };
   }
 }
-const pe = {
+function be(e, r, t) {
+  const s = te(e), n = p(r, t);
+  return `<mstyle mathvariant="${s}">${n}</mstyle>`;
+}
+function fe(e, r, t, s) {
+  const n = e ? `<mo form="prefix" stretchy="true" fence="true">${i(e)}</mo>` : "", a = r ? `<mo form="postfix" stretchy="true" fence="true">${i(r)}</mo>` : "";
+  return `<mrow>${n}${p(t, s)}${a}</mrow>`;
+}
+const ge = {
+  hat: "^",
+  tilde: "~",
+  dot: "˙",
+  "dot.double": "¨",
+  "dot.triple": "⃛",
+  overline: "‾",
+  bar: "‾",
+  arrow: "⃗",
+  "arrow.l": "⃖",
+  "arrow.l.r": "⃡",
+  breve: "˘",
+  grave: "`",
+  acute: "´",
+  macron: "¯",
+  caron: "ˇ",
+  circle: "˚"
+};
+function we(e, r, t) {
+  const s = ge[e] ?? "^";
+  return `<mover accent="true">${p(r, t)}<mo>${i(s)}</mo></mover>`;
+}
+const ve = {
+  overbrace: { ch: "⏞", over: !0 },
+  underbrace: { ch: "⏟", over: !1 },
+  "overline.stretch": { ch: "‾", over: !0 },
+  "underline.stretch": { ch: "_", over: !1 },
+  overparen: { ch: "⏜", over: !0 },
+  underparen: { ch: "⏝", over: !1 },
+  overbracket: { ch: "⎴", over: !0 },
+  underbracket: { ch: "⎵", over: !1 }
+};
+function ye(e, r) {
+  const t = ve[e.kind], s = t.over ? "mover" : "munder", n = p(e.body, r), a = `<mo stretchy="true">${i(t.ch)}</mo>`, l = `<${s} accent="true">${n}${a}</${s}>`;
+  if (e.annotation === void 0) return l;
+  const c = p(e.annotation, r);
+  return t.over ? `<mover>${l}${c}</mover>` : `<munder>${l}${c}</munder>`;
+}
+function qe(e, r) {
+  return `<menclose notation="${e === "bcancel" ? "downdiagonalstrike" : e === "xcancel" ? "updiagonalstrike downdiagonalstrike" : "updiagonalstrike"}">${r}</menclose>`;
+}
+function xe(e, r) {
+  return `<mi mathvariant="normal">${i(e)}</mi><mspace width="0.1667em"/>`;
+}
+function $e(e, r, t) {
+  if (r.type === "atom" || r.type === "symbol" || r.type === "operator") {
+    const s = r.type === "atom" ? r.text : r.type === "symbol" ? r.char : r.text;
+    if (e === "op")
+      return `<mo largeop="true" movablelimits="true">${i(s)}</mo>`;
+    if (e === "bin" || e === "rel" || e === "punct")
+      return `<mo>${i(s)}</mo>`;
+    if (e === "open")
+      return `<mo form="prefix" stretchy="true">${i(s)}</mo>`;
+    if (e === "close")
+      return `<mo form="postfix" stretchy="true">${i(s)}</mo>`;
+    if (e === "normal")
+      return `<mi mathvariant="normal">${i(s)}</mi>`;
+  }
+  return p(r, t);
+}
+function Ae(e, r, t) {
+  const s = e === "display" ? "true" : e === "inline" ? "false" : void 0, n = e === "display" || e === "inline" ? "0" : e === "script" ? "1" : e === "sscript" ? "2" : void 0, a = [
+    s !== void 0 ? `displaystyle="${s}"` : "",
+    n !== void 0 ? `scriptlevel="${n}"` : ""
+  ].filter(Boolean).join(" "), l = {
+    ...t,
+    display: e === "display" ? !0 : e === "inline" ? !1 : t.display
+  };
+  return `<mstyle ${a}>${p(r, l)}</mstyle>`;
+}
+function C(e, r) {
+  const t = u(e);
+  return `<span class="${r ? "kern kern-display" : "kern kern-inline"}">${t}</span>`;
+}
+function u(e, r) {
+  switch (e.type) {
+    case "seq":
+      return Se(e.nodes);
+    case "atom":
+      return Ce(e.text, e.italic, e.operator === !0);
+    case "number":
+      return `<span class="kern-mn">${i(e.value)}</span>`;
+    case "symbol":
+      return Re(e.char);
+    case "operator":
+      return `<span class="kern-mo">${i(e.text)}</span>`;
+    case "text":
+      return `<span class="kern-mtext">${i(e.value)}</span>`;
+    case "frac":
+      return Pe(e.num, e.den);
+    case "sqrt":
+      return Ee(e.body);
+    case "root":
+      return Le(e.index, e.body);
+    case "attach":
+      return Ne(e);
+    case "matrix":
+      return Be(e.kind, e.rows);
+    case "style":
+      return _e(e.kind, e.body);
+    case "lr":
+      return De(e.open, e.close, e.body);
+    case "spacing":
+      return Fe(e.kind);
+    case "align":
+      return '<span class="kern-align"></span>';
+    case "binom":
+      return Oe(e.top, e.bot);
+    case "accent":
+      return ze(e.kind, e.body);
+    case "underover":
+      return Ue(e.kind, e.body, e.annotation);
+    case "cancel":
+      return je(e.kind, e.body);
+    case "op":
+      return Ge(e.text);
+    case "class":
+      return u(e.body);
+    case "size":
+      return u(e.body);
+    case "limits-hint":
+      return u(e.body);
+  }
+}
+function Se(e, r) {
+  return `<span class="kern-mrow">${e.map((t) => u(t)).join("")}</span>`;
+}
+function Ce(e, r, t) {
+  return t ? `<span class="kern-mi kern-mathrm kern-op">${i(e)}</span><span class="kern-mspace" style="display:inline-block;width:0.1667em"></span>` : `<span class="${r ? "kern-mi kern-mathnormal" : "kern-mi kern-mathrm"}">${i(e)}</span>`;
+}
+function Re(e) {
+  return e === "" ? "" : `<span class="kern-mo">${i(e)}</span>`;
+}
+function Pe(e, r, t) {
+  return `<span class="kern-mfrac"><span class="kern-mfrac-num">${u(e)}</span><span class="kern-mfrac-den">${u(r)}</span></span>`;
+}
+function Oe(e, r, t) {
+  return `<span class="kern-mrow"><span class="kern-mo">(</span><span class="kern-mfrac kern-mfrac-binom"><span class="kern-mfrac-num">${u(e)}</span><span class="kern-mfrac-den">${u(r)}</span></span><span class="kern-mo">)</span></span>`;
+}
+function Ee(e, r) {
+  return `<span class="kern-sqrt"><span class="kern-sqrt-sign">√</span><span class="kern-sqrt-body">${u(e)}</span></span>`;
+}
+function Le(e, r, t) {
+  return `<span class="kern-sqrt kern-nroot"><span class="kern-nroot-index">${u(e)}</span><span class="kern-sqrt-sign">√</span><span class="kern-sqrt-body">${u(r)}</span></span>`;
+}
+function Ne(e, r) {
+  const t = u(e.base);
+  return e.sub !== void 0 && e.sup !== void 0 ? `<span class="kern-msubsup"><span class="kern-msubsup-base">${t}</span><span class="kern-msubsup-scripts"><span class="kern-msup">${u(e.sup)}</span><span class="kern-msub">${u(e.sub)}</span></span></span>` : e.sub !== void 0 ? `<span class="kern-msub">${t}<span class="kern-msub-script">${u(e.sub)}</span></span>` : e.sup !== void 0 ? `<span class="kern-msup">${t}<span class="kern-msup-script">${u(e.sup)}</span></span>` : t;
+}
+function Be(e, r, t) {
+  const { open: s, close: n } = Me(e), l = `<span class="kern-mtable">${r.map((c) => `<span class="kern-mtr">${c.map(
+    (h) => `<span class="kern-mtd">${u(h)}</span>`
+  ).join("")}</span>`).join("")}</span>`;
+  return s || n ? '<span class="kern-mrow">' + (s ? `<span class="kern-mo kern-delimiter">${i(s)}</span>` : "") + l + (n ? `<span class="kern-mo kern-delimiter">${i(n)}</span>` : "") + "</span>" : l;
+}
+function Me(e) {
+  switch (e) {
+    case "vec":
+      return { open: "(", close: ")" };
+    case "mat":
+      return { open: "(", close: ")" };
+    case "pmat":
+      return { open: "(", close: ")" };
+    case "bmat":
+      return { open: "[", close: "]" };
+    case "vmat":
+      return { open: "|", close: "|" };
+    case "Vmat":
+      return { open: "‖", close: "‖" };
+    case "cases":
+      return { open: "{", close: "" };
+    default:
+      return { open: "(", close: ")" };
+  }
+}
+const He = {
   cal: "kern-cal",
   bb: "kern-bb",
   frak: "kern-frak",
@@ -1016,13 +2246,13 @@ const pe = {
   sans: "kern-sans",
   mono: "kern-mono"
 };
-function le(e, t, r) {
-  return `<span class="${pe[e] ?? "kern-upright"}">${p(t)}</span>`;
+function _e(e, r, t) {
+  return `<span class="${He[e] ?? "kern-upright"}">${u(r)}</span>`;
 }
-function ue(e, t, r, s) {
-  return '<span class="kern-mrow">' + (e ? `<span class="kern-mo kern-delimiter">${i(e)}</span>` : "") + p(r) + (t ? `<span class="kern-mo kern-delimiter">${i(t)}</span>` : "") + "</span>";
+function De(e, r, t, s) {
+  return '<span class="kern-mrow">' + (e ? `<span class="kern-mo kern-delimiter">${i(e)}</span>` : "") + u(t) + (r ? `<span class="kern-mo kern-delimiter">${i(r)}</span>` : "") + "</span>";
 }
-const me = {
+const Ie = {
   hat: "^",
   tilde: "~",
   dot: "˙",
@@ -1030,14 +2260,34 @@ const me = {
   bar: "‾",
   arrow: "→"
 };
-function he(e, t, r) {
-  const s = me[e] ?? "^";
-  return `<span class="kern-mover"><span class="kern-mover-body">${p(t)}</span><span class="kern-mo kern-accent">${i(s)}</span></span>`;
+function ze(e, r, t) {
+  const s = Ie[e] ?? "^";
+  return `<span class="kern-mover"><span class="kern-mover-body">${u(r)}</span><span class="kern-mo kern-accent">${i(s)}</span></span>`;
 }
-function de(e) {
-  return `<span class="kern-mspace" style="display:inline-block;width:${q(e)}"></span>`;
+function Fe(e) {
+  return `<span class="kern-mspace" style="display:inline-block;width:${B(e)}"></span>`;
 }
-function ke(e) {
+const R = {
+  overbrace: { ch: "⏞", over: !0 },
+  underbrace: { ch: "⏟", over: !1 },
+  "overline.stretch": { ch: "‾", over: !0 },
+  "underline.stretch": { ch: "_", over: !1 },
+  overparen: { ch: "⏜", over: !0 },
+  underparen: { ch: "⏝", over: !1 },
+  overbracket: { ch: "⎴", over: !0 },
+  underbracket: { ch: "⎵", over: !1 }
+};
+function Ue(e, r, t, s) {
+  const n = R[e] ?? R.overbrace, a = n.over ? "kern-mover" : "kern-munder", l = n.over ? "kern-mover-mark" : "kern-munder-mark", c = n.over ? "kern-mover-body" : "kern-munder-body", d = t !== void 0 ? `<span class="${l} kern-ann">${u(t)}</span>` : "";
+  return `<span class="${a}"><span class="${c}">${u(r)}</span><span class="${l}">${i(n.ch)}</span>` + d + "</span>";
+}
+function je(e, r, t) {
+  return `<span class="${e === "bcancel" ? "kern-cancel kern-bcancel" : e === "xcancel" ? "kern-cancel kern-xcancel" : "kern-cancel"}">${u(r)}</span>`;
+}
+function Ge(e) {
+  return `<span class="kern-mi kern-mathrm kern-op">${i(e)}</span><span class="kern-mspace" style="display:inline-block;width:0.1667em"></span>`;
+}
+function Ve(e) {
   return {
     displayMode: e?.displayMode ?? !1,
     throwOnError: e?.throwOnError ?? !0,
@@ -1052,33 +2302,33 @@ function ke(e) {
     ]
   };
 }
-function we(e, t, r) {
-  t.innerHTML = be(e, r);
+function Ze(e, r, t) {
+  r.innerHTML = We(e, t);
 }
-function be(e, t) {
-  const r = ke(t);
+function We(e, r) {
+  const t = Ve(r);
   try {
-    const s = F(e), n = r.displayMode, o = r.output;
-    if (o === "mathml")
-      return x(s, n);
-    if (o === "html")
-      return y(s, n);
-    const l = x(s, n), u = y(s, n);
-    return `<span class="${n ? "kern kern-display" : "kern kern-inline"}" aria-hidden="true">${u}</span>${l}`;
+    const s = J(e), n = t.displayMode, a = t.output;
+    if (a === "mathml")
+      return S(s, n);
+    if (a === "html")
+      return C(s, n);
+    const l = S(s, n), c = C(s, n);
+    return `<span class="${n ? "kern kern-display" : "kern kern-inline"}" aria-hidden="true">${c}</span>${l}`;
   } catch (s) {
-    if (s instanceof m) {
-      if (r.throwOnError) throw s;
-      const n = fe(s.message);
-      return `<span class="kern-error" style="color:${r.errorColor}">${n}</span>`;
+    if (s instanceof k) {
+      if (t.throwOnError) throw s;
+      const n = Ye(s.message);
+      return `<span class="kern-error" style="color:${t.errorColor}">${n}</span>`;
     }
     throw s;
   }
 }
-function fe(e) {
+function Ye(e) {
   return e.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
 export {
-  m as ParseError,
-  we as render,
-  be as renderToString
+  k as ParseError,
+  Ze as render,
+  We as renderToString
 };

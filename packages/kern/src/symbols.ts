@@ -574,6 +574,7 @@ export const SYMBOLS: Record<string, string> = {
   'harpoons.tltr': "⥣",
   hash: "#",
   hat: "^",
+  hbar: "ℏ",
   'hexa.filled': "⬢",
   'hexa.stroked': "⬡",
   HH: "ℍ",
