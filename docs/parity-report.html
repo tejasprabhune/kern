@@ -33,7 +33,7 @@
     <span class="pill pass">0 pass</span>
     <span class="pill warn">0 warn</span>
     <span class="pill fail">0 fail</span>
-    <span class="pill kern-only">82 kern-only</span>
+    <span class="pill kern-only">89 kern-only</span>
     <span class="pill error">0 error</span>
     &nbsp;&nbsp;Typst MathML oracle: <strong>unavailable</strong> (Typst 0.14.2 has not yet exposed equation HTML export; see <code>crates/typst-html/src/mathml.rs</code>).
   </p>
@@ -474,6 +474,30 @@
   <td class="notes"></td>
 </tr>
 <tr class="row kern-only">
+  <td class="src"><code>mat(1, 2, 3; 4, 5, 6, augment: 2) <span class="badge">display</span></code></td>
+  <td class="rendered"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mo stretchy="true" fence="true">(</mo><mtable><mtr><mtd><mn>1</mn></mtd><mtd class="kern-augment-right"><mn>2</mn></mtd><mtd><mn>3</mn></mtd></mtr><mtr><mtd><mn>4</mn></mtd><mtd class="kern-augment-right"><mn>5</mn></mtd><mtd><mn>6</mn></mtd></mtr></mtable><mo stretchy="true" fence="true">)</mo></mrow></math></td>
+  <td class="status kern-only">kern-only</td>
+  <td class="kern-mathml"><pre>&lt;math xmlns="http://www.w3.org/1998/Math/MathML" display="block"&gt;&lt;mrow&gt;&lt;mo stretchy="true" fence="true"&gt;(&lt;/mo&gt;&lt;mtable&gt;&lt;mtr&gt;&lt;mtd&gt;&lt;mn&gt;1&lt;/mn&gt;&lt;/mtd&gt;&lt;mtd class="kern-augment-right"&gt;&lt;mn&gt;2&lt;/mn&gt;&lt;/mtd&gt;&lt;mtd&gt;&lt;mn&gt;3&lt;/mn&gt;&lt;/mtd&gt;&lt;/mtr&gt;&lt;mtr&gt;&lt;mtd&gt;&lt;mn&gt;4&lt;/mn&gt;&lt;/mtd&gt;&lt;mtd class="kern-augment-right"&gt;&lt;mn&gt;5&lt;/mn&gt;&lt;/mtd&gt;&lt;mtd&gt;&lt;mn&gt;6&lt;/mn&gt;&lt;/mtd&gt;&lt;/mtr&gt;&lt;/mtable&gt;&lt;mo stretchy="true" fence="true"&gt;)&lt;/mo&gt;&lt;/mrow&gt;&lt;/math&gt;</pre></td>
+  <td class="typst-mathml"><em>oracle unavailable</em></td>
+  <td class="notes"></td>
+</tr>
+<tr class="row kern-only">
+  <td class="src"><code>mat(1, 0; 0, 1, gap: 0.6em) <span class="badge">display</span></code></td>
+  <td class="rendered"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mo stretchy="true" fence="true">(</mo><mtable class="kern-gap" style="--kern-row-gap:0.6em;--kern-column-gap:0.6em"><mtr><mtd><mn>1</mn></mtd><mtd><mn>0</mn></mtd></mtr><mtr><mtd><mn>0</mn></mtd><mtd><mn>1</mn></mtd></mtr></mtable><mo stretchy="true" fence="true">)</mo></mrow></math></td>
+  <td class="status kern-only">kern-only</td>
+  <td class="kern-mathml"><pre>&lt;math xmlns="http://www.w3.org/1998/Math/MathML" display="block"&gt;&lt;mrow&gt;&lt;mo stretchy="true" fence="true"&gt;(&lt;/mo&gt;&lt;mtable class="kern-gap" style="--kern-row-gap:0.6em;--kern-column-gap:0.6em"&gt;&lt;mtr&gt;&lt;mtd&gt;&lt;mn&gt;1&lt;/mn&gt;&lt;/mtd&gt;&lt;mtd&gt;&lt;mn&gt;0&lt;/mn&gt;&lt;/mtd&gt;&lt;/mtr&gt;&lt;mtr&gt;&lt;mtd&gt;&lt;mn&gt;0&lt;/mn&gt;&lt;/mtd&gt;&lt;mtd&gt;&lt;mn&gt;1&lt;/mn&gt;&lt;/mtd&gt;&lt;/mtr&gt;&lt;/mtable&gt;&lt;mo stretchy="true" fence="true"&gt;)&lt;/mo&gt;&lt;/mrow&gt;&lt;/math&gt;</pre></td>
+  <td class="typst-mathml"><em>oracle unavailable</em></td>
+  <td class="notes"></td>
+</tr>
+<tr class="row kern-only">
+  <td class="src"><code>mat(a, b; c, d, row-gap: 1em) <span class="badge">display</span></code></td>
+  <td class="rendered"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mo stretchy="true" fence="true">(</mo><mtable class="kern-gap" style="--kern-row-gap:1em"><mtr><mtd><mi>a</mi></mtd><mtd><mi>b</mi></mtd></mtr><mtr><mtd><mi>c</mi></mtd><mtd><mi>d</mi></mtd></mtr></mtable><mo stretchy="true" fence="true">)</mo></mrow></math></td>
+  <td class="status kern-only">kern-only</td>
+  <td class="kern-mathml"><pre>&lt;math xmlns="http://www.w3.org/1998/Math/MathML" display="block"&gt;&lt;mrow&gt;&lt;mo stretchy="true" fence="true"&gt;(&lt;/mo&gt;&lt;mtable class="kern-gap" style="--kern-row-gap:1em"&gt;&lt;mtr&gt;&lt;mtd&gt;&lt;mi&gt;a&lt;/mi&gt;&lt;/mtd&gt;&lt;mtd&gt;&lt;mi&gt;b&lt;/mi&gt;&lt;/mtd&gt;&lt;/mtr&gt;&lt;mtr&gt;&lt;mtd&gt;&lt;mi&gt;c&lt;/mi&gt;&lt;/mtd&gt;&lt;mtd&gt;&lt;mi&gt;d&lt;/mi&gt;&lt;/mtd&gt;&lt;/mtr&gt;&lt;/mtable&gt;&lt;mo stretchy="true" fence="true"&gt;)&lt;/mo&gt;&lt;/mrow&gt;&lt;/math&gt;</pre></td>
+  <td class="typst-mathml"><em>oracle unavailable</em></td>
+  <td class="notes"></td>
+</tr>
+<tr class="row kern-only">
   <td class="src"><code>vec(a, b, c) <span class="badge">display</span></code></td>
   <td class="rendered"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mo stretchy="true" fence="true">(</mo><mtable><mtr><mtd><mi>a</mi></mtd></mtr><mtr><mtd><mi>b</mi></mtd></mtr><mtr><mtd><mi>c</mi></mtd></mtr></mtable><mo stretchy="true" fence="true">)</mo></mrow></math></td>
   <td class="status kern-only">kern-only</td>
@@ -486,6 +510,30 @@
   <td class="rendered"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mo stretchy="true">{</mo><mtable columnalign="left left"><mtr><mtd><mrow><mi>x</mi><mspace width="0.1667em"/><mtext>if</mtext><mspace width="0.1667em"/><mi>x</mi><mo>&gt;</mo><mn>0</mn></mrow></mtd></mtr><mtr><mtd><mrow><mo>−</mo><mi>x</mi><mspace width="0.1667em"/><mtext>otherwise</mtext></mrow></mtd></mtr></mtable></mrow></math></td>
   <td class="status kern-only">kern-only</td>
   <td class="kern-mathml"><pre>&lt;math xmlns="http://www.w3.org/1998/Math/MathML" display="block"&gt;&lt;mrow&gt;&lt;mo stretchy="true"&gt;{&lt;/mo&gt;&lt;mtable columnalign="left left"&gt;&lt;mtr&gt;&lt;mtd&gt;&lt;mrow&gt;&lt;mi&gt;x&lt;/mi&gt;&lt;mspace width="0.1667em"/&gt;&lt;mtext&gt;if&lt;/mtext&gt;&lt;mspace width="0.1667em"/&gt;&lt;mi&gt;x&lt;/mi&gt;&lt;mo&gt;&amp;gt;&lt;/mo&gt;&lt;mn&gt;0&lt;/mn&gt;&lt;/mrow&gt;&lt;/mtd&gt;&lt;/mtr&gt;&lt;mtr&gt;&lt;mtd&gt;&lt;mrow&gt;&lt;mo&gt;−&lt;/mo&gt;&lt;mi&gt;x&lt;/mi&gt;&lt;mspace width="0.1667em"/&gt;&lt;mtext&gt;otherwise&lt;/mtext&gt;&lt;/mrow&gt;&lt;/mtd&gt;&lt;/mtr&gt;&lt;/mtable&gt;&lt;/mrow&gt;&lt;/math&gt;</pre></td>
+  <td class="typst-mathml"><em>oracle unavailable</em></td>
+  <td class="notes"></td>
+</tr>
+<tr class="row kern-only">
+  <td class="src"><code>a = b \ c = d <span class="badge">display</span></code></td>
+  <td class="rendered"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mtable class="kern-eqarray kern-aligned"><mtr><mtd><mrow><mi>a</mi><mo>=</mo><mi>b</mi></mrow></mtd></mtr><mtr><mtd><mrow><mi>c</mi><mo>=</mo><mi>d</mi></mrow></mtd></mtr></mtable></math></td>
+  <td class="status kern-only">kern-only</td>
+  <td class="kern-mathml"><pre>&lt;math xmlns="http://www.w3.org/1998/Math/MathML" display="block"&gt;&lt;mtable class="kern-eqarray kern-aligned"&gt;&lt;mtr&gt;&lt;mtd&gt;&lt;mrow&gt;&lt;mi&gt;a&lt;/mi&gt;&lt;mo&gt;=&lt;/mo&gt;&lt;mi&gt;b&lt;/mi&gt;&lt;/mrow&gt;&lt;/mtd&gt;&lt;/mtr&gt;&lt;mtr&gt;&lt;mtd&gt;&lt;mrow&gt;&lt;mi&gt;c&lt;/mi&gt;&lt;mo&gt;=&lt;/mo&gt;&lt;mi&gt;d&lt;/mi&gt;&lt;/mrow&gt;&lt;/mtd&gt;&lt;/mtr&gt;&lt;/mtable&gt;&lt;/math&gt;</pre></td>
+  <td class="typst-mathml"><em>oracle unavailable</em></td>
+  <td class="notes"></td>
+</tr>
+<tr class="row kern-only">
+  <td class="src"><code>a &amp;= b + c \ &amp;= d <span class="badge">display</span></code></td>
+  <td class="rendered"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mtable class="kern-eqarray kern-aligned"><mtr><mtd><mi>a</mi></mtd><mtd><mrow><mo>=</mo><mi>b</mi><mo>+</mo><mi>c</mi></mrow></mtd></mtr><mtr><mtd><mrow></mrow></mtd><mtd><mrow><mo>=</mo><mi>d</mi></mrow></mtd></mtr></mtable></math></td>
+  <td class="status kern-only">kern-only</td>
+  <td class="kern-mathml"><pre>&lt;math xmlns="http://www.w3.org/1998/Math/MathML" display="block"&gt;&lt;mtable class="kern-eqarray kern-aligned"&gt;&lt;mtr&gt;&lt;mtd&gt;&lt;mi&gt;a&lt;/mi&gt;&lt;/mtd&gt;&lt;mtd&gt;&lt;mrow&gt;&lt;mo&gt;=&lt;/mo&gt;&lt;mi&gt;b&lt;/mi&gt;&lt;mo&gt;+&lt;/mo&gt;&lt;mi&gt;c&lt;/mi&gt;&lt;/mrow&gt;&lt;/mtd&gt;&lt;/mtr&gt;&lt;mtr&gt;&lt;mtd&gt;&lt;mrow&gt;&lt;/mrow&gt;&lt;/mtd&gt;&lt;mtd&gt;&lt;mrow&gt;&lt;mo&gt;=&lt;/mo&gt;&lt;mi&gt;d&lt;/mi&gt;&lt;/mrow&gt;&lt;/mtd&gt;&lt;/mtr&gt;&lt;/mtable&gt;&lt;/math&gt;</pre></td>
+  <td class="typst-mathml"><em>oracle unavailable</em></td>
+  <td class="notes"></td>
+</tr>
+<tr class="row kern-only">
+  <td class="src"><code>f(x) &amp;= x^2 + 2 x \ &amp;= x (x + 2) <span class="badge">display</span></code></td>
+  <td class="rendered"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mtable class="kern-eqarray kern-aligned"><mtr><mtd><mrow><mi>f</mi><mrow><mo stretchy="false" fence="true">(</mo><mi>x</mi><mo stretchy="false" fence="true">)</mo></mrow></mrow></mtd><mtd><mrow><mo>=</mo><msup><mrow><mi>x</mi><mspace width="0.04em"/></mrow><mn>2</mn></msup><mo>+</mo><mn>2</mn><mi>x</mi></mrow></mtd></mtr><mtr><mtd><mrow></mrow></mtd><mtd><mrow><mo>=</mo><mi>x</mi><mrow><mo stretchy="false" fence="true">(</mo><mrow><mi>x</mi><mo>+</mo><mn>2</mn></mrow><mo stretchy="false" fence="true">)</mo></mrow></mrow></mtd></mtr></mtable></math></td>
+  <td class="status kern-only">kern-only</td>
+  <td class="kern-mathml"><pre>&lt;math xmlns="http://www.w3.org/1998/Math/MathML" display="block"&gt;&lt;mtable class="kern-eqarray kern-aligned"&gt;&lt;mtr&gt;&lt;mtd&gt;&lt;mrow&gt;&lt;mi&gt;f&lt;/mi&gt;&lt;mrow&gt;&lt;mo stretchy="false" fence="true"&gt;(&lt;/mo&gt;&lt;mi&gt;x&lt;/mi&gt;&lt;mo stretchy="false" fence="true"&gt;)&lt;/mo&gt;&lt;/mrow&gt;&lt;/mrow&gt;&lt;/mtd&gt;&lt;mtd&gt;&lt;mrow&gt;&lt;mo&gt;=&lt;/mo&gt;&lt;msup&gt;&lt;mrow&gt;&lt;mi&gt;x&lt;/mi&gt;&lt;mspace width="0.04em"/&gt;&lt;/mrow&gt;&lt;mn&gt;2&lt;/mn&gt;&lt;/msup&gt;&lt;mo&gt;+&lt;/mo&gt;&lt;mn&gt;2&lt;/mn&gt;&lt;mi&gt;x&lt;/mi&gt;&lt;/mrow&gt;&lt;/mtd&gt;&lt;/mtr&gt;&lt;mtr&gt;&lt;mtd&gt;&lt;mrow&gt;&lt;/mrow&gt;&lt;/mtd&gt;&lt;mtd&gt;&lt;mrow&gt;&lt;mo&gt;=&lt;/mo&gt;&lt;mi&gt;x&lt;/mi&gt;&lt;mrow&gt;&lt;mo stretchy="false" fence="true"&gt;(&lt;/mo&gt;&lt;mrow&gt;&lt;mi&gt;x&lt;/mi&gt;&lt;mo&gt;+&lt;/mo&gt;&lt;mn&gt;2&lt;/mn&gt;&lt;/mrow&gt;&lt;mo stretchy="false" fence="true"&gt;)&lt;/mo&gt;&lt;/mrow&gt;&lt;/mrow&gt;&lt;/mtd&gt;&lt;/mtr&gt;&lt;/mtable&gt;&lt;/math&gt;</pre></td>
   <td class="typst-mathml"><em>oracle unavailable</em></td>
   <td class="notes"></td>
 </tr>
@@ -650,10 +698,18 @@
   <td class="notes"></td>
 </tr>
 <tr class="row kern-only">
-  <td class="src"><code>a wide b</code></td>
-  <td class="rendered"><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>a</mi><mi mathvariant="normal">wide</mi><mi>b</mi></mrow></math></td>
+  <td class="src"><code>a qquad b</code></td>
+  <td class="rendered"><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>a</mi><mspace width="2em"/><mi>b</mi></mrow></math></td>
   <td class="status kern-only">kern-only</td>
-  <td class="kern-mathml"><pre>&lt;math xmlns="http://www.w3.org/1998/Math/MathML"&gt;&lt;mrow&gt;&lt;mi&gt;a&lt;/mi&gt;&lt;mi mathvariant="normal"&gt;wide&lt;/mi&gt;&lt;mi&gt;b&lt;/mi&gt;&lt;/mrow&gt;&lt;/math&gt;</pre></td>
+  <td class="kern-mathml"><pre>&lt;math xmlns="http://www.w3.org/1998/Math/MathML"&gt;&lt;mrow&gt;&lt;mi&gt;a&lt;/mi&gt;&lt;mspace width="2em"/&gt;&lt;mi&gt;b&lt;/mi&gt;&lt;/mrow&gt;&lt;/math&gt;</pre></td>
+  <td class="typst-mathml"><em>oracle unavailable</em></td>
+  <td class="notes"></td>
+</tr>
+<tr class="row kern-only">
+  <td class="src"><code>a wide b</code></td>
+  <td class="rendered"><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>a</mi><mspace width="2em"/><mi>b</mi></mrow></math></td>
+  <td class="status kern-only">kern-only</td>
+  <td class="kern-mathml"><pre>&lt;math xmlns="http://www.w3.org/1998/Math/MathML"&gt;&lt;mrow&gt;&lt;mi&gt;a&lt;/mi&gt;&lt;mspace width="2em"/&gt;&lt;mi&gt;b&lt;/mi&gt;&lt;/mrow&gt;&lt;/math&gt;</pre></td>
   <td class="typst-mathml"><em>oracle unavailable</em></td>
   <td class="notes"></td>
 </tr>

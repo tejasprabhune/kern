@@ -46,7 +46,6 @@
   </header>
 
   <section>
-    <h1>Typst parity</h1>
     <p>
       kern's job is to render Typst math syntax to MathML that matches what
       Typst itself would produce. This page tracks which constructs are
@@ -156,10 +155,10 @@
         <tr><td><code>mat(a, b; c, d)</code></td><td><span class="status ok">ok</span></td><td>Comma = column, semicolon = row</td></tr>
         <tr><td><code>cases(...)</code></td><td><span class="status ok">ok</span></td><td>Left brace, left-aligned cells</td></tr>
         <tr><td><code>mat(..., delim: "[")</code></td><td><span class="status ok">ok</span></td><td>Honored for <code>()</code>, <code>[]</code>, <code>{}</code>, <code>|</code>, <code>||</code></td></tr>
-        <tr><td><code>mat(..., augment: ...)</code></td><td><span class="status no">no</span></td><td>Augmented matrices (vline/hline) not rendered</td></tr>
-        <tr><td><code>mat(..., gap: ...)</code></td><td><span class="status no">no</span></td><td>Spacing knobs ignored</td></tr>
-        <tr><td><code>&amp;</code> alignment across lines</td><td><span class="status partial">partial</span></td><td>Only inside matrix calls; multi-line display equations are the biggest gap</td></tr>
-        <tr><td>Multi-line equations with <code>\</code></td><td><span class="status no">no</span></td><td>Parser doesn't yet recognize <code>\</code> as a row break in display equations. Tracked in <a href="https://github.com/tejasprabhune/kern">the parser TODO</a></td></tr>
+        <tr><td><code>mat(..., augment: 1)</code></td><td><span class="status ok">ok</span></td><td>Integer or paren-list of integers draws vertical rules after the given column(s). Hline support via the augment dict shorthand is queued</td></tr>
+        <tr><td><code>mat(..., gap: ...)</code></td><td><span class="status ok">ok</span></td><td><code>gap</code>, <code>row-gap</code>, <code>column-gap</code> in em units are honored via CSS variables</td></tr>
+        <tr><td><code>&amp;</code> alignment across lines</td><td><span class="status ok">ok</span></td><td>Single-row <code>&amp;</code> stays an inline align marker; with <code>\</code>, <code>&amp;</code> splits into <code>&lt;mtd&gt;</code> cells with alternating right/left alignment</td></tr>
+        <tr><td>Multi-line equations with <code>\</code></td><td><span class="status ok">ok</span></td><td><code>\</code> at end-of-token (or <code>\\</code>) becomes a row break; the whole construct renders as <code>&lt;mtable class="kern-eqarray kern-aligned"&gt;</code></td></tr>
         <tr><td>Equation numbering / supplements</td><td><span class="status skip">skip</span></td><td>Belongs to Typst's figure/layout system</td></tr>
       </tbody>
     </table>
@@ -186,8 +185,7 @@
     <table class="parity">
       <thead><tr><th>Construct</th><th>Status</th><th>Notes</th></tr></thead>
       <tbody>
-        <tr><td><code>thin</code>, <code>med</code>, <code>thick</code>, <code>quad</code>, <code>qquad</code></td><td><span class="status ok">ok</span></td><td></td></tr>
-        <tr><td><code>wide</code> (2 em)</td><td><span class="status no">no</span></td><td>Not in the spacing map yet</td></tr>
+        <tr><td><code>thin</code>, <code>med</code>, <code>thick</code>, <code>quad</code>, <code>qquad</code>, <code>wide</code></td><td><span class="status ok">ok</span></td><td><code>wide</code> = 2 em</td></tr>
         <tr><td><code>class("rel", x)</code> &amp; friends</td><td><span class="status partial">partial</span></td><td>Single-atom bodies only</td></tr>
         <tr><td><code>display</code>, <code>inline</code>, <code>script</code>, <code>sscript</code></td><td><span class="status ok">ok</span></td><td><code>&lt;mstyle&gt;</code> with <code>displaystyle</code>/<code>scriptlevel</code></td></tr>
         <tr><td><code>cancel</code>, <code>bcancel</code>, <code>xcancel</code></td><td><span class="status ok">ok</span></td><td><code>menclose</code> notation</td></tr>

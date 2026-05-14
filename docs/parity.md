@@ -100,10 +100,10 @@ Last reviewed against Typst commit `de6f40097` (0.14.2). Audit run with
 | `mat(a, b; c, d)` | [ok] | Comma = column, semicolon = row |
 | `cases(x "if" x > 0, -x "otherwise")` | [ok] | `<mtable>` with left brace |
 | `mat(..., delim: "[")` | [ok] | Honored for `(`, `[`, `{`, `\|`, `\|\|` |
-| `mat(..., augment: ...)` | [no] | Augmented matrices (vline/hline) not rendered |
-| `mat(..., gap: 1em)` | [no] | gap/row-gap/column-gap arguments ignored |
-| `&` alignment inside `mat` / `vec` / `cases` rows | [partial] | Treated as a cell boundary at the seq level only; cross-row alignment in display equations is not yet implemented |
-| Multi-line display equations with `\` | [no] | The parser doesn't recognize `\` as a row separator outside of matrix calls. This is the biggest user-facing gap; see "Known gaps" below |
+| `mat(..., augment: 1)` | [ok] | Integer or paren-list of integers draws vertical rules after those columns. Hline support via the dict-shorthand form is queued |
+| `mat(..., gap: 1em)`, `row-gap:`, `column-gap:` | [ok] | Em values are dropped into CSS custom properties on the `mtable`; cell padding picks them up |
+| `&` alignment inside `mat` / `vec` / `cases` rows | [ok] | Single-row `&` stays an inline align marker (back-compat); with `\` line breaks, every `&` becomes a column boundary in the emitted `mtable` |
+| Multi-line display equations with `\` | [ok] | `\` (at end of token) or `\\` becomes a row break; the construct renders as `<mtable class="kern-eqarray kern-aligned">` with alternating right/left column alignment, matching Typst's aligned-equation layout |
 | `equation` block numbering / supplement | [skip] | Belongs to Typst's layout/figure system |
 
 ## Accents
@@ -129,9 +129,8 @@ Last reviewed against Typst commit `de6f40097` (0.14.2). Audit run with
 
 | Construct | Status | Notes |
 | --- | --- | --- |
-| `thin`, `med`, `thick`, `quad`, `qquad` | [ok] | Matches Typst values |
+| `thin`, `med`, `thick`, `quad`, `qquad`, `wide` | [ok] | Matches Typst values; `wide` is 2 em |
 | `space`, `zws` | [ok] | |
-| `wide` (2 em) | [no] | Not in the spacing map; falls through to symbol lookup |
 | `h(1em)` (parametric spacing) | [no] | Typst's general horizontal-element call not recognized in math mode |
 
 ## Math class control
@@ -174,30 +173,6 @@ unconditionally; the visual difference is at most 0.1667 em at a single
 boundary, which is below the visual-diff floor.
 
 ## Known structural gaps
-
-### Multi-line display equations
-
-Typst handles `\\` (escaped line break) inside a math block as a row
-separator and `&` as a column-alignment point, emitting
-`<mtable class="multiline-equation aligned">`. **kern** only recognizes
-`&` inside matrix/vec/cases calls and treats `\\` as a lex error in math
-mode. This blocks the common multi-line `align`-style equation:
-
-```typst
-$ a &= b + c \
-    &= d $
-```
-
-Adding this needs:
-
-1. Lexer: emit a `LineBreak` token for `\` followed by whitespace.
-2. Parser: a `multiline` production that collects `LineBreak`-separated
-   rows of `align`-expressions when at the top level of a display
-   equation.
-3. Renderer: emit an `<mtable>` row per alignment row, applying the
-   `kern-aligned` CSS class.
-
-Tracked at top of `packages/kern/src/parser.ts` (TODO marker added).
 
 ### Pre-scripts via explicit `attach()`
 
