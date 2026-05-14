@@ -300,12 +300,16 @@ tr:last-child td {
   border-radius: 6px;
   overflow: hidden;
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  /* minmax(0, 1fr) instead of plain 1fr so a wide math output doesn't
+     expand the column to its intrinsic width; the column stays half the
+     wrap and the #editor-output's overflow-x: auto can actually scroll. */
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
 }
 
 .editor-col {
   display: flex;
   flex-direction: column;
+  min-width: 0;
 }
 
 .editor-col + .editor-col {
@@ -339,16 +343,22 @@ tr:last-child td {
 
 #editor-output {
   flex: 1;
+  min-width: 0;
   min-height: 140px;
   padding: 12px;
   display: flex;
   align-items: center;
-  justify-content: center;
   font-size: 1.2rem;
   overflow-x: auto;
+  overflow-y: hidden;
 }
 
-#editor-output > math {
+/* margin: auto on a flex child centers it when there's room and collapses
+   to 0 when the child is wider than the container, which lets overflow-x
+   actually scroll instead of clipping the left edge under justify-content. */
+#editor-output > math,
+#editor-output > span {
+  margin: auto;
   flex-shrink: 0;
 }
 

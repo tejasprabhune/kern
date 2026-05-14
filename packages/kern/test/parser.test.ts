@@ -163,14 +163,14 @@ describe('parser', () => {
     expect(ast.type).toBe('attach');
     const a = ast as AttachNode;
     expect(a.base).toMatchObject({ type: 'atom', text: 'f' });
-    expect(a.sup).toMatchObject({ type: 'symbol', name: 'prime' });
+    expect(a.sup).toMatchObject({ type: 'atom', text: '′' });
   });
 
   it('parses double prime f\'\'', () => {
     const ast = parse("f''");
     expect(ast.type).toBe('attach');
     const a = ast as AttachNode;
-    expect((a.sup as any).char).toBe('″');
+    expect((a.sup as any).text).toBe('″');
   });
 
   it('parses paren group', () => {

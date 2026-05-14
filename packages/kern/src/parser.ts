@@ -213,7 +213,9 @@ class Parser {
 
     if (primeCount > 0) {
       const primeChar = primeCount === 1 ? '′' : primeCount === 2 ? '″' : '‴';
-      const primeNode: SymbolNode = { type: 'symbol', name: 'prime', char: primeChar };
+      // Use an atom (renders as <mi>) instead of a symbol (<mo>) so Chrome
+      // doesn't apply operator-dictionary lspace that overlaps the base.
+      const primeNode: AtomNode = { type: 'atom', text: primeChar, italic: false };
       return {
         type: 'attach',
         base,

@@ -46,7 +46,7 @@ export const GALLERY = [
   },
   {
     name: 'Determinant (2x2)',
-    src: 'det(mat(a, b; c, d)) = a d - b c',
+    src: 'det vmat(a, b; c, d) = a d - b c',
   },
   {
     name: 'Singular value decomposition',

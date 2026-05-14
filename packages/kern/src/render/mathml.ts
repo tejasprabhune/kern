@@ -13,6 +13,19 @@ interface RenderCtx {
 
 const BIG_OP_RE = /^[∑∏∐∫∬∭⨌∮∯∰∱∲∳⋃⋂⨆⨅⨀⨁⨂⨃⨄⨊⨋]$/u;
 
+// Chrome's MathML reads the operator dictionary literally and uses the
+// ASCII hyphen-minus (U+002D) for `-`, which is much narrower than the
+// proper math minus (U+2212) Firefox and Safari substitute. Map ASCII
+// operators to their math counterparts so all three engines agree.
+const OPERATOR_GLYPHS: Record<string, string> = {
+  '-': '−', // MINUS SIGN
+  '*': '∗', // ASTERISK OPERATOR
+};
+
+function normalizeOperator(text: string): string {
+  return OPERATOR_GLYPHS[text] ?? text;
+}
+
 export function renderMathML(node: AstNode, display: boolean): string {
   const ctx: RenderCtx = { display, scriptLevel: 0 };
   const inner = renderNode(node, ctx);
@@ -26,7 +39,7 @@ function renderNode(node: AstNode, ctx: RenderCtx): string {
     case 'atom': return renderAtom(node.text, node.italic, node.operator === true);
     case 'number': return `<mn>${escapeHtml(node.value)}</mn>`;
     case 'symbol': return renderSymbol(node.char);
-    case 'operator': return `<mo>${escapeHtml(node.text)}</mo>`;
+    case 'operator': return `<mo>${escapeHtml(normalizeOperator(node.text))}</mo>`;
     case 'text': return `<mtext>${escapeHtml(node.value)}</mtext>`;
     case 'frac': return renderFrac(node.num, node.den, ctx);
     case 'sqrt': return `<msqrt>${renderNode(node.body, ctx)}</msqrt>`;
