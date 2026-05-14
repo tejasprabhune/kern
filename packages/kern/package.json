@@ -1,6 +1,6 @@
 {
   "name": "kern-typ",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Fast, zero-dependency Typst math renderer for the browser",
   "license": "MIT",
   "author": "Tejas Prabhune",
