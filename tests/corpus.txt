@@ -1,0 +1,129 @@
+# Parity corpus. One expression per line. Lines beginning with `#` are
+# comments and ignored. A trailing `[display]` marker forces block mode.
+#
+# Each expression is rendered by kern and (when Typst's MathML CLI export
+# is available) by typst, then compared structurally by
+# scripts/check-parity.ts. Keep entries narrow so a failure points at one
+# Typst math construct.
+
+# Atoms and identifiers
+x
+42
+3.14
+sin x
+log_2 n
+
+# Greek
+alpha
+Sigma
+omega
+Theta
+pi
+
+# Sequences and binary ops
+a b c
+a + b - c
+x = y
+a plus.minus b
+a equiv b (mod n)
+
+# Subscripts and superscripts
+x_1
+x^2
+x_1^2
+e^(i pi)
+x^(y^z)
+a_(i,j)^k
+
+# Primes
+f'
+f''
+
+# Fractions
+frac(a, b)
+a/b
+frac(x^2 + 1, 2 x)
+1/(1 + 1/(1 + x))
+
+# Roots
+sqrt(x)
+sqrt(x^2 + 1)
+root(3, x)
+
+# Big operators
+sum_(i=0)^n i [display]
+sum_(i=0)^n i
+product_(k=1)^n k [display]
+integral_0^1 x dif x [display]
+integral.cont_C f dif z
+integral_M dif omega = integral_(partial M) omega [display]
+
+# Differential (Bug 1 regression)
+integral f(x) dif x [display]
+(diff f)/(diff x)
+dif y / dif x
+
+# Delimiters
+(x + y)
+[x + y]
+abs(x)
+norm(v)
+floor(x)
+ceil(x)
+lr((frac(a, b))) [display]
+lr(| frac(a, b) |) [display]
+
+# Auto-sizing fences (Bug 3 regression)
+(a/b)
+("softmax")((Q K^T) / sqrt(d_k)) V [display]
+P(A | B)
+lr((A | B))
+
+# Matrices / vectors / cases
+mat(1, 0; 0, 1) [display]
+mat(a, b; c, d) [display]
+vec(a, b, c) [display]
+cases(x "if" x > 0, -x "otherwise") [display]
+
+# Binomial
+binom(n, k) [display]
+
+# Styles
+cal(A)
+bb(R)
+frak(g)
+bold(x)
+italic(y)
+upright(d)
+
+# Accents
+hat(f)
+tilde(x)
+bar(x)
+dot(x)
+ddot(x)
+arrow(x)
+
+# Under/Over
+overbrace(a + b + c, "sum")
+underbrace(a b c, "prod")
+overline(x + y)
+
+# Text in math
+x "where" x > 0
+"if" x > 0 "then" 1 "else" 0
+
+# Spacing
+a thin b
+a quad b
+a wide b
+
+# Set notation
+x in RR
+A subset B
+A union B
+
+# Showcase
+x = frac(-b plus.minus sqrt(b^2 - 4 a c), 2 a) [display]
+e^(i pi) + 1 = 0
+sum_(k=0)^infinity x^k / k! = e^x [display]

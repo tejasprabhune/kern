@@ -4,7 +4,8 @@
   "type": "module",
   "scripts": {
     "gen-symbols": "tsx gen-symbols.ts",
-    "bench": "tsx bench.ts"
+    "bench": "tsx bench.ts",
+    "check-parity": "tsx check-parity.ts"
   },
   "devDependencies": {
     "tsx": "^4.7.2",
