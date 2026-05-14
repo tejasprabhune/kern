@@ -345,6 +345,11 @@ tr:last-child td {
   align-items: center;
   justify-content: center;
   font-size: 1.2rem;
+  overflow-x: auto;
+}
+
+#editor-output > math {
+  flex-shrink: 0;
 }
 
 .editor-toolbar {

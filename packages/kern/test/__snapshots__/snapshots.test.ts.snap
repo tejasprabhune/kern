@@ -56,7 +56,7 @@ exports[`MathML snapshots > bold 1`] = `"<math xmlns="http://www.w3.org/1998/Mat
 
 exports[`MathML snapshots > cal 1`] = `"<math xmlns="http://www.w3.org/1998/Math/MathML"><mstyle mathvariant="script"><mi>A</mi></mstyle></math>"`;
 
-exports[`MathML snapshots > cases 1`] = `"<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo form="prefix" stretchy="true">{</mo><mtable columnalign="left left" columnspacing="0.8em" rowspacing="0.4em"><mtr><mtd><mrow><mi>x</mi><mo>=</mo><mn>1</mn></mrow></mtd></mtr><mtr><mtd><mrow><mi>y</mi><mo>=</mo><mn>2</mn></mrow></mtd></mtr></mtable></mrow></math>"`;
+exports[`MathML snapshots > cases 1`] = `"<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="true">{</mo><mtable columnalign="left left"><mtr><mtd><mrow><mi>x</mi><mo>=</mo><mn>1</mn></mrow></mtd></mtr><mtr><mtd><mrow><mi>y</mi><mo>=</mo><mn>2</mn></mrow></mtd></mtr></mtable></mrow></math>"`;
 
 exports[`MathML snapshots > display-mode 1`] = `"<math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mfrac><mi>x</mi><mi>y</mi></mfrac></math>"`;
 
@@ -102,7 +102,7 @@ exports[`MathML snapshots > lr-paren 1`] = `"<math xmlns="http://www.w3.org/1998
 
 exports[`MathML snapshots > lt-eq 1`] = `"<math xmlns="http://www.w3.org/1998/Math/MathML"><mo>≤</mo></math>"`;
 
-exports[`MathML snapshots > mat-2x2 1`] = `"<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo form="prefix" stretchy="true">(</mo><mtable columnspacing="0.8em" rowspacing="0.4em"><mtr><mtd><mn>1</mn></mtd><mtd><mn>0</mn></mtd></mtr><mtr><mtd><mn>0</mn></mtd><mtd><mn>1</mn></mtd></mtr></mtable><mo form="postfix" stretchy="true">)</mo></mrow></math>"`;
+exports[`MathML snapshots > mat-2x2 1`] = `"<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="true" fence="true">(</mo><mtable><mtr><mtd><mn>1</mn></mtd><mtd><mn>0</mn></mtd></mtr><mtr><mtd><mn>0</mn></mtd><mtd><mn>1</mn></mtd></mtr></mtable><mo stretchy="true" fence="true">)</mo></mrow></math>"`;
 
 exports[`MathML snapshots > norm 1`] = `"<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="true" fence="true">‖</mo><mi>x</mi><mo stretchy="true" fence="true">‖</mo></mrow></math>"`;
 
@@ -138,4 +138,4 @@ exports[`MathML snapshots > upright 1`] = `"<math xmlns="http://www.w3.org/1998/
 
 exports[`MathML snapshots > variable 1`] = `"<math xmlns="http://www.w3.org/1998/Math/MathML"><mi>x</mi></math>"`;
 
-exports[`MathML snapshots > vec 1`] = `"<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo form="prefix" stretchy="true">(</mo><mtable columnspacing="0.8em" rowspacing="0.4em"><mtr><mtd><mi>a</mi></mtd></mtr><mtr><mtd><mi>b</mi></mtd></mtr><mtr><mtd><mi>c</mi></mtd></mtr></mtable><mo form="postfix" stretchy="true">)</mo></mrow></math>"`;
+exports[`MathML snapshots > vec 1`] = `"<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="true" fence="true">(</mo><mtable><mtr><mtd><mi>a</mi></mtd></mtr><mtr><mtd><mi>b</mi></mtd></mtr><mtr><mtd><mi>c</mi></mtd></mtr></mtable><mo stretchy="true" fence="true">)</mo></mrow></math>"`;

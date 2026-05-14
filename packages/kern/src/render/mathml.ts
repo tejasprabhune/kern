@@ -189,19 +189,16 @@ function renderMatrix(
     return `<mtr>${cells}</mtr>`;
   }).join('');
 
-  // Chromium's <mtable> defaults to zero column/row spacing, so cells
-  // collide visually (the identity matrix renders as `100/010/001`).
-  // Set explicit values that roughly match Typst's matrix defaults.
-  const tableAttrs = ' columnspacing="0.8em" rowspacing="0.4em"';
-
+  // MathML Core drops columnspacing/rowspacing as attributes; cell padding
+  // lives in CSS now (see kern.css "MathML output styling" block).
   if (kind === 'cases') {
-    return `<mrow><mo form="prefix" stretchy="true">{</mo><mtable columnalign="left left"${tableAttrs}>${tableRows}</mtable></mrow>`;
+    return `<mrow><mo stretchy="true">{</mo><mtable columnalign="left left">${tableRows}</mtable></mrow>`;
   }
 
-  const table = `<mtable${tableAttrs}>${tableRows}</mtable>`;
+  const table = `<mtable>${tableRows}</mtable>`;
   if (open || close) {
-    const o = open ? `<mo form="prefix" stretchy="true">${escapeHtml(open)}</mo>` : '';
-    const c = close ? `<mo form="postfix" stretchy="true">${escapeHtml(close)}</mo>` : '';
+    const o = open ? `<mo stretchy="true" fence="true">${escapeHtml(open)}</mo>` : '';
+    const c = close ? `<mo stretchy="true" fence="true">${escapeHtml(close)}</mo>` : '';
     return `<mrow>${o}${table}${c}</mrow>`;
   }
   return table;

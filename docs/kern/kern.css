@@ -254,3 +254,21 @@
   display: inline-block;
   width: 0;
 }
+
+/* ---- MathML output styling ----
+   Chromium MathML Core dropped the columnspacing/rowspacing attributes on
+   <mtable>, so a bare identity matrix renders as 100/010/001 with no
+   gaps. Padding the <mtd> cells via CSS works across Chromium, Firefox,
+   and Safari and roughly matches Typst's matrix spacing. */
+math mtable {
+  border-spacing: 0;
+}
+math mtd {
+  padding: 0.15em 0.4em;
+  text-align: center;
+}
+/* Cases tables (columnalign="left left") keep their left edge. */
+math mtable[columnalign~="left"] mtd {
+  text-align: left;
+  padding-right: 1em;
+}
