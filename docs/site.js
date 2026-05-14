@@ -8,7 +8,7 @@ const output = document.getElementById('editor-output');
 const displayToggle = document.getElementById('display-toggle');
 const permalinkBtn = document.getElementById('permalink-btn');
 
-let displayMode = false;
+let displayMode = displayToggle ? displayToggle.checked : true;
 let debounceTimer = null;
 
 function renderEditor() {
