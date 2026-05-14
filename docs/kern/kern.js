@@ -2095,20 +2095,30 @@ function xe(e, r, t, s, n) {
   return `<mrow>${l}${p(t, n)}${c}</mrow>`;
 }
 const $e = {
-  hat: "^",
-  tilde: "~",
+  hat: "ˆ",
+  // U+02C6 MODIFIER LETTER CIRCUMFLEX ACCENT
+  tilde: "˜",
+  // U+02DC SMALL TILDE
   dot: "˙",
+  // U+02D9 DOT ABOVE
   "dot.double": "¨",
+  // U+00A8 DIAERESIS
   "dot.triple": "⃛",
+  // U+20DB combining three dots above
   overline: "‾",
-  bar: "‾",
+  bar: "ˉ",
+  // U+02C9 MODIFIER LETTER MACRON
   arrow: "⃗",
+  // U+20D7 combining right arrow above
   "arrow.l": "⃖",
   "arrow.l.r": "⃡",
   breve: "˘",
-  grave: "`",
-  acute: "´",
-  macron: "¯",
+  grave: "ˋ",
+  // U+02CB MODIFIER LETTER GRAVE ACCENT
+  acute: "ˊ",
+  // U+02CA MODIFIER LETTER ACUTE ACCENT
+  macron: "ˉ",
+  // U+02C9
   caron: "ˇ",
   circle: "˚"
 };

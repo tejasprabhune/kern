@@ -274,21 +274,25 @@ function renderLR(open: string, close: string, body: AstNode, stretchy: boolean,
   return `<mrow>${openMo}${renderNode(body, ctx)}${closeMo}</mrow>`;
 }
 
+// Accent glyphs. Prefer the modifier-letter / accent-height characters
+// (U+02C6 etc.) over the ASCII typewriter versions (^, ~, `) — those sit at
+// caret height in most fonts and read as "stray symbol over the letter"
+// rather than as a proper math accent.
 const ACCENT_CHARS: Record<string, string> = {
-  hat: '^',
-  tilde: '~',
-  dot: '˙',
-  'dot.double': '¨',
-  'dot.triple': '⃛',
+  hat: 'ˆ',           // U+02C6 MODIFIER LETTER CIRCUMFLEX ACCENT
+  tilde: '˜',         // U+02DC SMALL TILDE
+  dot: '˙',           // U+02D9 DOT ABOVE
+  'dot.double': '¨',  // U+00A8 DIAERESIS
+  'dot.triple': '⃛',  // U+20DB combining three dots above
   overline: '‾',
-  bar: '‾',
-  arrow: '⃗',
+  bar: 'ˉ',           // U+02C9 MODIFIER LETTER MACRON
+  arrow: '⃗',          // U+20D7 combining right arrow above
   'arrow.l': '⃖',
   'arrow.l.r': '⃡',
   breve: '˘',
-  grave: '`',
-  acute: '´',
-  macron: '¯',
+  grave: 'ˋ',         // U+02CB MODIFIER LETTER GRAVE ACCENT
+  acute: 'ˊ',         // U+02CA MODIFIER LETTER ACUTE ACCENT
+  macron: 'ˉ',        // U+02C9
   caron: 'ˇ',
   circle: '˚',
 };
