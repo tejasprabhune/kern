@@ -16,12 +16,15 @@ export function escapeAttr(s: string): string {
 }
 
 // Maps a StyleKind to the MathML mathvariant attribute value.
+// `bold` resolves to `bold-italic` because Typst's `bold(x)` is a *weight*
+// switch that preserves the math italic of single-letter variables; using
+// plain `bold` would render `bold(v)` as an upright bold v.
 export function mathvariantForStyle(kind: string): string {
   switch (kind) {
     case 'cal': return 'script';
     case 'bb': return 'double-struck';
     case 'frak': return 'fraktur';
-    case 'bold': return 'bold';
+    case 'bold': return 'bold-italic';
     case 'italic': return 'italic';
     case 'upright': return 'normal';
     case 'sans': return 'sans-serif';

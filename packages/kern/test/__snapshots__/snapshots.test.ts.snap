@@ -52,7 +52,7 @@ exports[`MathML snapshots > binom 1`] = `"<math xmlns="http://www.w3.org/1998/Ma
 
 exports[`MathML snapshots > binop-seq 1`] = `"<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>x</mi><mo>+</mo><mi>y</mi><mo>-</mo><mi>z</mi></mrow></math>"`;
 
-exports[`MathML snapshots > bold 1`] = `"<math xmlns="http://www.w3.org/1998/Math/MathML"><mstyle mathvariant="bold"><mi>x</mi></mstyle></math>"`;
+exports[`MathML snapshots > bold 1`] = `"<math xmlns="http://www.w3.org/1998/Math/MathML"><mstyle mathvariant="bold-italic"><mi>x</mi></mstyle></math>"`;
 
 exports[`MathML snapshots > cal 1`] = `"<math xmlns="http://www.w3.org/1998/Math/MathML"><mstyle mathvariant="script"><mi>A</mi></mstyle></math>"`;
 

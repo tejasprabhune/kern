@@ -326,8 +326,12 @@ class Parser {
       return { type: 'spacing', kind };
     }
 
-    // Function call?
-    if (this.peek().kind === TK.LParen) {
+    // Only the *structural* names (frac, sqrt, mat, accents, style funcs,
+    // limits/scripts/op/class, etc.) take their parens as call syntax.
+    // Generic identifiers like `p`, `f`, `Psi`, or `clip` get resolved as
+    // symbols/operators/atoms first, and the trailing `(...)` is parsed as
+    // a separate paren group (math juxtaposition).
+    if (this.peek().kind === TK.LParen && isStructuralFunction(name)) {
       return this.parseCall(name);
     }
 
@@ -692,6 +696,24 @@ function mirrorDelimiter(open: string): string {
 
 function isAddOpText(text: string): boolean {
   return isAddOp(text);
+}
+
+// Names that consume their following `(...)` as call syntax. Anything else
+// (a generic identifier like `p`, a symbol like `Psi`, or even a named
+// operator like `sin`) treats the parens as a math paren group instead.
+function isStructuralFunction(name: string): boolean {
+  if (name === 'frac' || name === 'sqrt' || name === 'root') return true;
+  if (name === 'binom' || name === 'lr' || name === 'mid') return true;
+  if (name === 'op' || name === 'class') return true;
+  if (name === 'limits' || name === 'scripts') return true;
+  if (name === 'cancel' || name === 'bcancel' || name === 'xcancel') return true;
+  if (name in SIZE_FUNCS) return true;
+  if (name in UNDEROVER_MAP) return true;
+  if (name in LR_MAP) return true;
+  if (ACCENT_NAMES.has(name)) return true;
+  if (STYLE_FUNCS.has(name)) return true;
+  if (MATRIX_FUNCS.has(name)) return true;
+  return false;
 }
 
 // Re-export so the auto-render utility can probe operator names.
