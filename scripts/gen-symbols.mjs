@@ -185,18 +185,12 @@ const OVERRIDES = {
   // module's default character, which for dots is `…` (HORIZONTAL
   // ELLIPSIS). Wire that explicitly so `a, b, dots, n` works.
   dots: '…',
-  // Angle brackets. The pinned codex commit doesn't have these; newer
-  // codex moved them under `chevron.l`/`.r` and Typst's library exposes
-  // `angle.l`/`.r` as deprecated-but-supported aliases. Add both
-  // spellings so kern accepts the form users actually write.
+  // angle.l / angle.r are deprecated-but-supported aliases in Typst's
+  // runtime (they map to chevron.l / chevron.r). The codex doesn't
+  // export them, so add the aliases here so kern accepts the form
+  // users still type today.
   'angle.l': '⟨',
   'angle.r': '⟩',
-  'chevron.l': '⟨',
-  'chevron.r': '⟩',
-  'chevron.l.double': '⟪',
-  'chevron.r.double': '⟫',
-  'chevron.l.curly': '⧼',
-  'chevron.r.curly': '⧽',
   // Spacing tokens stored as empty strings; the parser turns them into
   // <mspace> nodes.
   thin: '',

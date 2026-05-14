@@ -241,6 +241,8 @@ const O = {
   "and.double": "⩓",
   angle: "∠",
   "angle.acute": "⦟",
+  "angle.l": "⟨",
+  "angle.r": "⟩",
   "angle.arc": "∡",
   "angle.arc.rev": "⦛",
   "angle.azimuth": "⍼",
