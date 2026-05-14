@@ -180,6 +180,11 @@ const OVERRIDES = {
   hbar: 'ℏ',
   infty: '∞',
   emptyset: '∅',
+  // codex's `dots` module has submodules (dots.h, dots.v, ...) but
+  // doesn't export a bare `dots`. Typst's math layer falls back to the
+  // module's default character, which for dots is `…` (HORIZONTAL
+  // ELLIPSIS). Wire that explicitly so `a, b, dots, n` works.
+  dots: '…',
   // Spacing tokens stored as empty strings; the parser turns them into
   // <mspace> nodes.
   thin: '',

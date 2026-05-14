@@ -615,6 +615,7 @@ const re = {
   "dot.triple": "⃛",
   "dotless.i": "ı",
   "dotless.j": "ȷ",
+  dots: "…",
   "dots.down": "⋱",
   "dots.h": "…",
   "dots.h.c": "⋯",

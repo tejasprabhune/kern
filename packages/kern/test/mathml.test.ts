@@ -253,6 +253,12 @@ describe('MathML renderer', () => {
     expect(out).toContain('--kern-row-gap:0.5em');
     expect(out).not.toContain('--kern-column-gap');
   });
+
+  it('bare dots renders as a horizontal ellipsis', () => {
+    const out = ml('a + b + dots + n');
+    expect(out).toContain('…');
+    expect(out).not.toMatch(/<mi[^>]*>dots<\/mi>/);
+  });
 });
 
 describe('renderToString error handling', () => {
