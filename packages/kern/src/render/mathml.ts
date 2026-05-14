@@ -191,24 +191,50 @@ function renderBaseForAttach(base: AstNode, ctx: RenderCtx): string {
 }
 
 // Chrome's MathML doesn't apply italic correction from the font's MATH
-// table, so accents over italic letters drift left and scripts on italic
-// letters drift left. Append a small <mspace> after italic single-letter
-// bases so their bounding box catches up to the visual right edge. Firefox
-// and Safari already correct for this; the mspace is harmless there.
-function isItalicSingleLetter(node: AstNode): boolean {
-  if (node.type === 'atom') return node.italic === true && node.text.length === 1;
-  if (node.type === 'symbol') {
-    // Greek letters and the script-letter Unicode blocks render italic by
-    // default and benefit from the same correction.
-    const cp = node.char.codePointAt(0) ?? 0;
-    return (cp >= 0x03B1 && cp <= 0x03C9) || (cp >= 0x1D400 && cp <= 0x1D7FF);
+// table, so accents and scripts on italic letters drift left. Append a
+// small <mspace> after italic single-letter bases so the bounding box
+// catches up to the visual right edge. Firefox and Safari were already
+// applying this much correction from the font; the mspace is a no-op
+// for them.
+//
+// Per-letter values are calibrated against Computer Modern italic. The
+// notable outlier is italic `f`, whose extreme right-lean needs nearly
+// twice the default.
+const ITALIC_CORRECTION_EM: Record<string, number> = {
+  f: 0.16,
+  j: 0.10,
+  l: 0.08,
+  t: 0.08,
+  d: 0.06,
+  g: 0.06,
+  p: 0.06,
+  q: 0.06,
+  y: 0.06,
+  // Capital italics with strong right lean.
+  A: 0.08, F: 0.08, J: 0.10, T: 0.08, V: 0.10, W: 0.10, Y: 0.10,
+};
+const DEFAULT_ITALIC_CORRECTION_EM = 0.04;
+
+function italicCorrectionFor(node: AstNode): number {
+  if (node.type === 'atom' && node.italic === true && node.text.length === 1) {
+    return ITALIC_CORRECTION_EM[node.text] ?? DEFAULT_ITALIC_CORRECTION_EM;
   }
-  return false;
+  if (node.type === 'symbol') {
+    const cp = node.char.codePointAt(0) ?? 0;
+    // Greek lowercase (α–ω) and the math italic alphanumerics carry a
+    // similar slant; a single mid-range value covers them since per-glyph
+    // tuning has diminishing returns past the worst Latin offenders.
+    if ((cp >= 0x03B1 && cp <= 0x03C9) || (cp >= 0x1D400 && cp <= 0x1D7FF)) {
+      return DEFAULT_ITALIC_CORRECTION_EM;
+    }
+  }
+  return 0;
 }
 
 function withItalicCorrection(html: string, base: AstNode): string {
-  if (!isItalicSingleLetter(base)) return html;
-  return `<mrow>${html}<mspace width="0.08em"/></mrow>`;
+  const em = italicCorrectionFor(base);
+  if (em === 0) return html;
+  return `<mrow>${html}<mspace width="${em}em"/></mrow>`;
 }
 
 function renderMatrix(
