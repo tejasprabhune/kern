@@ -2,7 +2,8 @@
   "name": "kern-workspace",
   "private": true,
   "scripts": {
-    "build": "pnpm -r build",
+    "build": "pnpm -r build && pnpm run sync-docs",
+    "sync-docs": "cp packages/kern/dist/kern.js docs/kern/kern.js && cp packages/kern/styles/kern.css docs/kern/kern.css && cp packages/kern/styles/kern-newcm.css docs/kern/kern-newcm.css",
     "test": "pnpm -r test",
     "typecheck": "pnpm -r typecheck",
     "lint": "pnpm -r lint",

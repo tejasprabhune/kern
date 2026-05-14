@@ -272,3 +272,31 @@ math mtable[columnalign~="left"] mtd {
   text-align: left;
   padding-right: 1em;
 }
+
+/* Multi-line equation arrays. Columns alternate right/left so
+   `a &= b + c \ &= d` lands with each `&` glued to the equals sign,
+   matching Typst's aligned-equation layout. */
+math mtable.kern-eqarray.kern-aligned mtd {
+  padding: 0.25em 0;
+  text-align: right;
+}
+math mtable.kern-eqarray.kern-aligned mtd:nth-child(even) {
+  text-align: left;
+}
+
+/* `gap:` / `row-gap:` / `column-gap:` on `mat()`. The renderer drops the
+   em values into CSS custom properties; mtd padding picks them up. */
+math mtable.kern-gap mtd {
+  padding-top: calc(var(--kern-row-gap, 0.15em) / 2);
+  padding-bottom: calc(var(--kern-row-gap, 0.15em) / 2);
+  padding-left: calc(var(--kern-column-gap, 0.4em) / 2);
+  padding-right: calc(var(--kern-column-gap, 0.4em) / 2);
+}
+
+/* Augment rules: thin lines drawn between cells. */
+math mtd.kern-augment-right {
+  border-right: 1px solid currentColor;
+}
+math mtd.kern-augment-bottom {
+  border-bottom: 1px solid currentColor;
+}
