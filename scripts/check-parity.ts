@@ -1,25 +1,16 @@
 // Structural parity check between kern's MathML output and Typst's.
 //
-// Reads tests/corpus.txt, renders each entry through kern, and (when the
-// Typst CLI exposes MathML output via `typst compile --features html
-// --format html`) renders it through Typst as well, then runs a structural
-// diff on the two MathML trees.
-//
-// Typst 0.14.2 ships the MathML emitter at
-// crates/typst-html/src/mathml.rs but does not yet wire it up to the
-// public HTML export (equations are dropped with a warning). Until that
-// lands the script runs in kern-only mode: it emits a report listing
-// kern's MathML for every corpus entry so a human can audit it against
-// Typst's PDF output side by side. The structural-diff codepath stays in
-// place so the moment Typst exposes the export, plugging it in is a
-// one-line change in `runTypst`.
+// Reads tests/corpus.txt, renders each entry through kern and through
+// `typst compile --features html` (Typst 0.15+ exports equations as
+// MathML), then runs a structural diff on the two MathML trees. Without
+// a new enough Typst on PATH it falls back to a kern-only report.
 
 import {
   readFileSync, writeFileSync, mkdirSync, existsSync,
 } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { execFileSync, spawnSync } from 'node:child_process';
+import { spawnSync } from 'node:child_process';
 
 import { renderToString } from '../packages/kern/src/index.js';
 import { NAMED_OPERATORS } from '../packages/kern/src/symbols.js';
@@ -48,26 +39,19 @@ function readCorpus(): Entry[] {
   return entries;
 }
 
-function hasTypstMathml(): boolean {
-  const probe = spawnSync('typst', ['--version'], { stdio: 'ignore' });
-  if (probe.status !== 0) return false;
-  try {
-    execFileSync('typst', ['compile', '--features', 'html', '--format', 'html',
-      '-', '-'], { input: '$x$', stdio: ['pipe', 'pipe', 'pipe'] });
-    // Even if it succeeds, the equation is currently dropped with a
-    // warning. Detect that by looking for an empty body.
-    return false;
-  } catch {
-    return false;
-  }
+function typstHtml(src: string): string | null {
+  const res = spawnSync('typst', ['compile', '--features', 'html', '--format', 'html', '-', '-'],
+    { input: src, encoding: 'utf8' });
+  return res.status === 0 ? res.stdout : null;
 }
 
-function runTypst(_entry: Entry): string | null {
-  // Placeholder. When `typst compile --features html` starts emitting
-  // <math>...</math> for equations, render `$<entry.src>$` to HTML,
-  // grep out the math element, and return it. Until then we report a
-  // missing oracle and the structural diff is skipped.
-  return null;
+function hasTypstMathml(): boolean {
+  return typstHtml('$x$')?.includes('<math') ?? false;
+}
+
+function runTypst(entry: Entry): string | null {
+  const src = entry.display ? `$ ${entry.src} $` : `$${entry.src}$`;
+  return typstHtml(src)?.match(/<math[\s>][\s\S]*<\/math>/)?.[0] ?? null;
 }
 
 // Tiny MathML parser sufficient for structural comparison. We don't want
@@ -142,6 +126,11 @@ function parseMathml(xml: string): MNode {
         children.push(child);
       }
     }
+    // A lone <mrow> child is implied by its parent (math, mtd, msqrt, ...),
+    // so hoist its children. kern wraps the top level in one, Typst doesn't.
+    if (children.length === 1 && children[0]!.tag === 'mrow') {
+      return { tag, attrs, children: children[0]!.children, text: children[0]!.text };
+    }
     return { tag, attrs, children, text: text.trim() };
   }
   return parseNode();
@@ -160,8 +149,9 @@ function diff(a: MNode, b: MNode, path: string, out: DiffMsg[]): void {
     out.push({ path, msg: `tag ${a.tag} != ${b.tag}` });
     return;
   }
-  const text = a.text.replace(/\s+/g, '');
-  const otherText = b.text.replace(/\s+/g, '');
+  // NFKC so Typst's math italic letters compare equal to kern's plain ones.
+  const text = a.text.normalize('NFKC').replace(/\s+/g, '');
+  const otherText = b.text.normalize('NFKC').replace(/\s+/g, '');
   if (text !== otherText) {
     out.push({ path: `${path}/${a.tag}`, msg: `text "${text}" != "${otherText}"` });
   }
@@ -221,6 +211,11 @@ interface Row {
   error?: string;
 }
 
+// Typst doesn't emit the source annotation, so unwrap kern's before diffing.
+function stripAnnotation(mathml: string): string {
+  return mathml.replace(/<semantics><mrow>([\s\S]*)<\/mrow><annotation[\s\S]*?<\/annotation><\/semantics>/, '$1');
+}
+
 function checkOne(entry: Entry, oracleAvailable: boolean): Row {
   let kernMathml = '';
   try {
@@ -245,7 +240,7 @@ function checkOne(entry: Entry, oracleAvailable: boolean): Row {
   }
   const diffs: DiffMsg[] = [];
   try {
-    const a = parseMathml(kernMathml);
+    const a = parseMathml(stripAnnotation(kernMathml));
     const b = parseMathml(typstMathml);
     diff(a, b, '', diffs);
   } catch (e) {
@@ -279,7 +274,7 @@ function renderReport(rows: Row[], oracleAvailable: boolean): string {
   <td class="rendered">${r.kernMathml}</td>
   <td class="status ${r.status}">${r.status}</td>
   <td class="kern-mathml"><pre>${escapeHtml(r.kernMathml)}</pre></td>
-  <td class="typst-mathml">${r.typstMathml === null ? '<em>oracle unavailable</em>' : `<pre>${escapeHtml(r.typstMathml)}</pre>`}</td>
+  <td class="typst-mathml">${r.typstMathml === null ? (oracleAvailable ? '<em>typst rejected this input</em>' : '<em>oracle unavailable</em>') : `<pre>${escapeHtml(r.typstMathml)}</pre>`}</td>
   <td class="notes">${diffsHtml}</td>
 </tr>`;
   }).join('\n');
@@ -321,7 +316,7 @@ function renderReport(rows: Row[], oracleAvailable: boolean): string {
     <span class="pill fail">${counts.fail} fail</span>
     <span class="pill kern-only">${counts['kern-only']} kern-only</span>
     <span class="pill error">${counts.error} error</span>
-    &nbsp;&nbsp;${oracleAvailable ? 'Typst MathML oracle: <strong>available</strong>' : 'Typst MathML oracle: <strong>unavailable</strong> (Typst 0.14.2 has not yet exposed equation HTML export; see <code>crates/typst-html/src/mathml.rs</code>).'}
+    &nbsp;&nbsp;${oracleAvailable ? 'Typst MathML oracle: <strong>available</strong>' : 'Typst MathML oracle: <strong>unavailable</strong> (needs Typst 0.15+ on PATH).'}
   </p>
   <table>
     <thead>

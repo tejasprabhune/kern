@@ -12,6 +12,11 @@ describe('MathML renderer', () => {
     expect(out).toContain('</math>');
   });
 
+  it('keeps the Typst source as an annotation', () => {
+    const out = ml('a < b');
+    expect(out).toContain('<annotation encoding="application/x-typst">a &lt; b</annotation>');
+  });
+
   it('adds display="block" in display mode', () => {
     const out = ml('x', true);
     expect(out).toContain('display="block"');

@@ -2071,9 +2071,9 @@ function $e(e, r) {
   const t = xe(e);
   return r.inStretchyLR && (t === "|" || t === "‖") ? `<mo stretchy="true" symmetric="true">${u(t)}</mo>` : `<mo>${u(t)}</mo>`;
 }
-function M(e, r) {
-  const s = d(e, { display: r, scriptLevel: 0 });
-  return `<math xmlns="http://www.w3.org/1998/Math/MathML"${r ? ' display="block"' : ""}>${s}</math>`;
+function M(e, r, t) {
+  const n = d(e, { display: r, scriptLevel: 0 }), a = r ? ' display="block"' : "", i = `<annotation encoding="application/x-typst">${u(t)}</annotation>`;
+  return `<math xmlns="http://www.w3.org/1998/Math/MathML"${a}><semantics><mrow>${n}</mrow>${i}</semantics></math>`;
 }
 function d(e, r) {
   switch (e.type) {
@@ -2535,10 +2535,10 @@ function br(e, r) {
   try {
     const s = he(e), n = t.displayMode, a = t.output;
     if (a === "mathml")
-      return M(s, n);
+      return M(s, n, e);
     if (a === "html")
       return D(s, n);
-    const i = M(s, n), l = D(s, n);
+    const i = M(s, n, e), l = D(s, n);
     return `<span class="${n ? "kern kern-display" : "kern kern-inline"}" aria-hidden="true">${l}</span>${i}`;
   } catch (s) {
     if (s instanceof y) {

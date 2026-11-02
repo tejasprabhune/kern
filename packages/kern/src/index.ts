@@ -32,13 +32,13 @@ export function renderToString(source: string, options?: KernOptions): string {
     const output = opts.output;
 
     if (output === 'mathml') {
-      return renderMathML(ast, display);
+      return renderMathML(ast, display, source);
     }
     if (output === 'html') {
       return renderHTML(ast, display);
     }
     // htmlAndMathml: wrap both
-    const mathml = renderMathML(ast, display);
+    const mathml = renderMathML(ast, display, source);
     const html = renderHTML(ast, display);
     const cls = display ? 'kern kern-display' : 'kern kern-inline';
     return `<span class="${cls}" aria-hidden="true">${html}</span>${mathml}`;
