@@ -42,11 +42,15 @@ function renderOperator(text: string, ctx: RenderCtx): string {
   return `<mo>${escapeHtml(t)}</mo>`;
 }
 
-export function renderMathML(node: AstNode, display: boolean): string {
+export function renderMathML(node: AstNode, display: boolean, source: string): string {
   const ctx: RenderCtx = { display, scriptLevel: 0 };
   const inner = renderNode(node, ctx);
   const displayAttr = display ? ' display="block"' : '';
-  return `<math xmlns="http://www.w3.org/1998/Math/MathML"${displayAttr}>${inner}</math>`;
+  // Keep the Typst source alongside the rendered tree, like KaTeX does
+  // with application/x-tex, so copy tools and screen readers can get it.
+  const annotation = `<annotation encoding="application/x-typst">${escapeHtml(source)}</annotation>`;
+  return `<math xmlns="http://www.w3.org/1998/Math/MathML"${displayAttr}>`
+    + `<semantics><mrow>${inner}</mrow>${annotation}</semantics></math>`;
 }
 
 function renderNode(node: AstNode, ctx: RenderCtx): string {
